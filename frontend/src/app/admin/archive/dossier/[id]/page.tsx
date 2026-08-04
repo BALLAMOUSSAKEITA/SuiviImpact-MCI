@@ -8,8 +8,6 @@ import { toast } from "sonner";
 import { ChevronRight, Folder, File } from "lucide-react";
 
 import { useAuth } from "@/components/auth-provider";
-import { ProtectedRoute } from "@/components/protected-route";
-import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import {
   createDossier,
@@ -21,11 +19,7 @@ import {
 } from "@/lib/api";
 
 export default function ArchiveDossierPage() {
-  return (
-    <ProtectedRoute>
-      <DossierContent />
-    </ProtectedRoute>
-  );
+  return <DossierContent />;
 }
 
 function DossierContent() {
@@ -105,9 +99,7 @@ function DossierContent() {
   };
 
   return (
-    <div className="flex min-h-screen bg-paper">
-      <Sidebar />
-      <main className="flex-1 space-y-6 p-8">
+    <>
         <div>
           <nav className="flex flex-wrap items-center gap-1 text-sm text-fog">
             <Link href="/admin/archive" className="hover:text-forest-ink">
@@ -289,7 +281,6 @@ function DossierContent() {
               )}
           </div>
         )}
-      </main>
-    </div>
+    </>
   );
 }

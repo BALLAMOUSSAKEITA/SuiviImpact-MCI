@@ -9,7 +9,6 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import { ProtectedRoute } from "@/components/protected-route";
-import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { createUser } from "@/lib/api";
@@ -53,9 +52,7 @@ function NouveauCompteContent() {
   });
 
   return (
-    <div className="flex min-h-screen bg-paper">
-      <Sidebar />
-      <main className="flex-1 p-8">
+    <>
         <Card className="mx-auto max-w-lg">
           <CardHeader>
             <CardTitle>Nouveau compte</CardTitle>
@@ -115,8 +112,7 @@ function NouveauCompteContent() {
             </form>
           </CardContent>
         </Card>
-      </main>
-    </div>
+    </>
   );
 }
 

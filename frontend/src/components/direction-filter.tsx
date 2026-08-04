@@ -22,15 +22,15 @@ export function DirectionFilter({
   });
 
   return (
-    <div className={cn("flex items-center gap-2", className)}>
-      <label htmlFor="direction-filter" className="text-sm text-slate">
+    <div className={cn("flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center", className)}>
+      <label htmlFor="direction-filter" className="shrink-0 text-sm text-slate">
         Direction :
       </label>
       <select
         id="direction-filter"
         value={value ?? ""}
         onChange={(e) => onChange(e.target.value || null)}
-        className="input-grain w-auto min-w-[200px]"
+        className="input-grain w-full sm:w-auto sm:min-w-[200px]"
       >
         <option value="">Toutes</option>
         {directions.map((d) => (

@@ -41,7 +41,12 @@ const navItems = [
   { href: "/admin/comptes", label: "Comptes", icon: Users, adminOnly: true },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  mobileOpen?: boolean;
+  onNavigate?: () => void;
+}
+
+export function Sidebar({ mobileOpen = false, onNavigate }: SidebarProps) {
   const pathname = usePathname();
   const { user, isAdmin, logout } = useAuth();
 
@@ -50,8 +55,19 @@ export function Sidebar() {
     return pathname === href || pathname.startsWith(`${href}/`);
   };
 
+  const handleLogout = () => {
+    onNavigate?.();
+    logout();
+  };
+
   return (
-    <aside className="flex w-64 shrink-0 flex-col border-r border-cloud bg-paper">
+    <aside
+      className={cn(
+        "flex w-64 shrink-0 flex-col border-r border-cloud bg-paper",
+        "fixed inset-y-0 left-0 z-50 transition-transform duration-300 ease-in-out lg:static lg:translate-x-0",
+        mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
+      )}
+    >
       <div className="border-b border-cloud px-5 py-5">
         <p className="text-[10px] font-medium uppercase leading-tight tracking-wide text-fog">
           {BRAND.ministryShort}
@@ -73,6 +89,7 @@ export function Sidebar() {
             <Link
               key={href}
               href={defaultChild ?? href}
+              onClick={onNavigate}
               className={cn(
                 "flex items-center gap-3 rounded-card px-3 py-2 text-sm font-medium transition-colors",
                 isActive(href)
@@ -87,7 +104,7 @@ export function Sidebar() {
       </nav>
 
       <div className="border-t border-cloud p-4">
-        <Button variant="ghost" className="w-full justify-start gap-2" onClick={logout}>
+        <Button variant="ghost" className="w-full justify-start gap-2" onClick={handleLogout}>
           <LogOut className="h-4 w-4" />
           Déconnexion
         </Button>

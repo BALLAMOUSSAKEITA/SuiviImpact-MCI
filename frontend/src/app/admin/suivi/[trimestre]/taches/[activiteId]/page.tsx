@@ -8,18 +8,12 @@ import { toast } from "sonner";
 
 import { useAuth } from "@/components/auth-provider";
 import { TacheStatutBadge } from "@/components/execution-badge";
-import { ProtectedRoute } from "@/components/protected-route";
-import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import { finaliserTache, listTachesSuivi } from "@/lib/api";
 import { DEFAULT_ANNEE, type Tache } from "@/types";
 
 export default function SuiviTachesPage() {
-  return (
-    <ProtectedRoute>
-      <SuiviTachesContent />
-    </ProtectedRoute>
-  );
+  return <SuiviTachesContent />;
 }
 
 function SuiviTachesContent() {
@@ -59,9 +53,7 @@ function SuiviTachesContent() {
   });
 
   return (
-    <div className="flex min-h-screen bg-paper">
-      <Sidebar />
-      <main className="flex-1 space-y-6 p-8">
+    <>
         <div>
           <Link
             href={`/admin/suivi/${trimestre}`}
@@ -69,13 +61,13 @@ function SuiviTachesContent() {
           >
             ← Retour suivi T{trimestre}
           </Link>
-          <h1 className="mt-2 text-2xl font-bold text-graphite">
+          <h1 className="mt-2 text-xl font-bold text-graphite sm:text-2xl">
             Tâches — Activité #{activiteId} — T{trimestre}
           </h1>
         </div>
 
-        <div className="overflow-hidden rounded-card border border-cloud bg-paper shadow-sm">
-          <table className="min-w-full divide-y divide-cloud text-sm">
+        <div className="table-shell">
+          <table className="table-grain min-w-[560px]">
             <thead className="bg-paper">
               <tr>
                 <th className="px-4 py-3 text-left font-medium text-slate">
@@ -184,7 +176,6 @@ function SuiviTachesContent() {
             </div>
           </div>
         )}
-      </main>
-    </div>
+    </>
   );
 }

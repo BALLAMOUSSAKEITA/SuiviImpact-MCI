@@ -1,7 +1,5 @@
 import Link from "next/link";
 
-import { ProtectedRoute } from "@/components/protected-route";
-import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -15,32 +13,27 @@ const DASHBOARDS = [
 
 export default function StatsHubPage() {
   return (
-    <ProtectedRoute>
-      <div className="flex min-h-screen bg-paper">
-        <Sidebar />
-        <main className="flex-1 p-8">
-          <h1 className="text-2xl font-bold text-graphite">Statistiques</h1>
-          <p className="mt-2 text-slate">
-            Tableaux de bord et indicateurs de suivi — BSD MIPME.
-          </p>
+    <>
+      <h1 className="text-xl font-bold text-graphite sm:text-2xl">Statistiques</h1>
+      <p className="mt-2 text-slate">
+        Tableaux de bord et indicateurs de suivi — BSD MIPME.
+      </p>
 
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {DASHBOARDS.map(({ href, label, desc }) => (
-              <Card key={href}>
-                <CardHeader>
-                  <CardTitle className="text-lg">{label}</CardTitle>
-                  <p className="text-sm text-fog">{desc}</p>
-                </CardHeader>
-                <CardContent>
-                  <Link href={href}>
-                    <Button variant="outline">Consulter</Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </main>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {DASHBOARDS.map(({ href, label, desc }) => (
+          <Card key={href}>
+            <CardHeader>
+              <CardTitle className="text-lg">{label}</CardTitle>
+              <p className="text-sm text-fog">{desc}</p>
+            </CardHeader>
+            <CardContent>
+              <Link href={href}>
+                <Button variant="outline">Consulter</Button>
+              </Link>
+            </CardContent>
+          </Card>
+        ))}
       </div>
-    </ProtectedRoute>
+    </>
   );
 }

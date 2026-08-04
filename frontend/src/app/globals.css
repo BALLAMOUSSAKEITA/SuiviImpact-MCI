@@ -92,6 +92,7 @@ body {
 
 .table-grain {
   width: 100%;
+  min-width: 480px;
   font-size: 0.875rem;
   letter-spacing: -0.42px;
 }
@@ -101,10 +102,17 @@ body {
 }
 
 .table-grain th {
-  padding: 0.75rem 1rem;
+  padding: 0.625rem 0.75rem;
   text-align: left;
   font-weight: 500;
   color: var(--color-fog);
+  white-space: nowrap;
+}
+
+@media (min-width: 640px) {
+  .table-grain th {
+    padding: 0.75rem 1rem;
+  }
 }
 
 .table-grain tbody tr {
@@ -116,12 +124,19 @@ body {
 }
 
 .table-grain td {
-  padding: 0.75rem 1rem;
+  padding: 0.625rem 0.75rem;
   color: var(--color-slate);
 }
 
+@media (min-width: 640px) {
+  .table-grain td {
+    padding: 0.75rem 1rem;
+  }
+}
+
 .table-shell {
-  overflow: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   border-radius: var(--radius-card);
   border: 1px solid var(--color-cloud);
   background-color: var(--color-paper);
@@ -132,8 +147,14 @@ body {
   border-radius: var(--radius-card);
   border: 1px solid var(--color-cloud);
   background-color: var(--color-paper);
-  padding: 1.5rem;
+  padding: 1rem;
   box-shadow: var(--shadow-card);
+}
+
+@media (min-width: 640px) {
+  .panel-grain {
+    padding: 1.5rem;
+  }
 }
 
 .badge-grain {

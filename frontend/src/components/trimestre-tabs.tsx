@@ -16,7 +16,7 @@ export function TrimestreTabs({
   className,
 }: TrimestreTabsProps) {
   return (
-    <div className={cn("flex gap-2", className)}>
+    <div className={cn("flex flex-wrap gap-2", className)}>
       {[1, 2, 3, 4].map((t) => {
         const href = `${basePath}/${t}`;
         const isActive = currentTrimestre === t;

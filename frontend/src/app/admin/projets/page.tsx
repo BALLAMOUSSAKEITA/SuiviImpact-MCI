@@ -6,18 +6,12 @@ import { toast } from "sonner";
 
 import { useAuth } from "@/components/auth-provider";
 import { ExecutionBadge } from "@/components/execution-badge";
-import { ProtectedRoute } from "@/components/protected-route";
-import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import { createProjet, deleteProjet, listProjets, updateProjet } from "@/lib/api";
 import type { Projet } from "@/types";
 
 export default function ProjetsPage() {
-  return (
-    <ProtectedRoute>
-      <ProjetsContent />
-    </ProtectedRoute>
-  );
+  return <ProjetsContent />;
 }
 
 function ProjetsContent() {
@@ -134,10 +128,8 @@ function ProjetsContent() {
   };
 
   return (
-    <div className="flex min-h-screen bg-paper">
-      <Sidebar />
-      <main className="flex-1 space-y-6 p-8">
-        <div className="flex items-center justify-between">
+    <>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-graphite">Projets</h1>
             <p className="mt-1 text-sm text-fog">
@@ -229,8 +221,8 @@ function ProjetsContent() {
           </form>
         )}
 
-        <div className="overflow-hidden rounded-card border border-cloud bg-paper shadow-sm">
-          <table className="min-w-full divide-y divide-cloud text-sm">
+        <div className="table-shell">
+          <table className="table-grain min-w-[640px]">
             <thead className="bg-paper">
               <tr>
                 <th className="px-4 py-3 text-left font-medium text-slate">Projet</th>
@@ -263,7 +255,7 @@ function ProjetsContent() {
                   </td>
                   <td className="px-4 py-3 text-right">
                     {canWrite && (
-                      <div className="flex justify-end gap-2">
+                      <div className="flex flex-wrap justify-end gap-1 sm:gap-2">
                         <Button
                           variant="outline"
                           className="h-8 px-3 text-xs"
@@ -290,7 +282,6 @@ function ProjetsContent() {
             </tbody>
           </table>
         </div>
-      </main>
-    </div>
+    </>
   );
 }

@@ -7,19 +7,13 @@ import { useState } from "react";
 
 import { DirectionFilter } from "@/components/direction-filter";
 import { ExecutionBadge } from "@/components/execution-badge";
-import { ProtectedRoute } from "@/components/protected-route";
-import { Sidebar } from "@/components/sidebar";
 import { TrimestreTabs } from "@/components/trimestre-tabs";
 import { Button } from "@/components/ui/button";
 import { getPlanification } from "@/lib/api";
 import { DEFAULT_ANNEE } from "@/types";
 
 export default function PlanificationTrimestrePage() {
-  return (
-    <ProtectedRoute>
-      <PlanificationContent />
-    </ProtectedRoute>
-  );
+  return <PlanificationContent />;
 }
 
 function PlanificationContent() {
@@ -34,11 +28,9 @@ function PlanificationContent() {
   });
 
   return (
-    <div className="flex min-h-screen bg-paper">
-      <Sidebar />
-      <main className="flex-1 space-y-6 p-8">
+    <>
         <div>
-          <h1 className="text-2xl font-bold text-graphite">
+          <h1 className="text-xl font-bold text-graphite sm:text-2xl">
             Planification — T{trimestre} {DEFAULT_ANNEE}
           </h1>
           <p className="mt-1 text-sm text-fog">
@@ -46,7 +38,7 @@ function PlanificationContent() {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
           <TrimestreTabs
             basePath="/admin/planification"
             currentTrimestre={trimestre}
@@ -54,8 +46,8 @@ function PlanificationContent() {
           <DirectionFilter value={direction} onChange={setDirection} />
         </div>
 
-        <div className="overflow-hidden rounded-card border border-cloud bg-paper shadow-sm">
-          <table className="min-w-full divide-y divide-cloud text-sm">
+        <div className="table-shell">
+          <table className="table-grain min-w-[720px]">
             <thead className="bg-paper">
               <tr>
                 <th className="px-4 py-3 text-left font-medium text-slate">Code</th>
@@ -104,7 +96,6 @@ function PlanificationContent() {
             </tbody>
           </table>
         </div>
-      </main>
-    </div>
+    </>
   );
 }

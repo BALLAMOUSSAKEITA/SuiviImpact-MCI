@@ -3,8 +3,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { ProtectedRoute } from "@/components/protected-route";
-import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { downloadExport } from "@/lib/api";
@@ -20,11 +18,7 @@ const EXPORTS: { type: ExportType; label: string; desc: string }[] = [
 ];
 
 export default function ExportPage() {
-  return (
-    <ProtectedRoute>
-      <ExportContent />
-    </ProtectedRoute>
-  );
+  return <ExportContent />;
 }
 
 function ExportContent() {
@@ -43,9 +37,7 @@ function ExportContent() {
   };
 
   return (
-    <div className="flex min-h-screen bg-paper">
-      <Sidebar />
-      <main className="flex-1 p-8">
+    <>
         <h1 className="text-2xl font-bold text-graphite">Exports Excel</h1>
         <p className="mt-2 text-slate">
           Téléchargez les données au format .xlsx
@@ -70,7 +62,6 @@ function ExportContent() {
             </Card>
           ))}
         </div>
-      </main>
-    </div>
+    </>
   );
 }

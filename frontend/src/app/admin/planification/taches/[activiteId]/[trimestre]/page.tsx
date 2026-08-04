@@ -8,8 +8,6 @@ import { toast } from "sonner";
 
 import { useAuth } from "@/components/auth-provider";
 import { TacheStatutBadge } from "@/components/execution-badge";
-import { ProtectedRoute } from "@/components/protected-route";
-import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import {
   createTache,
@@ -26,11 +24,7 @@ import {
 } from "@/types";
 
 export default function PlanificationTachesPage() {
-  return (
-    <ProtectedRoute>
-      <TachesContent />
-    </ProtectedRoute>
-  );
+  return <TachesContent />;
 }
 
 function TachesContent() {
@@ -161,10 +155,8 @@ function TachesContent() {
   };
 
   return (
-    <div className="flex min-h-screen bg-paper">
-      <Sidebar />
-      <main className="flex-1 space-y-6 p-8">
-        <div className="flex items-center justify-between">
+    <>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <Link
               href={`/admin/planification/${trimestre}`}
@@ -172,7 +164,7 @@ function TachesContent() {
             >
               ← Retour planification T{trimestre}
             </Link>
-            <h1 className="mt-2 text-2xl font-bold text-graphite">
+            <h1 className="mt-2 text-xl font-bold text-graphite sm:text-2xl">
               Tâches — Activité #{activiteId} — T{trimestre}
             </h1>
           </div>
@@ -405,7 +397,6 @@ function TachesContent() {
             ))}
           </div>
         )}
-      </main>
-    </div>
+    </>
   );
 }

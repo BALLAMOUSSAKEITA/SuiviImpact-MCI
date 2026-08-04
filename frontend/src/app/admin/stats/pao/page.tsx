@@ -6,17 +6,11 @@ import { useState } from "react";
 
 import { DirectionFilter } from "@/components/direction-filter";
 import { ProgressBar } from "@/components/execution-badge";
-import { ProtectedRoute } from "@/components/protected-route";
-import { Sidebar } from "@/components/sidebar";
 import { StatCard, StatGrid } from "@/components/stat-card";
 import { getStatsActivites } from "@/lib/api";
 
 export default function StatsPaoPage() {
-  return (
-    <ProtectedRoute>
-      <StatsPaoContent />
-    </ProtectedRoute>
-  );
+  return <StatsPaoContent />;
 }
 
 function StatsPaoContent() {
@@ -28,14 +22,12 @@ function StatsPaoContent() {
   });
 
   return (
-    <div className="flex min-h-screen bg-paper">
-      <Sidebar />
-      <main className="flex-1 space-y-6 p-8">
+    <>
         <div>
           <Link href="/admin/stats" className="text-sm text-forest-ink hover:underline">
             ← Statistiques
           </Link>
-          <h1 className="mt-2 text-2xl font-bold text-graphite">
+          <h1 className="mt-2 text-xl font-bold text-graphite sm:text-2xl">
             Statistiques — Plan d&apos;Action
           </h1>
         </div>
@@ -61,7 +53,6 @@ function StatsPaoContent() {
             </div>
           </>
         ) : null}
-      </main>
-    </div>
+    </>
   );
 }

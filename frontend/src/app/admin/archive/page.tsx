@@ -7,8 +7,6 @@ import { toast } from "sonner";
 import { Folder, File } from "lucide-react";
 
 import { useAuth } from "@/components/auth-provider";
-import { ProtectedRoute } from "@/components/protected-route";
-import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import {
   createDossier,
@@ -19,11 +17,7 @@ import {
 } from "@/lib/api";
 
 export default function ArchivePage() {
-  return (
-    <ProtectedRoute>
-      <ArchiveContent />
-    </ProtectedRoute>
-  );
+  return <ArchiveContent />;
 }
 
 function ArchiveContent() {
@@ -86,10 +80,8 @@ function ArchiveContent() {
   };
 
   return (
-    <div className="flex min-h-screen bg-paper">
-      <Sidebar />
-      <main className="flex-1 space-y-6 p-8">
-        <div className="flex items-center justify-between">
+    <>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-graphite">Archive</h1>
             <p className="mt-1 text-sm text-fog">
@@ -222,7 +214,6 @@ function ArchiveContent() {
               )}
           </div>
         )}
-      </main>
-    </div>
+    </>
   );
 }

@@ -8,8 +8,6 @@ import { toast } from "sonner";
 
 import { useAuth } from "@/components/auth-provider";
 import { ObjectifTabs } from "@/components/objectif-tabs";
-import { ProtectedRoute } from "@/components/protected-route";
-import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import {
   createActivite,
@@ -24,11 +22,7 @@ const YEARS = [2025, 2026, 2027];
 const TRIMESTRES = [1, 2, 3, 4];
 
 export default function ActivitesPage() {
-  return (
-    <ProtectedRoute>
-      <ActivitesContent />
-    </ProtectedRoute>
-  );
+  return <ActivitesContent />;
 }
 
 function ActivitesContent() {
@@ -114,9 +108,7 @@ function ActivitesContent() {
     selectedTrimestres.some((t) => t.annee === annee && t.trimestre === trimestre);
 
   return (
-    <div className="flex min-h-screen bg-paper">
-      <Sidebar />
-      <main className="flex-1 space-y-6 p-8">
+    <>
         <div className="flex items-start justify-between gap-4">
           <div>
             <Link href="/admin" className="text-sm text-forest-ink hover:underline">
@@ -228,7 +220,7 @@ function ActivitesContent() {
           </div>
         )}
 
-        <div className="overflow-x-auto rounded-card border border-cloud bg-paper shadow-sm">
+        <div className="table-shell">
           <table className="min-w-full text-sm">
             <thead className="bg-paper">
               <tr>
@@ -305,7 +297,6 @@ function ActivitesContent() {
             </tbody>
           </table>
         </div>
-      </main>
-    </div>
+    </>
   );
 }

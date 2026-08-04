@@ -68,7 +68,7 @@ export function ObjectifTable({ objectifs, queryKey }: ObjectifTableProps) {
               </td>
               {canWrite && (
                 <td className="text-right">
-                  <div className="flex justify-end gap-2">
+                  <div className="flex flex-wrap justify-end gap-1 sm:gap-2">
                     <Link href={`/admin/objectifs/${objectif.id}/modifier`}>
                       <Button variant="outline" size="sm">
                         Modifier

@@ -5,7 +5,6 @@ import Link from "next/link";
 import { toast } from "sonner";
 
 import { ProtectedRoute } from "@/components/protected-route";
-import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import {
   activateUser,
@@ -65,10 +64,8 @@ function ComptesContent() {
   };
 
   return (
-    <div className="flex min-h-screen bg-paper">
-      <Sidebar />
-      <main className="flex-1 p-8">
-        <div className="mb-6 flex items-center justify-between">
+    <>
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-graphite">Gestion des comptes</h1>
             <p className="mt-1 text-sm text-fog">
@@ -80,7 +77,7 @@ function ComptesContent() {
           </Link>
         </div>
 
-        <div className="overflow-hidden rounded-card border border-cloud bg-paper shadow-sm">
+        <div className="table-shell">
           <table className="min-w-full divide-y divide-cloud text-sm">
             <thead className="bg-paper">
               <tr>
@@ -120,7 +117,7 @@ function ComptesContent() {
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <div className="flex justify-end gap-2">
+                    <div className="flex flex-wrap justify-end gap-1 sm:gap-2">
                       {user.etat ? (
                         <Button
                           variant="outline"
@@ -155,7 +152,6 @@ function ComptesContent() {
             </tbody>
           </table>
         </div>
-      </main>
-    </div>
+    </>
   );
 }
