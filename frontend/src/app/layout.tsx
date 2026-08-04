@@ -17,9 +17,9 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "SuiviImpact — MIPME BSD",
+  title: "Connexion — SuiviImpact | MCI Guinée",
   description:
-    "Plateforme de gestion et de suivi d'impact du Bureau de Suivi et de Développement",
+    "Plateforme de suivi d'impact du Ministère du Commerce et de l'Industrie — Bureau de Stratégie et de Développement (BSD).",
 };
 
 export default function RootLayout({

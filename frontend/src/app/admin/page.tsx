@@ -5,7 +5,7 @@ import { ProtectedRoute } from "@/components/protected-route";
 import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
+import { BRAND } from "@/lib/brand";
 export default function AdminDashboardPage() {
   return (
     <ProtectedRoute>
@@ -13,12 +13,11 @@ export default function AdminDashboardPage() {
         <Sidebar />
         <main className="flex-1 space-y-8 p-8">
           <PageHeader
-            eyebrow="BSD MIPME"
+            eyebrow={`${BRAND.bureauShort} · ${BRAND.program}`}
             title="Plan d'Action"
-            description="Hub de gestion des objectifs OCT / OMT / OLT — Bureau de Suivi et de Développement."
+            description={`Hub de gestion des objectifs OCT / OMT / OLT — ${BRAND.bureau}.`}
             display
           />
-
           <div className="grid gap-6 sm:grid-cols-3">
             <Card>
               <CardHeader>

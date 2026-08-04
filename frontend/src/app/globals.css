@@ -148,3 +148,38 @@ body {
   color: var(--color-slate);
   letter-spacing: -0.42px;
 }
+
+/* Page de connexion — style institutionnel type Facebook */
+.login-shell {
+  background-color: #f0f2f5;
+}
+
+.login-card {
+  border-radius: var(--radius-card);
+  border: 1px solid var(--color-cloud);
+  background-color: #ffffff;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-elevated);
+}
+
+.login-input {
+  width: 100%;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--color-mist);
+  background-color: #ffffff;
+  padding: 0.875rem 1rem;
+  font-size: 1rem;
+  line-height: 1.25rem;
+  color: var(--color-graphite);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.login-input::placeholder {
+  color: var(--color-ash);
+}
+
+.login-input:focus {
+  border-color: var(--color-forest-ink);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-forest-ink) 20%, transparent);
+}

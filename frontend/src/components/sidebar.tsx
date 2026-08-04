@@ -20,6 +20,7 @@ import {
 
 import { useAuth } from "@/components/auth-provider";
 import { Button } from "@/components/ui/button";
+import { BRAND } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -51,14 +52,18 @@ export function Sidebar() {
 
   return (
     <aside className="flex w-64 shrink-0 flex-col border-r border-cloud bg-paper">
-      <div className="border-b border-cloud px-6 py-5">
-        <p className="text-xs font-semibold uppercase tracking-widest text-forest-ink">
-          SuiviImpact
+      <div className="border-b border-cloud px-5 py-5">
+        <p className="text-[10px] font-medium uppercase leading-tight tracking-wide text-fog">
+          {BRAND.ministryShort}
         </p>
-        <p className="mt-1 text-sm font-medium text-slate">{user?.prenom}</p>
-        <p className="text-xs text-ash">
-          {user?.type_acces === "ecriture" ? "Éditeur" : "Visiteur"}
-        </p>
+        <p className="mt-1 text-base font-semibold text-forest-ink">{BRAND.appName}</p>
+        <p className="text-[11px] text-ash">{BRAND.bureauShort} · {BRAND.program}</p>
+        <div className="mt-3 border-t border-cloud pt-3">
+          <p className="text-sm font-medium text-slate">{user?.prenom}</p>
+          <p className="text-xs text-ash">
+            {user?.type_acces === "ecriture" ? "Accès édition" : "Accès lecture"}
+          </p>
+        </div>
       </div>
 
       <nav className="flex-1 space-y-1 overflow-y-auto p-4">
