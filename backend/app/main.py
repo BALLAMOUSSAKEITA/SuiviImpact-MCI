@@ -6,6 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.router import api_router
 from app.core.config import settings
+from app.core.database import async_session_maker
+from app.services.user_service import seed_admin_user
 
 logger = logging.getLogger(__name__)
 
@@ -14,6 +16,8 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     logging.basicConfig(level=logging.INFO if not settings.DEBUG else logging.DEBUG)
     logger.info("Démarrage de %s", settings.APP_NAME)
+    async with async_session_maker() as session:
+        await seed_admin_user(session)
     yield
     logger.info("Arrêt de %s", settings.APP_NAME)
 
