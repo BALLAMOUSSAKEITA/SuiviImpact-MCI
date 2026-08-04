@@ -53,8 +53,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    refreshUser().finally(() => setIsLoading(false));
-  }, [refreshUser]);
+    let cancelled = false;
+
+    async function loadUser() {
+      const token = getAccessToken();
+      if (!token) {
+        if (!cancelled) {
+          setUser(null);
+          setIsLoading(false);
+        }
+        return;
+      }
+      try {
+        const profile = await getMe();
+        if (!cancelled) {
+          setUser(profile);
+        }
+      } catch {
+        clearTokens();
+        if (!cancelled) {
+          setUser(null);
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    void loadUser();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const login = useCallback(
     async (data: LoginRequest) => {
