@@ -38,47 +38,46 @@ export function ObjectifTable({ objectifs, queryKey }: ObjectifTableProps) {
   };
 
   return (
-    <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm">
-      <table className="min-w-full divide-y divide-zinc-200 text-sm">
-        <thead className="bg-zinc-50">
+    <div className="table-shell">
+      <table className="table-grain">
+        <thead>
           <tr>
-            <th className="px-4 py-3 text-left font-medium text-zinc-600">Code</th>
-            <th className="px-4 py-3 text-left font-medium text-zinc-600">Objectifs</th>
-            {canWrite && (
-              <th className="px-4 py-3 text-right font-medium text-zinc-600">Actions</th>
-            )}
+            <th>Code</th>
+            <th>Objectifs</th>
+            {canWrite && <th className="text-right">Actions</th>}
           </tr>
         </thead>
-        <tbody className="divide-y divide-zinc-100">
+        <tbody>
           {objectifs.length === 0 && (
             <tr>
-              <td colSpan={canWrite ? 3 : 2} className="px-4 py-8 text-center text-zinc-400">
+              <td colSpan={canWrite ? 3 : 2} className="py-8 text-center text-ash">
                 Aucun objectif enregistré
               </td>
             </tr>
           )}
           {objectifs.map((objectif) => (
-            <tr key={objectif.id} className="transition-colors hover:bg-emerald-50/40">
-              <td className="px-4 py-3 font-medium text-emerald-800">{objectif.code}</td>
-              <td className="px-4 py-3">
+            <tr key={objectif.id}>
+              <td className="font-medium text-forest-ink">{objectif.code}</td>
+              <td>
                 <Link
                   href={`/activite/${objectif.id}`}
-                  className="text-zinc-700 hover:text-emerald-700 hover:underline"
+                  className="text-slate hover:text-forest-ink hover:underline"
                 >
                   {objectif.description}
                 </Link>
               </td>
               {canWrite && (
-                <td className="px-4 py-3 text-right">
+                <td className="text-right">
                   <div className="flex justify-end gap-2">
                     <Link href={`/admin/objectifs/${objectif.id}/modifier`}>
-                      <Button variant="outline" className="h-8 px-3 text-xs">
+                      <Button variant="outline" size="sm">
                         Modifier
                       </Button>
                     </Link>
                     <Button
                       variant="ghost"
-                      className="h-8 px-3 text-xs text-red-600"
+                      size="sm"
+                      className="text-red-600"
                       onClick={() => handleDelete(objectif)}
                     >
                       Supprimer

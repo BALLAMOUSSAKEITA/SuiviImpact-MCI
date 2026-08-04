@@ -34,14 +34,14 @@ function PlanificationContent() {
   });
 
   return (
-    <div className="flex min-h-screen bg-zinc-50">
+    <div className="flex min-h-screen bg-paper">
       <Sidebar />
       <main className="flex-1 space-y-6 p-8">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-900">
+          <h1 className="text-2xl font-bold text-graphite">
             Planification — T{trimestre} {DEFAULT_ANNEE}
           </h1>
-          <p className="mt-1 text-sm text-zinc-500">
+          <p className="mt-1 text-sm text-fog">
             Activités planifiées pour le trimestre
           </p>
         </div>
@@ -54,35 +54,35 @@ function PlanificationContent() {
           <DirectionFilter value={direction} onChange={setDirection} />
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm">
-          <table className="min-w-full divide-y divide-zinc-200 text-sm">
-            <thead className="bg-zinc-50">
+        <div className="overflow-hidden rounded-card border border-cloud bg-paper shadow-sm">
+          <table className="min-w-full divide-y divide-cloud text-sm">
+            <thead className="bg-paper">
               <tr>
-                <th className="px-4 py-3 text-left font-medium text-zinc-600">Code</th>
-                <th className="px-4 py-3 text-left font-medium text-zinc-600">Description</th>
-                <th className="px-4 py-3 text-left font-medium text-zinc-600">Exécution</th>
-                <th className="px-4 py-3 text-left font-medium text-zinc-600">Budget</th>
-                <th className="px-4 py-3 text-left font-medium text-zinc-600">Tâches</th>
-                <th className="px-4 py-3 text-right font-medium text-zinc-600">Actions</th>
+                <th className="px-4 py-3 text-left font-medium text-slate">Code</th>
+                <th className="px-4 py-3 text-left font-medium text-slate">Description</th>
+                <th className="px-4 py-3 text-left font-medium text-slate">Exécution</th>
+                <th className="px-4 py-3 text-left font-medium text-slate">Budget</th>
+                <th className="px-4 py-3 text-left font-medium text-slate">Tâches</th>
+                <th className="px-4 py-3 text-right font-medium text-slate">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-100">
+            <tbody className="divide-y divide-cloud/60">
               {isLoading && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-zinc-400">
+                  <td colSpan={6} className="px-4 py-8 text-center text-ash">
                     Chargement…
                   </td>
                 </tr>
               )}
               {!isLoading && activites.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-zinc-400">
+                  <td colSpan={6} className="px-4 py-8 text-center text-ash">
                     Aucune activité planifiée pour ce trimestre.
                   </td>
                 </tr>
               )}
               {activites.map((a) => (
-                <tr key={a.id} className="hover:bg-zinc-50">
+                <tr key={a.id} className="hover:bg-paper">
                   <td className="px-4 py-3 font-medium">{a.code}</td>
                   <td className="max-w-xs truncate px-4 py-3">{a.description}</td>
                   <td className="px-4 py-3">

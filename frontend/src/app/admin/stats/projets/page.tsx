@@ -24,33 +24,33 @@ function StatsProjetsContent() {
   });
 
   return (
-    <div className="flex min-h-screen bg-zinc-50">
+    <div className="flex min-h-screen bg-paper">
       <Sidebar />
       <main className="flex-1 space-y-6 p-8">
         <div>
-          <Link href="/admin/stats" className="text-sm text-emerald-700 hover:underline">
+          <Link href="/admin/stats" className="text-sm text-forest-ink hover:underline">
             ← Statistiques
           </Link>
-          <h1 className="mt-2 text-2xl font-bold text-zinc-900">
+          <h1 className="mt-2 text-2xl font-bold text-graphite">
             Statistiques — Projets
           </h1>
         </div>
 
         {isLoading ? (
-          <p className="text-sm text-zinc-400">Chargement…</p>
+          <p className="text-sm text-ash">Chargement…</p>
         ) : stats ? (
           <>
             <StatGrid>
               <StatCard title="Total projets" value={stats.total} />
             </StatGrid>
             <div className="grid gap-4 sm:grid-cols-2">
-              <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+              <div className="rounded-card border border-cloud bg-paper p-6 shadow-sm">
                 <ProgressBar
                   label="Exécution financière moyenne"
                   value={stats.execution_financiere}
                 />
               </div>
-              <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+              <div className="rounded-card border border-cloud bg-paper p-6 shadow-sm">
                 <ProgressBar
                   label="Exécution physique moyenne"
                   value={stats.execution_physique}

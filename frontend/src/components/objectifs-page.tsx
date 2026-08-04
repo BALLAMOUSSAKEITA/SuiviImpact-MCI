@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ObjectifForm } from "@/components/objectif-form";
 import { ObjectifTable } from "@/components/objectif-table";
 import { ObjectifTabs } from "@/components/objectif-tabs";
+import { PageHeader } from "@/components/page-header";
 import { ProtectedRoute } from "@/components/protected-route";
 import { Sidebar } from "@/components/sidebar";
 import { listObjectifs } from "@/lib/api";
@@ -21,23 +22,20 @@ export function ObjectifsPage({ type }: { type: ObjectifType }) {
 
   return (
     <ProtectedRoute>
-      <div className="flex min-h-screen bg-zinc-50">
+      <div className="flex min-h-screen bg-paper">
         <Sidebar />
-        <main className="flex-1 space-y-6 p-8">
-          <div>
-            <h1 className="text-2xl font-bold text-zinc-900">
-              Objectifs {label} — {year}
-            </h1>
-            <p className="mt-1 text-sm text-zinc-500">
-              Plan d&apos;action — objectifs clés de transformation
-            </p>
-          </div>
+        <main className="flex-1 space-y-8 p-8">
+          <PageHeader
+            eyebrow="Plan d'action"
+            title={`Objectifs ${label} — ${year}`}
+            description="Objectifs clés de transformation et activités associées"
+          />
 
           <ObjectifTabs />
           <ObjectifForm type={type} queryKey={queryKey} />
 
           {isLoading ? (
-            <p className="text-sm text-zinc-400">Chargement…</p>
+            <p className="text-sm text-ash">Chargement…</p>
           ) : (
             <ObjectifTable objectifs={objectifs} queryKey={queryKey} />
           )}

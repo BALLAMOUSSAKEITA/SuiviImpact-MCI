@@ -28,14 +28,14 @@ function StatsRccContent() {
   });
 
   return (
-    <div className="flex min-h-screen bg-zinc-50">
+    <div className="flex min-h-screen bg-paper">
       <Sidebar />
       <main className="flex-1 space-y-6 p-8">
         <div>
-          <Link href="/admin/stats" className="text-sm text-emerald-700 hover:underline">
+          <Link href="/admin/stats" className="text-sm text-forest-ink hover:underline">
             ← Statistiques
           </Link>
-          <h1 className="mt-2 text-2xl font-bold text-zinc-900">
+          <h1 className="mt-2 text-2xl font-bold text-graphite">
             Statistiques — Recommandations RCC
           </h1>
         </div>
@@ -44,10 +44,10 @@ function StatsRccContent() {
           <button
             type="button"
             onClick={() => setTrimestre(undefined)}
-            className={`rounded-lg px-3 py-1.5 text-sm font-medium ${
+            className={`rounded-card px-3 py-1.5 text-sm font-medium ${
               trimestre === undefined
-                ? "bg-emerald-700 text-white"
-                : "bg-white ring-1 ring-zinc-200"
+                ? "bg-forest-ink text-white"
+                : "bg-paper ring-1 ring-cloud"
             }`}
           >
             Année
@@ -57,10 +57,10 @@ function StatsRccContent() {
               key={t}
               type="button"
               onClick={() => setTrimestre(t)}
-              className={`rounded-lg px-3 py-1.5 text-sm font-medium ${
+              className={`rounded-card px-3 py-1.5 text-sm font-medium ${
                 trimestre === t
-                  ? "bg-emerald-700 text-white"
-                  : "bg-white ring-1 ring-zinc-200"
+                  ? "bg-forest-ink text-white"
+                  : "bg-paper ring-1 ring-cloud"
               }`}
             >
               T{t}
@@ -69,7 +69,7 @@ function StatsRccContent() {
         </div>
 
         {isLoading ? (
-          <p className="text-sm text-zinc-400">Chargement…</p>
+          <p className="text-sm text-ash">Chargement…</p>
         ) : stats ? (
           <>
             <StatGrid>
@@ -78,7 +78,7 @@ function StatsRccContent() {
               <StatCard title="En cours" value={stats.en_cours} />
               <StatCard title="Terminées" value={stats.termine} />
             </StatGrid>
-            <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+            <div className="rounded-card border border-cloud bg-paper p-6 shadow-sm">
               <ProgressBar label="Progression" value={stats.progression} />
             </div>
           </>

@@ -1,26 +1,150 @@
 @import "tailwindcss";
 
+@theme {
+  /* Grain — Colors */
+  --color-forest-ink: #009959;
+  --color-vine: #00b96c;
+  --color-neon-sprout: #00ff95;
+  --color-ice-blue: #3de1ff;
+  --color-obsidian: #000000;
+  --color-graphite: #141414;
+  --color-carbon: #313232;
+  --color-slate: #545454;
+  --color-fog: #707070;
+  --color-ash: #949494;
+  --color-mist: #d6d6d6;
+  --color-cloud: #e6e6e6;
+  --color-veil: #f0f0f0;
+  --color-paper: #fafafa;
+
+  /* Typography */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+
+  /* Border radius — Grain */
+  --radius-card: 10px;
+  --radius-image: 14px;
+
+  /* Letter spacing tokens */
+  --tracking-body-sm: -0.42px;
+  --tracking-heading-sm: -0.4px;
+
+  /* Shadows — Grain */
+  --shadow-card: rgba(0, 0, 0, 0.04) 0px 4px 8px 0px;
+  --shadow-elevated: rgba(0, 0, 0, 0.08) 0px 4px 16px 0px;
+  --shadow-inset: rgba(0, 0, 0, 0.05) 0px 0px 12px 0px inset;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: #fafafa;
+  --foreground: #141414;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  font-feature-settings: "cv11", "ss01";
+  -webkit-font-smoothing: antialiased;
+}
+
+.grain-gradient {
+  background: linear-gradient(
+    114deg,
+    rgba(30, 229, 146, 0.15),
+    rgba(0, 128, 74, 0.05)
+  );
+}
+
+.font-display {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: normal;
+}
+
+.input-grain {
+  width: 100%;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--color-mist);
+  background-color: var(--color-paper);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--color-graphite);
+  letter-spacing: -0.42px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.input-grain:focus {
+  border-color: var(--color-forest-ink);
+  box-shadow: 0 0 0 1px var(--color-forest-ink);
+}
+
+.label-grain {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-slate);
+  letter-spacing: -0.42px;
+}
+
+.table-grain {
+  width: 100%;
+  font-size: 0.875rem;
+  letter-spacing: -0.42px;
+}
+
+.table-grain thead {
+  background-color: var(--color-veil);
+}
+
+.table-grain th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 500;
+  color: var(--color-fog);
+}
+
+.table-grain tbody tr {
+  border-top: 1px solid var(--color-cloud);
+}
+
+.table-grain tbody tr:hover {
+  background-color: color-mix(in srgb, var(--color-veil) 60%, transparent);
+}
+
+.table-grain td {
+  padding: 0.75rem 1rem;
+  color: var(--color-slate);
+}
+
+.table-shell {
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--color-cloud);
+  background-color: var(--color-paper);
+  box-shadow: var(--shadow-card);
+}
+
+.panel-grain {
+  border-radius: var(--radius-card);
+  border: 1px solid var(--color-cloud);
+  background-color: var(--color-paper);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-card);
+}
+
+.badge-grain {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--color-cloud);
+  background-color: var(--color-paper);
+  padding: 0.5rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-slate);
+  letter-spacing: -0.42px;
 }

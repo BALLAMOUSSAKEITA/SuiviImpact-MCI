@@ -50,13 +50,13 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="flex w-64 shrink-0 flex-col border-r border-zinc-200 bg-white">
-      <div className="border-b border-zinc-200 px-6 py-5">
-        <p className="text-xs font-semibold uppercase tracking-widest text-emerald-700">
+    <aside className="flex w-64 shrink-0 flex-col border-r border-cloud bg-paper">
+      <div className="border-b border-cloud px-6 py-5">
+        <p className="text-xs font-semibold uppercase tracking-widest text-forest-ink">
           SuiviImpact
         </p>
-        <p className="mt-1 text-sm text-zinc-600">{user?.prenom}</p>
-        <p className="text-xs text-zinc-400">
+        <p className="mt-1 text-sm font-medium text-slate">{user?.prenom}</p>
+        <p className="text-xs text-ash">
           {user?.type_acces === "ecriture" ? "Éditeur" : "Visiteur"}
         </p>
       </div>
@@ -69,10 +69,10 @@ export function Sidebar() {
               key={href}
               href={defaultChild ?? href}
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                "flex items-center gap-3 rounded-card px-3 py-2 text-sm font-medium transition-colors",
                 isActive(href)
-                  ? "bg-emerald-50 text-emerald-800"
-                  : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900",
+                  ? "bg-veil text-forest-ink"
+                  : "text-slate hover:bg-veil hover:text-graphite",
               )}
             >
               <Icon className="h-4 w-4 shrink-0" />
@@ -81,7 +81,7 @@ export function Sidebar() {
           ))}
       </nav>
 
-      <div className="border-t border-zinc-200 p-4">
+      <div className="border-t border-cloud p-4">
         <Button variant="ghost" className="w-full justify-start gap-2" onClick={logout}>
           <LogOut className="h-4 w-4" />
           Déconnexion

@@ -16,16 +16,18 @@ export function ApiStatusCard() {
   });
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full max-w-md shadow-[var(--shadow-elevated)]">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <Activity className="h-5 w-5 text-emerald-700" />
+        <CardTitle className="flex items-center gap-2 text-base font-semibold">
+          <span className="flex h-10 w-10 items-center justify-center rounded-card bg-veil">
+            <Activity className="h-5 w-5 text-forest-ink" />
+          </span>
           Statut de l&apos;API
         </CardTitle>
       </CardHeader>
       <CardContent>
         {isLoading && (
-          <p className="text-sm text-zinc-500">Vérification en cours…</p>
+          <p className="text-sm text-fog">Vérification en cours…</p>
         )}
         {isError && (
           <div className="flex items-start gap-2 text-red-600">
@@ -36,7 +38,7 @@ export function ApiStatusCard() {
           </div>
         )}
         {data && (
-          <div className="flex items-center gap-2 text-emerald-700">
+          <div className="flex items-center gap-2 text-forest-ink">
             <CheckCircle2 className="h-5 w-5" />
             <p className="text-sm font-medium">
               API opérationnelle — statut : {data.status}
@@ -50,18 +52,18 @@ export function ApiStatusCard() {
 
 export function LandingHero() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-emerald-50 to-white px-6 py-16">
-      <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-8 text-center">
-        <div className="space-y-4">
-          <p className="text-sm font-semibold uppercase tracking-widest text-emerald-700">
+    <div className="grain-gradient flex min-h-screen flex-col items-center justify-center px-6 py-16">
+      <div className="mx-auto flex w-full max-w-[1200px] flex-col items-center gap-12 text-center">
+        <div className="space-y-6">
+          <span className="badge-grain mx-auto inline-flex gap-2">
             MIPME — République de Guinée
-          </p>
-          <h1 className="text-4xl font-bold tracking-tight text-zinc-900 sm:text-5xl">
+          </span>
+          <h1 className="font-display text-[38px] leading-[1.25] text-graphite sm:text-[42px]">
             SuiviImpact
           </h1>
-          <p className="mx-auto max-w-xl text-lg text-zinc-600">
+          <p className="mx-auto max-w-xl text-base leading-relaxed text-slate">
             Plateforme de gestion et de suivi d&apos;impact du Bureau de Suivi
-            et de Développement (BSD) — refonte Next.js + FastAPI.
+            et de Développement (BSD) — MIPME Guinée.
           </p>
         </div>
 
@@ -72,7 +74,7 @@ export function LandingHero() {
             <Button size="lg">Se connecter</Button>
           </Link>
           <a
-            href="http://localhost:8000/docs"
+            href={`${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"}/docs`}
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -82,7 +84,7 @@ export function LandingHero() {
           </a>
         </div>
 
-        <p className="text-xs text-zinc-400">Sprint 0 — Fondations</p>
+        <p className="text-xs text-ash">Bureau de Suivi et de Développement</p>
       </div>
     </div>
   );

@@ -51,23 +51,19 @@ export default function ConnexionPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-emerald-50 to-white px-6">
-      <Card className="w-full max-w-md">
+    <div className="grain-gradient flex min-h-screen items-center justify-center px-6">
+      <Card className="w-full max-w-md shadow-[var(--shadow-elevated)]">
         <CardHeader className="text-center">
-          <p className="text-xs font-semibold uppercase tracking-widest text-emerald-700">
-            MIPME — BSD Guinée
-          </p>
-          <CardTitle className="mt-2">Connexion</CardTitle>
+          <span className="badge-grain mx-auto">MIPME — BSD Guinée</span>
+          <CardTitle className="mt-4 font-display text-2xl">Connexion</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
-              <label className="mb-1 block text-sm font-medium text-zinc-700">
-                Identifiant
-              </label>
+              <label className="label-grain">Identifiant</label>
               <input
                 {...register("username")}
-                className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
+                className="input-grain"
                 autoComplete="username"
               />
               {errors.username && (
@@ -75,13 +71,11 @@ export default function ConnexionPage() {
               )}
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-zinc-700">
-                Mot de passe
-              </label>
+              <label className="label-grain">Mot de passe</label>
               <input
                 type="password"
                 {...register("password")}
-                className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
+                className="input-grain"
                 autoComplete="current-password"
               />
               {errors.password && (
@@ -92,8 +86,8 @@ export default function ConnexionPage() {
               {submitting ? "Connexion…" : "Se connecter"}
             </Button>
           </form>
-          <p className="mt-4 text-center text-sm text-zinc-500">
-            <Link href="/" className="text-emerald-700 hover:underline">
+          <p className="mt-4 text-center text-sm text-fog">
+            <Link href="/" className="text-forest-ink hover:underline">
               Retour à l&apos;accueil
             </Link>
           </p>

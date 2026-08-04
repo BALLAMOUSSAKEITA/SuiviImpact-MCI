@@ -16,11 +16,11 @@ const DASHBOARDS = [
 export default function StatsHubPage() {
   return (
     <ProtectedRoute>
-      <div className="flex min-h-screen bg-zinc-50">
+      <div className="flex min-h-screen bg-paper">
         <Sidebar />
         <main className="flex-1 p-8">
-          <h1 className="text-2xl font-bold text-zinc-900">Statistiques</h1>
-          <p className="mt-2 text-zinc-600">
+          <h1 className="text-2xl font-bold text-graphite">Statistiques</h1>
+          <p className="mt-2 text-slate">
             Tableaux de bord et indicateurs de suivi — BSD MIPME.
           </p>
 
@@ -29,7 +29,7 @@ export default function StatsHubPage() {
               <Card key={href}>
                 <CardHeader>
                   <CardTitle className="text-lg">{label}</CardTitle>
-                  <p className="text-sm text-zinc-500">{desc}</p>
+                  <p className="text-sm text-fog">{desc}</p>
                 </CardHeader>
                 <CardContent>
                   <Link href={href}>

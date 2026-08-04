@@ -17,11 +17,11 @@ const TRIMESTRES = [
 export default function PlanificationHubPage() {
   return (
     <ProtectedRoute>
-      <div className="flex min-h-screen bg-zinc-50">
+      <div className="flex min-h-screen bg-paper">
         <Sidebar />
         <main className="flex-1 p-8">
-          <h1 className="text-2xl font-bold text-zinc-900">Planification</h1>
-          <p className="mt-2 text-zinc-600">
+          <h1 className="text-2xl font-bold text-graphite">Planification</h1>
+          <p className="mt-2 text-slate">
             Planifiez les activités et tâches par trimestre — BSD MIPME 2025.
           </p>
 
@@ -30,7 +30,7 @@ export default function PlanificationHubPage() {
               <Card key={num}>
                 <CardHeader>
                   <CardTitle className="text-lg">{label}</CardTitle>
-                  <p className="text-sm text-zinc-500">{periode}</p>
+                  <p className="text-sm text-fog">{periode}</p>
                 </CardHeader>
                 <CardContent>
                   <Link href={`/admin/planification/${num}`}>

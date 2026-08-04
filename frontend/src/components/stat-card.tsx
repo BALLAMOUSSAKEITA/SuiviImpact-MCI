@@ -22,15 +22,13 @@ export function StatCard({
   return (
     <Card className={cn(className)}>
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-zinc-500">
-          {title}
-        </CardTitle>
+        <CardTitle className="text-sm font-medium text-fog">{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-3xl font-bold text-zinc-900">{value}</p>
-        {subtitle && (
-          <p className="mt-1 text-xs text-zinc-400">{subtitle}</p>
-        )}
+        <p className="text-3xl font-semibold text-graphite">
+          {value}
+        </p>
+        {subtitle && <p className="mt-1 text-xs text-ash">{subtitle}</p>}
         {showProgress && progressValue != null && (
           <ProgressBar value={progressValue} className="mt-3" />
         )}
@@ -48,7 +46,7 @@ export function StatGrid({ children, className }: StatGridProps) {
   return (
     <div
       className={cn(
-        "grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
+        "grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
         className,
       )}
     >

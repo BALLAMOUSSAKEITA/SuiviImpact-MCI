@@ -43,11 +43,11 @@ function ExportContent() {
   };
 
   return (
-    <div className="flex min-h-screen bg-zinc-50">
+    <div className="flex min-h-screen bg-paper">
       <Sidebar />
       <main className="flex-1 p-8">
-        <h1 className="text-2xl font-bold text-zinc-900">Exports Excel</h1>
-        <p className="mt-2 text-zinc-600">
+        <h1 className="text-2xl font-bold text-graphite">Exports Excel</h1>
+        <p className="mt-2 text-slate">
           Téléchargez les données au format .xlsx
         </p>
 
@@ -56,7 +56,7 @@ function ExportContent() {
             <Card key={type}>
               <CardHeader>
                 <CardTitle className="text-lg">{label}</CardTitle>
-                <p className="text-sm text-zinc-500">{desc}</p>
+                <p className="text-sm text-fog">{desc}</p>
               </CardHeader>
               <CardContent>
                 <Button

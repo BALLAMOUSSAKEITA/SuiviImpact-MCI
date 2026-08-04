@@ -53,7 +53,7 @@ function NouveauCompteContent() {
   });
 
   return (
-    <div className="flex min-h-screen bg-zinc-50">
+    <div className="flex min-h-screen bg-paper">
       <Sidebar />
       <main className="flex-1 p-8">
         <Card className="mx-auto max-w-lg">
@@ -68,26 +68,26 @@ function NouveauCompteContent() {
               <Field label="Prénom" error={errors.prenom?.message}>
                 <input
                   {...register("prenom")}
-                  className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm"
+                  className="w-full rounded-card border border-mist px-3 py-2 text-sm"
                 />
               </Field>
               <Field label="Identifiant" error={errors.username?.message}>
                 <input
                   {...register("username")}
-                  className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm"
+                  className="w-full rounded-card border border-mist px-3 py-2 text-sm"
                 />
               </Field>
               <Field label="Mot de passe" error={errors.password?.message}>
                 <input
                   type="password"
                   {...register("password")}
-                  className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm"
+                  className="w-full rounded-card border border-mist px-3 py-2 text-sm"
                 />
               </Field>
               <Field label="Type d'accès" error={errors.type_acces?.message}>
                 <select
                   {...register("type_acces")}
-                  className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm"
+                  className="w-full rounded-card border border-mist px-3 py-2 text-sm"
                 >
                   <option value="lecture">Lecture (Visiteur)</option>
                   <option value="ecriture">Écriture (Éditeur)</option>
@@ -96,7 +96,7 @@ function NouveauCompteContent() {
               <Field label="Rôle" error={errors.role?.message}>
                 <select
                   {...register("role")}
-                  className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm"
+                  className="w-full rounded-card border border-mist px-3 py-2 text-sm"
                 >
                   <option value="user">Utilisateur</option>
                   <option value="admin">Administrateur</option>
@@ -131,7 +131,7 @@ function Field({
 }) {
   return (
     <div>
-      <label className="mb-1 block text-sm font-medium text-zinc-700">{label}</label>
+      <label className="mb-1 block text-sm font-medium text-slate">{label}</label>
       {children}
       {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
     </div>

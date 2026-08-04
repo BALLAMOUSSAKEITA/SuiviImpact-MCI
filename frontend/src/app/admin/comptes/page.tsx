@@ -65,13 +65,13 @@ function ComptesContent() {
   };
 
   return (
-    <div className="flex min-h-screen bg-zinc-50">
+    <div className="flex min-h-screen bg-paper">
       <Sidebar />
       <main className="flex-1 p-8">
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-zinc-900">Gestion des comptes</h1>
-            <p className="mt-1 text-sm text-zinc-500">
+            <h1 className="text-2xl font-bold text-graphite">Gestion des comptes</h1>
+            <p className="mt-1 text-sm text-fog">
               Créer, activer, désactiver ou supprimer des utilisateurs.
             </p>
           </div>
@@ -80,29 +80,29 @@ function ComptesContent() {
           </Link>
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm">
-          <table className="min-w-full divide-y divide-zinc-200 text-sm">
-            <thead className="bg-zinc-50">
+        <div className="overflow-hidden rounded-card border border-cloud bg-paper shadow-sm">
+          <table className="min-w-full divide-y divide-cloud text-sm">
+            <thead className="bg-paper">
               <tr>
-                <th className="px-4 py-3 text-left font-medium text-zinc-600">N°</th>
-                <th className="px-4 py-3 text-left font-medium text-zinc-600">Prénom</th>
-                <th className="px-4 py-3 text-left font-medium text-zinc-600">Username</th>
-                <th className="px-4 py-3 text-left font-medium text-zinc-600">Rôle</th>
-                <th className="px-4 py-3 text-left font-medium text-zinc-600">Accès</th>
-                <th className="px-4 py-3 text-left font-medium text-zinc-600">Statut</th>
-                <th className="px-4 py-3 text-right font-medium text-zinc-600">Actions</th>
+                <th className="px-4 py-3 text-left font-medium text-slate">N°</th>
+                <th className="px-4 py-3 text-left font-medium text-slate">Prénom</th>
+                <th className="px-4 py-3 text-left font-medium text-slate">Username</th>
+                <th className="px-4 py-3 text-left font-medium text-slate">Rôle</th>
+                <th className="px-4 py-3 text-left font-medium text-slate">Accès</th>
+                <th className="px-4 py-3 text-left font-medium text-slate">Statut</th>
+                <th className="px-4 py-3 text-right font-medium text-slate">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-100">
+            <tbody className="divide-y divide-cloud/60">
               {isLoading && (
                 <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-zinc-400">
+                  <td colSpan={7} className="px-4 py-8 text-center text-ash">
                     Chargement…
                   </td>
                 </tr>
               )}
               {users?.map((user) => (
-                <tr key={user.id} className="hover:bg-zinc-50">
+                <tr key={user.id} className="hover:bg-paper">
                   <td className="px-4 py-3">{user.id}</td>
                   <td className="px-4 py-3 font-medium">{user.prenom}</td>
                   <td className="px-4 py-3">{user.username}</td>
@@ -112,7 +112,7 @@ function ComptesContent() {
                     <span
                       className={
                         user.etat
-                          ? "rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-800"
+                          ? "rounded-full bg-veil px-2 py-0.5 text-xs text-forest-ink"
                           : "rounded-full bg-red-100 px-2 py-0.5 text-xs text-red-800"
                       }
                     >

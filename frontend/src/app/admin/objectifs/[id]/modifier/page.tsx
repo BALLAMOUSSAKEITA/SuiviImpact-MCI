@@ -32,7 +32,7 @@ function ModifierObjectifContent() {
 
   if (!objectif) {
     return (
-      <div className="flex min-h-screen bg-zinc-50">
+      <div className="flex min-h-screen bg-paper">
         <Sidebar />
         <main className="flex-1 p-8">Objectif introuvable</main>
       </div>
@@ -40,7 +40,7 @@ function ModifierObjectifContent() {
   }
 
   return (
-    <div className="flex min-h-screen bg-zinc-50">
+    <div className="flex min-h-screen bg-paper">
       <Sidebar />
       <main className="flex-1 p-8">
         <ObjectifEditForm key={objectif.id} objectif={objectif} />
@@ -99,19 +99,19 @@ function CardForm({
   cancelHref: string;
 }) {
   return (
-    <div className="mx-auto max-w-lg rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+    <div className="mx-auto max-w-lg rounded-card border border-cloud bg-paper p-6 shadow-sm">
       <h1 className="text-xl font-semibold">{title}</h1>
       <div className="mt-4 space-y-3">
         <input
           value={code}
           onChange={(e) => onCodeChange(e.target.value)}
-          className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm"
+          className="w-full rounded-card border border-mist px-3 py-2 text-sm"
         />
         <textarea
           value={description}
           onChange={(e) => onDescriptionChange(e.target.value)}
           rows={4}
-          className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm"
+          className="w-full rounded-card border border-mist px-3 py-2 text-sm"
         />
         <div className="flex gap-3">
           <Button onClick={onSubmit} disabled={submitting}>
