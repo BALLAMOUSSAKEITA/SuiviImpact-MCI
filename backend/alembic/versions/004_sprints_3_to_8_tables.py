@@ -8,28 +8,37 @@ from typing import Sequence, Union
 
 import sqlalchemy as sa
 from alembic import op
+from sqlalchemy.dialects import postgresql
+
+from app.db.migration_helpers import drop_enum, ensure_enum
 
 revision: str = "004"
 down_revision: Union[str, None] = "003"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
-tache_statut = sa.Enum(
-    "en_cours", "terminee", "en_retard", name="tache_statut", create_type=False
-)
-ppm_statut = sa.Enum(
-    "dao_elabore",
-    "dao_publie",
-    "marche_attribue",
-    "contrat_signe",
-    name="ppm_statut",
-    create_type=False,
-)
-
 
 def upgrade() -> None:
-    tache_statut.create(op.get_bind(), checkfirst=True)
-    ppm_statut.create(op.get_bind(), checkfirst=True)
+    ensure_enum("tache_statut", "en_cours", "terminee", "en_retard")
+    ensure_enum(
+        "ppm_statut",
+        "dao_elabore",
+        "dao_publie",
+        "marche_attribue",
+        "contrat_signe",
+    )
+
+    tache_statut = postgresql.ENUM(
+        "en_cours", "terminee", "en_retard", name="tache_statut", create_type=False
+    )
+    ppm_statut = postgresql.ENUM(
+        "dao_elabore",
+        "dao_publie",
+        "marche_attribue",
+        "contrat_signe",
+        name="ppm_statut",
+        create_type=False,
+    )
 
     op.create_table(
         "taches",
@@ -211,5 +220,5 @@ def downgrade() -> None:
     op.drop_table("tache_fichiers")
     op.drop_table("tache_semaines")
     op.drop_table("taches")
-    ppm_statut.drop(op.get_bind(), checkfirst=True)
-    tache_statut.drop(op.get_bind(), checkfirst=True)
+    drop_enum("ppm_statut")
+    drop_enum("tache_statut")

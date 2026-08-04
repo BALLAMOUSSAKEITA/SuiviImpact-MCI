@@ -10,19 +10,24 @@ from typing import Sequence, Union
 
 import sqlalchemy as sa
 from alembic import op
+from sqlalchemy.dialects import postgresql
+
+from app.db.migration_helpers import drop_enum, ensure_enum
 
 revision: str = "002"
 down_revision: Union[str, None] = "001"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
-access_type = sa.Enum("lecture", "ecriture", name="access_type", create_type=False)
-user_role = sa.Enum("user", "admin", name="user_role", create_type=False)
-
 
 def upgrade() -> None:
-    access_type.create(op.get_bind(), checkfirst=True)
-    user_role.create(op.get_bind(), checkfirst=True)
+    ensure_enum("access_type", "lecture", "ecriture")
+    ensure_enum("user_role", "user", "admin")
+
+    access_type = postgresql.ENUM(
+        "lecture", "ecriture", name="access_type", create_type=False
+    )
+    user_role = postgresql.ENUM("user", "admin", name="user_role", create_type=False)
 
     op.create_table(
         "users",
@@ -73,5 +78,5 @@ def upgrade() -> None:
 def downgrade() -> None:
     op.drop_table("refresh_tokens")
     op.drop_table("users")
-    user_role.drop(op.get_bind(), checkfirst=True)
-    access_type.drop(op.get_bind(), checkfirst=True)
+    drop_enum("user_role")
+    drop_enum("access_type")

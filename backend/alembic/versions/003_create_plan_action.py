@@ -10,17 +10,22 @@ from typing import Sequence, Union
 
 import sqlalchemy as sa
 from alembic import op
+from sqlalchemy.dialects import postgresql
+
+from app.db.migration_helpers import drop_enum, ensure_enum
 
 revision: str = "003"
 down_revision: Union[str, None] = "002"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
-objectif_type = sa.Enum("oct", "omt", "olt", name="objectif_type", create_type=False)
-
 
 def upgrade() -> None:
-    objectif_type.create(op.get_bind(), checkfirst=True)
+    ensure_enum("objectif_type", "oct", "omt", "olt")
+
+    objectif_type = postgresql.ENUM(
+        "oct", "omt", "olt", name="objectif_type", create_type=False
+    )
 
     op.create_table(
         "objectifs",
@@ -42,6 +47,7 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("type", "code"),
+        if_not_exists=True,
     )
 
     op.create_table(
@@ -67,6 +73,7 @@ def upgrade() -> None:
         sa.CheckConstraint("execution >= 0 AND execution <= 100", name="ck_execution_range"),
         sa.ForeignKeyConstraint(["objectif_id"], ["objectifs.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
+        if_not_exists=True,
     )
 
     op.create_table(
@@ -81,6 +88,7 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["activite_id"], ["activites.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("activite_id", "annee", "trimestre"),
+        if_not_exists=True,
     )
 
     op.create_table(
@@ -90,6 +98,7 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["activite_id"], ["activites.id"], ondelete="CASCADE"),
         sa.ForeignKeyConstraint(["direction_id"], ["directions.id"]),
         sa.PrimaryKeyConstraint("activite_id", "direction_id"),
+        if_not_exists=True,
     )
 
 
@@ -98,4 +107,4 @@ def downgrade() -> None:
     op.drop_table("activite_trimestres")
     op.drop_table("activites")
     op.drop_table("objectifs")
-    objectif_type.drop(op.get_bind(), checkfirst=True)
+    drop_enum("objectif_type")

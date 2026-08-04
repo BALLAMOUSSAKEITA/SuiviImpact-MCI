@@ -41,6 +41,7 @@ def upgrade() -> None:
         sa.Column("libelle", sa.String(length=100), nullable=False),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("code"),
+        if_not_exists=True,
     )
     op.bulk_insert(
         directions,
