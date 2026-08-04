@@ -1,6 +1,12 @@
 #!/bin/bash
 set -euo pipefail
 
+if [ -z "${DATABASE_URL:-}" ]; then
+  echo "ERROR: DATABASE_URL n'est pas défini."
+  echo "Railway → service backend → Variables → Add Reference → Postgres.DATABASE_URL"
+  exit 1
+fi
+
 echo "==> Migrations Alembic..."
 alembic upgrade head
 
