@@ -1,8 +1,8 @@
 [phases.setup]
-nixPkgs = ["python312", "bash"]
+nixPkgs = ["python312"]
 
 [phases.install]
 cmds = ["pip install -r requirements.txt"]
 
 [start]
-cmd = "bash start.sh"
+cmd = "sh start.sh"

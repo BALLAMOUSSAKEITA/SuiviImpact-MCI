@@ -141,7 +141,8 @@ Configurer SMTP sur le backend si vous activez Celery.
 
 | Problème | Solution |
 |----------|----------|
-| `sh: next: not found` (frontend) | Le projet utilise `output: standalone` — le démarrage passe par `bash start.sh` (`node .next/standalone/server.js`), pas `next start`. Redéployer après mise à jour de `frontend/railway.toml`. |
+| `sh: next: not found` (frontend) | Le démarrage passe par `npm run start` → `node .next/standalone/server.js` (plus `next start`). Redéployer après mise à jour. |
+| `bash could not be found` | Railway Nixpacks n'inclut pas toujours bash au runtime — utiliser `npm run start` (frontend) ou `sh start.sh` (backend). |
 | Migrations → `localhost:5432` | `DATABASE_URL` absent sur le service backend. **Add Reference** → `${{Postgres.DATABASE_URL}}` sur le **service backend**, puis redéployer. |
 | CORS error | Vérifier `CORS_ORIGINS` = URL exacte du frontend (https, sans slash final) |
 | API unreachable depuis le frontend | Vérifier `NEXT_PUBLIC_API_URL` puis **redéployer** le frontend |
@@ -168,7 +169,7 @@ Configurer SMTP sur le backend si vous activez Celery.
 | `backend/start.sh` | Migrations + uvicorn sur `$PORT` |
 | `frontend/railway.toml` | Config deploy frontend |
 | `frontend/nixpacks.toml` | Node 20 + build Next.js |
-| `frontend/start.sh` | Démarrage standalone (`server.js`) |
+| `frontend/start.sh` | Démarrage local standalone (optionnel ; Railway utilise `npm run start`) |
 | `.env.railway.*.example` | Templates variables |
 
 Docker (`docker-compose.yml`) reste disponible pour le développement local — **non utilisé** sur Railway.
