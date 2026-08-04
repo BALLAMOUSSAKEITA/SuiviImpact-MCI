@@ -75,4 +75,19 @@ SuiviImpact/
 
 ## Sprint en cours
 
-**Sprint 0** — Fondations : monorepo, PostgreSQL, API `/health`, landing Next.js, Docker Compose, CI.
+**Sprints 0–9 terminés** — Application complète SuiviImpact MIPME.
+
+| Sprint | Module |
+|--------|--------|
+| 0 | Fondations (FastAPI, Next.js, Docker) |
+| 1 | Authentification JWT + comptes |
+| 2 | Plan d'action OCT/OMT/OLT + activités |
+| 3 | Planification trimestrielle + tâches |
+| 4 | Suivi PAO + finalisation + Celery |
+| 5 | RCC + Missions |
+| 6 | PPM + Projets + Indicateurs |
+| 7 | Statistiques + exports Excel |
+| 8 | Archive GED |
+| 9 | Migration, sécurité, déploiement prod |
+
+Voir [docs/deploiement.md](docs/deploiement.md) pour la mise en production.

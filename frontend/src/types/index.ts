@@ -86,4 +86,392 @@ export const OBJECTIF_LABELS: Record<ObjectifType, { label: string; year: number
   olt: { label: "OLT", year: 2027 },
 };
 
+export const DEFAULT_ANNEE = 2025;
+
+export const TRIMESTRE_MOIS: Record<number, number[]> = {
+  1: [1, 2, 3],
+  2: [4, 5, 6],
+  3: [7, 8, 9],
+  4: [10, 11, 12],
+};
+
+export const MOIS_LABELS = [
+  "Janvier",
+  "Février",
+  "Mars",
+  "Avril",
+  "Mai",
+  "Juin",
+  "Juillet",
+  "Août",
+  "Septembre",
+  "Octobre",
+  "Novembre",
+  "Décembre",
+];
+
+export type TacheStatut = "en_cours" | "terminee" | "en_retard";
+
+export interface SemainePlan {
+  mois: number;
+  semaine: number;
+}
+
+export interface SemaineRead extends SemainePlan {
+  id: number;
+  planifie: boolean;
+  date_fin_semaine: string | null;
+}
+
+export interface TacheFichier {
+  id: number;
+  nom_original: string;
+  mime_type: string | null;
+  taille: number | null;
+  uploaded_at: string;
+}
+
+export interface Tache {
+  id: number;
+  activite_id: number;
+  trimestre: number;
+  annee: number;
+  description: string;
+  responsable: string;
+  email_responsable: string | null;
+  ponderation: string;
+  statut: TacheStatut;
+  observation: string | null;
+  semaines: SemaineRead[];
+  fichiers: TacheFichier[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TacheCreate {
+  trimestre: number;
+  annee?: number;
+  description: string;
+  responsable: string;
+  email_responsable?: string | null;
+  ponderation: number;
+  semaines?: SemainePlan[];
+}
+
+export interface TacheUpdate {
+  description?: string;
+  responsable?: string;
+  email_responsable?: string | null;
+  ponderation?: number;
+  semaines?: SemainePlan[];
+}
+
+export interface TacheDetails extends Tache {
+  activite_code: string;
+  activite_description: string;
+}
+
+export interface PlanificationActivite {
+  id: number;
+  code: string;
+  description: string;
+  execution: string;
+  budget: string;
+  objectif_id: number;
+  direction_ids: number[];
+  nb_taches: number;
+}
+
+export interface SuiviActivite {
+  id: number;
+  code: string;
+  description: string;
+  execution: string;
+  budget: string;
+  objectif_id: number;
+  direction_ids: number[];
+  nb_taches: number;
+  nb_terminees: number;
+  nb_en_retard: number;
+}
+
+export interface Recommandation {
+  id: number;
+  trimestre: number;
+  annee: number;
+  date_recommandation: string;
+  description: string;
+  responsable: string;
+  execution: string;
+  observations: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RecommandationCreate {
+  trimestre: number;
+  annee?: number;
+  date_recommandation: string;
+  description: string;
+  responsable: string;
+  execution?: number;
+  observations?: string | null;
+}
+
+export interface RecommandationUpdate {
+  trimestre?: number;
+  annee?: number;
+  date_recommandation?: string;
+  description?: string;
+  responsable?: string;
+  execution?: number;
+  observations?: string | null;
+}
+
+export interface Mission {
+  id: number;
+  trimestre: number;
+  annee: number;
+  date_mission: string;
+  description: string;
+  responsable: string;
+  execution: string;
+  observations: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface MissionCreate {
+  trimestre: number;
+  annee?: number;
+  date_mission: string;
+  description: string;
+  responsable: string;
+  execution?: number;
+  observations?: string | null;
+}
+
+export interface MissionUpdate {
+  trimestre?: number;
+  annee?: number;
+  date_mission?: string;
+  description?: string;
+  responsable?: string;
+  execution?: number;
+  observations?: string | null;
+}
+
+export type PpmStatut =
+  | "dao_elabore"
+  | "dao_publie"
+  | "marche_attribue"
+  | "contrat_signe";
+
+export interface Ppm {
+  id: number;
+  numero: string | null;
+  intitule: string;
+  type_marche: string | null;
+  mode_passation: string | null;
+  montant_estime: string | null;
+  montant_attribue: string | null;
+  financement: string | null;
+  date_marche: string | null;
+  statut: PpmStatut;
+  observations: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PpmCreate {
+  numero?: string | null;
+  intitule: string;
+  type_marche?: string | null;
+  mode_passation?: string | null;
+  montant_estime?: number | null;
+  montant_attribue?: number | null;
+  financement?: string | null;
+  date_marche?: string | null;
+  statut?: PpmStatut;
+  observations?: string | null;
+}
+
+export interface PpmUpdate {
+  numero?: string | null;
+  intitule?: string;
+  type_marche?: string | null;
+  mode_passation?: string | null;
+  montant_estime?: number | null;
+  montant_attribue?: number | null;
+  financement?: string | null;
+  date_marche?: string | null;
+  statut?: PpmStatut;
+  observations?: string | null;
+}
+
+export interface Projet {
+  id: number;
+  description: string;
+  abreviation: string | null;
+  cout: string | null;
+  bailleur: string | null;
+  part_etat: string | null;
+  part_bailleur: string | null;
+  execution_financiere: string;
+  execution_physique: string;
+  date_debut: string | null;
+  date_fin: string | null;
+  observations: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ProjetCreate {
+  description: string;
+  abreviation?: string | null;
+  cout?: number | null;
+  bailleur?: string | null;
+  part_etat?: number | null;
+  part_bailleur?: number | null;
+  execution_financiere?: number;
+  execution_physique?: number;
+  date_debut?: string | null;
+  date_fin?: string | null;
+  observations?: string | null;
+}
+
+export interface ProjetUpdate {
+  description?: string;
+  abreviation?: string | null;
+  cout?: number | null;
+  bailleur?: string | null;
+  part_etat?: number | null;
+  part_bailleur?: number | null;
+  execution_financiere?: number;
+  execution_physique?: number;
+  date_debut?: string | null;
+  date_fin?: string | null;
+  observations?: string | null;
+}
+
+export interface Indicateur {
+  id: number;
+  code: string;
+  libelle: string;
+  reference: string | null;
+  cible: string | null;
+  realise: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface IndicateurCreate {
+  code: string;
+  libelle: string;
+  reference?: string | null;
+  cible?: number | null;
+  realise?: number;
+}
+
+export interface IndicateurUpdate {
+  code?: string;
+  libelle?: string;
+  reference?: string | null;
+  cible?: number | null;
+  realise?: number;
+}
+
+export interface ModuleListResponse<T> {
+  items: T[];
+  avg_execution: string | null;
+}
+
+export interface ActiviteStats {
+  total: number;
+  non_demare: number;
+  en_cours: number;
+  termine: number;
+  en_retard: number;
+  progression: string;
+}
+
+export interface ExecutionStats {
+  total: number;
+  non_demare: number;
+  en_cours: number;
+  termine: number;
+  progression: string;
+}
+
+export interface PpmStats {
+  total: number;
+  dao_elabore: number;
+  dao_publie: number;
+  marche_attribue: number;
+  contrat_signe: number;
+}
+
+export interface ProjetStats {
+  total: number;
+  execution_financiere: string;
+  execution_physique: string;
+}
+
+export type ExportType =
+  | "activites"
+  | "taches"
+  | "recommandations"
+  | "missions"
+  | "ppm"
+  | "projets";
+
+export interface Dossier {
+  id: number;
+  nom: string;
+  parent_id: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface FichierArchive {
+  id: number;
+  nom: string;
+  dossier_id: number | null;
+  mime_type: string | null;
+  taille: number;
+  created_at: string;
+}
+
+export interface BreadcrumbItem {
+  id: number;
+  nom: string;
+}
+
+export interface ArchiveRoot {
+  dossiers: Dossier[];
+  fichiers: FichierArchive[];
+}
+
+export interface DossierContent {
+  dossier: Dossier;
+  breadcrumb: BreadcrumbItem[];
+  sous_dossiers: Dossier[];
+  fichiers: FichierArchive[];
+}
+
+export type ExecutionStatutFilter = "non_demare" | "en_cours" | "termine" | null;
+
+export const TACHE_STATUT_LABELS: Record<TacheStatut, string> = {
+  en_cours: "En cours",
+  terminee: "Terminée",
+  en_retard: "En retard",
+};
+
+export const PPM_STATUT_LABELS: Record<PpmStatut, string> = {
+  dao_elabore: "DAO élaboré",
+  dao_publie: "DAO publié",
+  marche_attribue: "Marché attribué",
+  contrat_signe: "Contrat signé",
+};
+
 export type { HealthResponse } from "@/lib/api";
