@@ -1,7 +1,6 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AdminShell } from "@/components/admin-shell";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -10,6 +9,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/components/auth-provider";
 import { ObjectifTabs } from "@/components/objectif-tabs";
 import { ProtectedRoute } from "@/components/protected-route";
+import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import {
   createActivite,
@@ -114,14 +114,15 @@ function ActivitesContent() {
     selectedTrimestres.some((t) => t.annee === annee && t.trimestre === trimestre);
 
   return (
-    <AdminShell>
-        <div className="space-y-8">
+    <div className="flex min-h-screen bg-paper">
+      <Sidebar />
+      <main className="flex-1 space-y-6 p-8">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <Link href="/admin" className="text-sm text-electric-blue hover:underline">
+            <Link href="/admin" className="text-sm text-forest-ink hover:underline">
               ← Plan d&apos;action
             </Link>
-            <h1 className="mt-2 text-2xl font-bold text-charcoal">
+            <h1 className="mt-2 text-2xl font-bold text-graphite">
               Activités — {objectif?.code ?? `Objectif #${objectifId}`}
             </h1>
             <p className="mt-1 text-sm text-fog">{objectif?.description}</p>
@@ -131,10 +132,10 @@ function ActivitesContent() {
         <ObjectifTabs />
 
         {canWrite && (
-          <div className="rounded-[var(--radius-card)] border border-ash bg-canvas-white p-4">
+          <div className="rounded-card border border-cloud bg-paper p-4 shadow-sm">
             <button
               type="button"
-              className="text-sm font-medium text-electric-blue"
+              className="text-sm font-medium text-forest-ink"
               onClick={() => setOpen((v) => !v)}
             >
               {open ? "− Masquer" : "+ Nouvelle activité"}
@@ -146,25 +147,25 @@ function ActivitesContent() {
                     placeholder="Code activité"
                     value={code}
                     onChange={(e) => setCode(e.target.value)}
-                    className="rounded-[var(--radius-card)] border border-ash px-3 py-2 text-sm"
+                    className="rounded-card border border-mist px-3 py-2 text-sm"
                   />
                   <input
                     placeholder="Description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="rounded-[var(--radius-card)] border border-ash px-3 py-2 text-sm sm:col-span-2"
+                    className="rounded-card border border-mist px-3 py-2 text-sm sm:col-span-2"
                   />
                   <input
                     type="number"
                     placeholder="Budget"
                     value={budget}
                     onChange={(e) => setBudget(e.target.value)}
-                    className="rounded-[var(--radius-card)] border border-ash px-3 py-2 text-sm"
+                    className="rounded-card border border-mist px-3 py-2 text-sm"
                   />
                 </div>
 
                 <div>
-                  <p className="mb-2 text-sm font-medium text-steel">Directions</p>
+                  <p className="mb-2 text-sm font-medium text-slate">Directions</p>
                   <div className="flex flex-wrap gap-2">
                     {directions.map((d) => (
                       <button
@@ -173,8 +174,8 @@ function ActivitesContent() {
                         onClick={() => toggleDirection(d.id)}
                         className={
                           selectedDirections.includes(d.id)
-                            ? "rounded-full bg-midnight-ink px-3 py-1 text-xs text-white"
-                            : "rounded-full bg-paper-mist px-3 py-1 text-xs text-steel"
+                            ? "rounded-full bg-forest-ink px-3 py-1 text-xs text-white"
+                            : "rounded-full bg-veil px-3 py-1 text-xs text-slate"
                         }
                       >
                         {d.code}
@@ -184,7 +185,7 @@ function ActivitesContent() {
                 </div>
 
                 <div>
-                  <p className="mb-2 text-sm font-medium text-steel">Trimestres</p>
+                  <p className="mb-2 text-sm font-medium text-slate">Trimestres</p>
                   <div className="space-y-2">
                     {YEARS.map((year) => (
                       <div key={year} className="flex flex-wrap items-center gap-2">
@@ -196,8 +197,8 @@ function ActivitesContent() {
                             onClick={() => toggleTrimestre(year, t)}
                             className={
                               isTrimestreSelected(year, t)
-                                ? "rounded bg-midnight-ink px-2 py-1 text-xs text-white"
-                                : "rounded bg-paper-mist px-2 py-1 text-xs text-steel"
+                                ? "rounded bg-forest-ink px-2 py-1 text-xs text-white"
+                                : "rounded bg-veil px-2 py-1 text-xs text-slate"
                             }
                           >
                             T{t}
@@ -227,9 +228,9 @@ function ActivitesContent() {
           </div>
         )}
 
-        <div className="overflow-x-auto rounded-[var(--radius-card)] border border-ash bg-canvas-white">
+        <div className="overflow-x-auto rounded-card border border-cloud bg-paper shadow-sm">
           <table className="min-w-full text-sm">
-            <thead className="bg-paper-mist">
+            <thead className="bg-paper">
               <tr>
                 <th className="px-3 py-3 text-left">Code</th>
                 <th className="px-3 py-3 text-left">Activité</th>
@@ -246,16 +247,16 @@ function ActivitesContent() {
                 {canWrite && <th className="px-3 py-3 text-right">Actions</th>}
               </tr>
             </thead>
-            <tbody className="divide-y divide-ash/60">
+            <tbody className="divide-y divide-cloud/60">
               {isLoading && (
                 <tr>
-                  <td colSpan={20} className="px-4 py-8 text-center text-fog">
+                  <td colSpan={20} className="px-4 py-8 text-center text-ash">
                     Chargement…
                   </td>
                 </tr>
               )}
               {activites.map((activite) => (
-                <tr key={activite.id} className="hover:bg-paper-mist/80">
+                <tr key={activite.id} className="hover:bg-veil/80">
                   <td className="px-3 py-3 font-medium">{activite.code}</td>
                   <td className="px-3 py-3">{activite.description}</td>
                   <td className="px-3 py-3 text-xs">
@@ -304,7 +305,7 @@ function ActivitesContent() {
             </tbody>
           </table>
         </div>
-      </div>
-    </AdminShell>
+      </main>
+    </div>
   );
 }

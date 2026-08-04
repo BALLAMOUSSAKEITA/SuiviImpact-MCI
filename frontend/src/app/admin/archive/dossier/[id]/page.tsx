@@ -1,7 +1,6 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AdminShell } from "@/components/admin-shell";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
@@ -10,6 +9,7 @@ import { ChevronRight, Folder, File } from "lucide-react";
 
 import { useAuth } from "@/components/auth-provider";
 import { ProtectedRoute } from "@/components/protected-route";
+import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import {
   createDossier,
@@ -105,22 +105,23 @@ function DossierContent() {
   };
 
   return (
-    <AdminShell>
-        <div className="space-y-8">
+    <div className="flex min-h-screen bg-paper">
+      <Sidebar />
+      <main className="flex-1 space-y-6 p-8">
         <div>
           <nav className="flex flex-wrap items-center gap-1 text-sm text-fog">
-            <Link href="/admin/archive" className="hover:text-electric-blue">
+            <Link href="/admin/archive" className="hover:text-forest-ink">
               Archive
             </Link>
             {data?.breadcrumb.map((item, i) => (
               <span key={item.id} className="flex items-center gap-1">
                 <ChevronRight className="h-3 w-3" />
                 {i === data.breadcrumb.length - 1 ? (
-                  <span className="font-medium text-charcoal">{item.nom}</span>
+                  <span className="font-medium text-graphite">{item.nom}</span>
                 ) : (
                   <Link
                     href={`/admin/archive/dossier/${item.id}`}
-                    className="hover:text-electric-blue"
+                    className="hover:text-forest-ink"
                   >
                     {item.nom}
                   </Link>
@@ -130,7 +131,7 @@ function DossierContent() {
           </nav>
 
           <div className="mt-4 flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-charcoal">
+            <h1 className="text-2xl font-bold text-graphite">
               {data?.dossier.nom ?? "Dossier"}
             </h1>
             {canWrite && (
@@ -148,7 +149,7 @@ function DossierContent() {
                   Nouveau sous-dossier
                 </Button>
                 <label className="cursor-pointer">
-                  <span className="inline-flex h-10 items-center justify-center rounded-[var(--radius-card)] bg-midnight-ink px-4 text-sm font-medium text-white hover:bg-midnight-ink/90">
+                  <span className="inline-flex h-10 items-center justify-center rounded-card bg-forest-ink px-4 text-sm font-medium text-white hover:bg-forest-ink/90">
                     Uploader
                   </span>
                   <input
@@ -167,11 +168,11 @@ function DossierContent() {
         </div>
 
         {renaming && canWrite && (
-          <div className="flex gap-2 rounded-[var(--radius-card)] border border-ash bg-canvas-white p-4">
+          <div className="flex gap-2 rounded-card border border-cloud bg-paper p-4">
             <input
               value={renameValue}
               onChange={(e) => setRenameValue(e.target.value)}
-              className="flex-1 rounded-[var(--radius-card)] border border-ash px-3 py-2 text-sm"
+              className="flex-1 rounded-card border border-cloud px-3 py-2 text-sm"
             />
             <Button
               onClick={() => renameMutation.mutate()}
@@ -186,12 +187,12 @@ function DossierContent() {
         )}
 
         {showNewFolder && canWrite && (
-          <div className="flex gap-2 rounded-[var(--radius-card)] border border-ash bg-canvas-white p-4">
+          <div className="flex gap-2 rounded-card border border-cloud bg-paper p-4">
             <input
               value={newFolderName}
               onChange={(e) => setNewFolderName(e.target.value)}
               placeholder="Nom du sous-dossier"
-              className="flex-1 rounded-[var(--radius-card)] border border-ash px-3 py-2 text-sm"
+              className="flex-1 rounded-card border border-cloud px-3 py-2 text-sm"
             />
             <Button
               onClick={() => createFolderMutation.mutate()}
@@ -207,7 +208,7 @@ function DossierContent() {
 
         {canWrite && (
           <div
-            className="rounded-[var(--radius-card)] border-2 border-dashed border-ash bg-canvas-white p-8 text-center"
+            className="rounded-card border-2 border-dashed border-mist bg-paper p-8 text-center"
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => {
               e.preventDefault();
@@ -222,17 +223,17 @@ function DossierContent() {
         )}
 
         {isLoading ? (
-          <p className="text-sm text-fog">Chargement…</p>
+          <p className="text-sm text-ash">Chargement…</p>
         ) : (
-          <div className="space-y-2 rounded-[var(--radius-card)] border border-ash bg-canvas-white p-4">
+          <div className="space-y-2 rounded-card border border-cloud bg-paper p-4 shadow-sm">
             {data?.sous_dossiers.map((d) => (
               <div
                 key={d.id}
-                className="flex items-center justify-between rounded-[var(--radius-card)] px-3 py-2 hover:bg-paper-mist"
+                className="flex items-center justify-between rounded-card px-3 py-2 hover:bg-paper"
               >
                 <Link
                   href={`/admin/archive/dossier/${d.id}`}
-                  className="flex items-center gap-2 text-sm font-medium text-charcoal hover:text-electric-blue"
+                  className="flex items-center gap-2 text-sm font-medium text-graphite hover:text-forest-ink"
                 >
                   <Folder className="h-4 w-4 text-amber-500" />
                   {d.nom}
@@ -255,12 +256,12 @@ function DossierContent() {
             {data?.fichiers.map((f) => (
               <div
                 key={f.id}
-                className="flex items-center justify-between rounded-[var(--radius-card)] px-3 py-2 hover:bg-paper-mist"
+                className="flex items-center justify-between rounded-card px-3 py-2 hover:bg-paper"
               >
-                <div className="flex items-center gap-2 text-sm text-steel">
-                  <File className="h-4 w-4 text-fog" />
+                <div className="flex items-center gap-2 text-sm text-slate">
+                  <File className="h-4 w-4 text-ash" />
                   {f.nom}
-                  <span className="text-xs text-fog">
+                  <span className="text-xs text-ash">
                     ({formatSize(f.taille)})
                   </span>
                 </div>
@@ -282,13 +283,13 @@ function DossierContent() {
             {data &&
               data.sous_dossiers.length === 0 &&
               data.fichiers.length === 0 && (
-                <p className="py-8 text-center text-sm text-fog">
+                <p className="py-8 text-center text-sm text-ash">
                   Dossier vide.
                 </p>
               )}
           </div>
         )}
-      </div>
-    </AdminShell>
+      </main>
+    </div>
   );
 }

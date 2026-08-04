@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { AdminShell } from "@/components/admin-shell";
 import { toast } from "sonner";
 
 import { ProtectedRoute } from "@/components/protected-route";
+import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { downloadExport } from "@/lib/api";
@@ -43,10 +43,11 @@ function ExportContent() {
   };
 
   return (
-    <AdminShell>
-        <div className="space-y-8">
-        <h1 className="text-2xl font-bold text-charcoal">Exports Excel</h1>
-        <p className="mt-2 text-steel">
+    <div className="flex min-h-screen bg-paper">
+      <Sidebar />
+      <main className="flex-1 p-8">
+        <h1 className="text-2xl font-bold text-graphite">Exports Excel</h1>
+        <p className="mt-2 text-slate">
           Téléchargez les données au format .xlsx
         </p>
 
@@ -69,7 +70,7 @@ function ExportContent() {
             </Card>
           ))}
         </div>
-      </div>
-    </AdminShell>
+      </main>
+    </div>
   );
 }

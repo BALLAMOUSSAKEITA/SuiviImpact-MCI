@@ -1,7 +1,6 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AdminShell } from "@/components/admin-shell";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -9,6 +8,7 @@ import { Folder, File } from "lucide-react";
 
 import { useAuth } from "@/components/auth-provider";
 import { ProtectedRoute } from "@/components/protected-route";
+import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import {
   createDossier,
@@ -86,11 +86,12 @@ function ArchiveContent() {
   };
 
   return (
-    <AdminShell>
-        <div className="space-y-8">
+    <div className="flex min-h-screen bg-paper">
+      <Sidebar />
+      <main className="flex-1 space-y-6 p-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-charcoal">Archive</h1>
+            <h1 className="text-2xl font-bold text-graphite">Archive</h1>
             <p className="mt-1 text-sm text-fog">
               Explorateur de documents — racine
             </p>
@@ -101,7 +102,7 @@ function ArchiveContent() {
                 Nouveau dossier
               </Button>
               <label className="cursor-pointer">
-                <span className="inline-flex h-10 items-center justify-center rounded-[var(--radius-card)] border border-charcoal px-4 text-sm font-medium text-electric-blue hover:bg-paper-mist">
+                <span className="inline-flex h-10 items-center justify-center rounded-card border border-forest-ink px-4 text-sm font-medium text-forest-ink hover:bg-veil">
                   Uploader un fichier
                 </span>
                 <input
@@ -119,12 +120,12 @@ function ArchiveContent() {
         </div>
 
         {showNewFolder && canWrite && (
-          <div className="flex gap-2 rounded-[var(--radius-card)] border border-ash bg-canvas-white p-4">
+          <div className="flex gap-2 rounded-card border border-cloud bg-paper p-4">
             <input
               value={newFolderName}
               onChange={(e) => setNewFolderName(e.target.value)}
               placeholder="Nom du dossier"
-              className="flex-1 rounded-[var(--radius-card)] border border-ash px-3 py-2 text-sm"
+              className="flex-1 rounded-card border border-cloud px-3 py-2 text-sm"
             />
             <Button
               onClick={() => createFolderMutation.mutate()}
@@ -140,7 +141,7 @@ function ArchiveContent() {
 
         {canWrite && (
           <div
-            className="rounded-[var(--radius-card)] border-2 border-dashed border-ash bg-canvas-white p-8 text-center"
+            className="rounded-card border-2 border-dashed border-mist bg-paper p-8 text-center"
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => {
               e.preventDefault();
@@ -155,17 +156,17 @@ function ArchiveContent() {
         )}
 
         {isLoading ? (
-          <p className="text-sm text-fog">Chargement…</p>
+          <p className="text-sm text-ash">Chargement…</p>
         ) : (
-          <div className="space-y-2 rounded-[var(--radius-card)] border border-ash bg-canvas-white p-4 ">
+          <div className="space-y-2 rounded-card border border-cloud bg-paper p-4 shadow-sm">
             {data?.dossiers.map((d) => (
               <div
                 key={d.id}
-                className="flex items-center justify-between rounded-[var(--radius-card)] px-3 py-2 hover:bg-paper-mist"
+                className="flex items-center justify-between rounded-card px-3 py-2 hover:bg-paper"
               >
                 <Link
                   href={`/admin/archive/dossier/${d.id}`}
-                  className="flex items-center gap-2 text-sm font-medium text-charcoal hover:text-electric-blue"
+                  className="flex items-center gap-2 text-sm font-medium text-graphite hover:text-forest-ink"
                 >
                   <Folder className="h-4 w-4 text-amber-500" />
                   {d.nom}
@@ -188,12 +189,12 @@ function ArchiveContent() {
             {data?.fichiers.map((f) => (
               <div
                 key={f.id}
-                className="flex items-center justify-between rounded-[var(--radius-card)] px-3 py-2 hover:bg-paper-mist"
+                className="flex items-center justify-between rounded-card px-3 py-2 hover:bg-paper"
               >
-                <div className="flex items-center gap-2 text-sm text-steel">
-                  <File className="h-4 w-4 text-fog" />
+                <div className="flex items-center gap-2 text-sm text-slate">
+                  <File className="h-4 w-4 text-ash" />
                   {f.nom}
-                  <span className="text-xs text-fog">
+                  <span className="text-xs text-ash">
                     ({formatSize(f.taille)})
                   </span>
                 </div>
@@ -215,13 +216,13 @@ function ArchiveContent() {
             {data &&
               data.dossiers.length === 0 &&
               data.fichiers.length === 0 && (
-                <p className="py-8 text-center text-sm text-fog">
+                <p className="py-8 text-center text-sm text-ash">
                   Archive vide.
                 </p>
               )}
           </div>
         )}
-      </div>
-    </AdminShell>
+      </main>
+    </div>
   );
 }

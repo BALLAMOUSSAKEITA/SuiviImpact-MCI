@@ -1,11 +1,11 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AdminShell } from "@/components/admin-shell";
 import Link from "next/link";
 import { toast } from "sonner";
 
 import { ProtectedRoute } from "@/components/protected-route";
+import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import {
   activateUser,
@@ -65,11 +65,12 @@ function ComptesContent() {
   };
 
   return (
-    <AdminShell>
-        <div className="space-y-8">
+    <div className="flex min-h-screen bg-paper">
+      <Sidebar />
+      <main className="flex-1 p-8">
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-charcoal">Gestion des comptes</h1>
+            <h1 className="text-2xl font-bold text-graphite">Gestion des comptes</h1>
             <p className="mt-1 text-sm text-fog">
               Créer, activer, désactiver ou supprimer des utilisateurs.
             </p>
@@ -79,29 +80,29 @@ function ComptesContent() {
           </Link>
         </div>
 
-        <div className="overflow-hidden rounded-[var(--radius-card)] border border-ash bg-canvas-white ">
+        <div className="overflow-hidden rounded-card border border-cloud bg-paper shadow-sm">
           <table className="min-w-full divide-y divide-cloud text-sm">
-            <thead className="bg-paper-mist">
+            <thead className="bg-paper">
               <tr>
-                <th className="px-4 py-3 text-left font-medium text-steel">N°</th>
-                <th className="px-4 py-3 text-left font-medium text-steel">Prénom</th>
-                <th className="px-4 py-3 text-left font-medium text-steel">Username</th>
-                <th className="px-4 py-3 text-left font-medium text-steel">Rôle</th>
-                <th className="px-4 py-3 text-left font-medium text-steel">Accès</th>
-                <th className="px-4 py-3 text-left font-medium text-steel">Statut</th>
-                <th className="px-4 py-3 text-right font-medium text-steel">Actions</th>
+                <th className="px-4 py-3 text-left font-medium text-slate">N°</th>
+                <th className="px-4 py-3 text-left font-medium text-slate">Prénom</th>
+                <th className="px-4 py-3 text-left font-medium text-slate">Username</th>
+                <th className="px-4 py-3 text-left font-medium text-slate">Rôle</th>
+                <th className="px-4 py-3 text-left font-medium text-slate">Accès</th>
+                <th className="px-4 py-3 text-left font-medium text-slate">Statut</th>
+                <th className="px-4 py-3 text-right font-medium text-slate">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-ash/60">
+            <tbody className="divide-y divide-cloud/60">
               {isLoading && (
                 <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-fog">
+                  <td colSpan={7} className="px-4 py-8 text-center text-ash">
                     Chargement…
                   </td>
                 </tr>
               )}
               {users?.map((user) => (
-                <tr key={user.id} className="hover:bg-paper-mist">
+                <tr key={user.id} className="hover:bg-paper">
                   <td className="px-4 py-3">{user.id}</td>
                   <td className="px-4 py-3 font-medium">{user.prenom}</td>
                   <td className="px-4 py-3">{user.username}</td>
@@ -111,7 +112,7 @@ function ComptesContent() {
                     <span
                       className={
                         user.etat
-                          ? "rounded-full bg-paper-mist px-2 py-0.5 text-xs text-electric-blue"
+                          ? "rounded-full bg-veil px-2 py-0.5 text-xs text-forest-ink"
                           : "rounded-full bg-red-100 px-2 py-0.5 text-xs text-red-800"
                       }
                     >
@@ -154,7 +155,7 @@ function ComptesContent() {
             </tbody>
           </table>
         </div>
-      </div>
-    </AdminShell>
+      </main>
+    </div>
   );
 }

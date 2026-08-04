@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 
-import { AdminShell } from "@/components/admin-shell";
 import { ProtectedRoute } from "@/components/protected-route";
+import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -17,10 +17,11 @@ const TRIMESTRES = [
 export default function PlanificationHubPage() {
   return (
     <ProtectedRoute>
-      <AdminShell>
-        <div className="space-y-8">
-          <h1 className="text-2xl font-bold text-charcoal">Planification</h1>
-          <p className="mt-2 text-steel">
+      <div className="flex min-h-screen bg-paper">
+        <Sidebar />
+        <main className="flex-1 p-8">
+          <h1 className="text-2xl font-bold text-graphite">Planification</h1>
+          <p className="mt-2 text-slate">
             Planifiez les activités et tâches par trimestre — BSD MIPME 2025.
           </p>
 
@@ -39,8 +40,8 @@ export default function PlanificationHubPage() {
               </Card>
             ))}
           </div>
-        </div>
-      </AdminShell>
+        </main>
+      </div>
     </ProtectedRoute>
   );
 }

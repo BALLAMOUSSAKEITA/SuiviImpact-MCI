@@ -1,7 +1,6 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AdminShell } from "@/components/admin-shell";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -9,6 +8,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/components/auth-provider";
 import { ExecutionBadge } from "@/components/execution-badge";
 import { ProtectedRoute } from "@/components/protected-route";
+import { Sidebar } from "@/components/sidebar";
 import { TrimestreTabs } from "@/components/trimestre-tabs";
 import { Button } from "@/components/ui/button";
 import {
@@ -154,11 +154,12 @@ function RecommandationContent() {
   };
 
   return (
-    <AdminShell>
-        <div className="space-y-8">
+    <div className="flex min-h-screen bg-paper">
+      <Sidebar />
+      <main className="flex-1 space-y-6 p-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-charcoal">
+            <h1 className="text-2xl font-bold text-graphite">
               Recommandations RCC — T{trimestre} {DEFAULT_ANNEE}
             </h1>
             {data?.avg_execution != null && (
@@ -184,10 +185,10 @@ function RecommandationContent() {
               key={label}
               type="button"
               onClick={() => setStatut(key)}
-              className={`rounded-[var(--radius-card)] px-3 py-1.5 text-sm font-medium transition-colors ${
+              className={`rounded-card px-3 py-1.5 text-sm font-medium transition-colors ${
                 statut === key
-                  ? "bg-midnight-ink text-white"
-                  : "bg-canvas-white text-steel ring-1 ring-ash hover:bg-paper-mist"
+                  ? "bg-forest-ink text-white"
+                  : "bg-paper text-slate ring-1 ring-cloud hover:bg-veil"
               }`}
             >
               {label}
@@ -198,14 +199,14 @@ function RecommandationContent() {
         {showForm && canWrite && (
           <form
             onSubmit={handleSubmit}
-            className="space-y-4 rounded-[var(--radius-card)] border border-ash bg-canvas-white p-6"
+            className="space-y-4 rounded-card border border-cloud bg-paper p-6 shadow-sm"
           >
             <h2 className="text-lg font-semibold">
               {editing ? "Modifier" : "Nouvelle recommandation"}
             </h2>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="mb-1 block text-sm text-steel">Date</label>
+                <label className="mb-1 block text-sm text-slate">Date</label>
                 <input
                   type="date"
                   required
@@ -213,11 +214,11 @@ function RecommandationContent() {
                   onChange={(e) =>
                     setForm((f) => ({ ...f, date_recommandation: e.target.value }))
                   }
-                  className="w-full rounded-[var(--radius-card)] border border-ash px-3 py-2 text-sm"
+                  className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm text-steel">
+                <label className="mb-1 block text-sm text-slate">
                   Responsable
                 </label>
                 <input
@@ -226,11 +227,11 @@ function RecommandationContent() {
                   onChange={(e) =>
                     setForm((f) => ({ ...f, responsable: e.target.value }))
                   }
-                  className="w-full rounded-[var(--radius-card)] border border-ash px-3 py-2 text-sm"
+                  className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
                 />
               </div>
               <div className="sm:col-span-2">
-                <label className="mb-1 block text-sm text-steel">
+                <label className="mb-1 block text-sm text-slate">
                   Description
                 </label>
                 <textarea
@@ -240,11 +241,11 @@ function RecommandationContent() {
                     setForm((f) => ({ ...f, description: e.target.value }))
                   }
                   rows={2}
-                  className="w-full rounded-[var(--radius-card)] border border-ash px-3 py-2 text-sm"
+                  className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm text-steel">
+                <label className="mb-1 block text-sm text-slate">
                   Exécution (%)
                 </label>
                 <input
@@ -255,11 +256,11 @@ function RecommandationContent() {
                   onChange={(e) =>
                     setForm((f) => ({ ...f, execution: e.target.value }))
                   }
-                  className="w-full rounded-[var(--radius-card)] border border-ash px-3 py-2 text-sm"
+                  className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm text-steel">
+                <label className="mb-1 block text-sm text-slate">
                   Observations
                 </label>
                 <input
@@ -267,7 +268,7 @@ function RecommandationContent() {
                   onChange={(e) =>
                     setForm((f) => ({ ...f, observations: e.target.value }))
                   }
-                  className="w-full rounded-[var(--radius-card)] border border-ash px-3 py-2 text-sm"
+                  className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
                 />
               </div>
             </div>
@@ -280,27 +281,27 @@ function RecommandationContent() {
           </form>
         )}
 
-        <div className="overflow-hidden rounded-[var(--radius-card)] border border-ash bg-canvas-white">
+        <div className="overflow-hidden rounded-card border border-cloud bg-paper shadow-sm">
           <table className="min-w-full divide-y divide-cloud text-sm">
-            <thead className="bg-paper-mist">
+            <thead className="bg-paper">
               <tr>
-                <th className="px-4 py-3 text-left font-medium text-steel">Date</th>
-                <th className="px-4 py-3 text-left font-medium text-steel">Description</th>
-                <th className="px-4 py-3 text-left font-medium text-steel">Responsable</th>
-                <th className="px-4 py-3 text-left font-medium text-steel">Exécution</th>
-                <th className="px-4 py-3 text-right font-medium text-steel">Actions</th>
+                <th className="px-4 py-3 text-left font-medium text-slate">Date</th>
+                <th className="px-4 py-3 text-left font-medium text-slate">Description</th>
+                <th className="px-4 py-3 text-left font-medium text-slate">Responsable</th>
+                <th className="px-4 py-3 text-left font-medium text-slate">Exécution</th>
+                <th className="px-4 py-3 text-right font-medium text-slate">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-ash/60">
+            <tbody className="divide-y divide-cloud/60">
               {isLoading && (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-fog">
+                  <td colSpan={5} className="px-4 py-8 text-center text-ash">
                     Chargement…
                   </td>
                 </tr>
               )}
               {data?.items.map((item) => (
-                <tr key={item.id} className="hover:bg-paper-mist">
+                <tr key={item.id} className="hover:bg-paper">
                   <td className="px-4 py-3">{item.date_recommandation}</td>
                   <td className="max-w-xs truncate px-4 py-3">{item.description}</td>
                   <td className="px-4 py-3">{item.responsable}</td>
@@ -345,7 +346,7 @@ function RecommandationContent() {
             </tbody>
           </table>
         </div>
-      </div>
-    </AdminShell>
+      </main>
+    </div>
   );
 }

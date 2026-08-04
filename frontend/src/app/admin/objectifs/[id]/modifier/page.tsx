@@ -6,8 +6,8 @@ import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { AdminShell } from "@/components/admin-shell";
 import { ProtectedRoute } from "@/components/protected-route";
+import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import { listObjectifs, updateObjectif } from "@/lib/api";
 import type { Objectif } from "@/types";
@@ -32,20 +32,20 @@ function ModifierObjectifContent() {
 
   if (!objectif) {
     return (
-      <AdminShell>
-        <div className="space-y-8">
-          <p className="text-sm text-fog">Objectif introuvable</p>
-        </div>
-      </AdminShell>
+      <div className="flex min-h-screen bg-paper">
+        <Sidebar />
+        <main className="flex-1 p-8">Objectif introuvable</main>
+      </div>
     );
   }
 
   return (
-    <AdminShell>
-      <div className="space-y-8">
+    <div className="flex min-h-screen bg-paper">
+      <Sidebar />
+      <main className="flex-1 p-8">
         <ObjectifEditForm key={objectif.id} objectif={objectif} />
-      </div>
-    </AdminShell>
+      </main>
+    </div>
   );
 }
 
@@ -99,19 +99,19 @@ function CardForm({
   cancelHref: string;
 }) {
   return (
-    <div className="panel-dub mx-auto max-w-lg">
-      <h1 className="text-xl font-semibold text-charcoal">{title}</h1>
+    <div className="mx-auto max-w-lg rounded-card border border-cloud bg-paper p-6 shadow-sm">
+      <h1 className="text-xl font-semibold">{title}</h1>
       <div className="mt-4 space-y-3">
         <input
           value={code}
           onChange={(e) => onCodeChange(e.target.value)}
-          className="dub-input"
+          className="w-full rounded-card border border-mist px-3 py-2 text-sm"
         />
         <textarea
           value={description}
           onChange={(e) => onDescriptionChange(e.target.value)}
           rows={4}
-          className="dub-input"
+          className="w-full rounded-card border border-mist px-3 py-2 text-sm"
         />
         <div className="flex gap-3">
           <Button onClick={onSubmit} disabled={submitting}>

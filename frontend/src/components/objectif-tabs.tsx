@@ -22,10 +22,10 @@ export function ObjectifTabs() {
             key={type}
             href={href}
             className={cn(
-              "rounded-[var(--radius-btn)] px-4 py-2 text-sm font-medium transition-colors",
+              "rounded-card px-4 py-2 text-sm font-medium transition-colors",
               active
-                ? "bg-sky-soft text-charcoal"
-                : "border border-ash bg-canvas-white text-steel hover:bg-paper-mist hover:text-charcoal",
+                ? "bg-forest-ink text-paper"
+                : "bg-paper text-slate ring-1 ring-cloud hover:bg-veil",
             )}
           >
             {label} — {year}

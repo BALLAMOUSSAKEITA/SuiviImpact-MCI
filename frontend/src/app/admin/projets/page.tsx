@@ -1,13 +1,13 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AdminShell } from "@/components/admin-shell";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/components/auth-provider";
 import { ExecutionBadge } from "@/components/execution-badge";
 import { ProtectedRoute } from "@/components/protected-route";
+import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import { createProjet, deleteProjet, listProjets, updateProjet } from "@/lib/api";
 import type { Projet } from "@/types";
@@ -134,11 +134,12 @@ function ProjetsContent() {
   };
 
   return (
-    <AdminShell>
-        <div className="space-y-8">
+    <div className="flex min-h-screen bg-paper">
+      <Sidebar />
+      <main className="flex-1 space-y-6 p-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-charcoal">Projets</h1>
+            <h1 className="text-2xl font-bold text-graphite">Projets</h1>
             <p className="mt-1 text-sm text-fog">
               Suivi des projets et exécution financière / physique
             </p>
@@ -151,49 +152,49 @@ function ProjetsContent() {
         {showForm && canWrite && (
           <form
             onSubmit={handleSubmit}
-            className="space-y-4 rounded-[var(--radius-card)] border border-ash bg-canvas-white p-6 "
+            className="space-y-4 rounded-card border border-cloud bg-paper p-6 shadow-sm"
           >
             <h2 className="text-lg font-semibold">
               {editing ? "Modifier" : "Nouveau projet"}
             </h2>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <div className="sm:col-span-2">
-                <label className="mb-1 block text-sm text-steel">Description</label>
+                <label className="mb-1 block text-sm text-slate">Description</label>
                 <input
                   required
                   value={form.description}
                   onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-                  className="w-full rounded-[var(--radius-card)] border border-ash px-3 py-2 text-sm"
+                  className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm text-steel">Abréviation</label>
+                <label className="mb-1 block text-sm text-slate">Abréviation</label>
                 <input
                   value={form.abreviation}
                   onChange={(e) => setForm((f) => ({ ...f, abreviation: e.target.value }))}
-                  className="w-full rounded-[var(--radius-card)] border border-ash px-3 py-2 text-sm"
+                  className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm text-steel">Coût</label>
+                <label className="mb-1 block text-sm text-slate">Coût</label>
                 <input
                   type="number"
                   min="0"
                   value={form.cout}
                   onChange={(e) => setForm((f) => ({ ...f, cout: e.target.value }))}
-                  className="w-full rounded-[var(--radius-card)] border border-ash px-3 py-2 text-sm"
+                  className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm text-steel">Bailleur</label>
+                <label className="mb-1 block text-sm text-slate">Bailleur</label>
                 <input
                   value={form.bailleur}
                   onChange={(e) => setForm((f) => ({ ...f, bailleur: e.target.value }))}
-                  className="w-full rounded-[var(--radius-card)] border border-ash px-3 py-2 text-sm"
+                  className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm text-steel">Exé. financière (%)</label>
+                <label className="mb-1 block text-sm text-slate">Exé. financière (%)</label>
                 <input
                   type="number"
                   min="0"
@@ -202,11 +203,11 @@ function ProjetsContent() {
                   onChange={(e) =>
                     setForm((f) => ({ ...f, execution_financiere: e.target.value }))
                   }
-                  className="w-full rounded-[var(--radius-card)] border border-ash px-3 py-2 text-sm"
+                  className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm text-steel">Exé. physique (%)</label>
+                <label className="mb-1 block text-sm text-slate">Exé. physique (%)</label>
                 <input
                   type="number"
                   min="0"
@@ -215,7 +216,7 @@ function ProjetsContent() {
                   onChange={(e) =>
                     setForm((f) => ({ ...f, execution_physique: e.target.value }))
                   }
-                  className="w-full rounded-[var(--radius-card)] border border-ash px-3 py-2 text-sm"
+                  className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
                 />
               </div>
             </div>
@@ -228,30 +229,30 @@ function ProjetsContent() {
           </form>
         )}
 
-        <div className="overflow-hidden rounded-[var(--radius-card)] border border-ash bg-canvas-white ">
+        <div className="overflow-hidden rounded-card border border-cloud bg-paper shadow-sm">
           <table className="min-w-full divide-y divide-cloud text-sm">
-            <thead className="bg-paper-mist">
+            <thead className="bg-paper">
               <tr>
-                <th className="px-4 py-3 text-left font-medium text-steel">Projet</th>
-                <th className="px-4 py-3 text-left font-medium text-steel">Bailleur</th>
-                <th className="px-4 py-3 text-left font-medium text-steel">Financière</th>
-                <th className="px-4 py-3 text-left font-medium text-steel">Physique</th>
-                <th className="px-4 py-3 text-right font-medium text-steel">Actions</th>
+                <th className="px-4 py-3 text-left font-medium text-slate">Projet</th>
+                <th className="px-4 py-3 text-left font-medium text-slate">Bailleur</th>
+                <th className="px-4 py-3 text-left font-medium text-slate">Financière</th>
+                <th className="px-4 py-3 text-left font-medium text-slate">Physique</th>
+                <th className="px-4 py-3 text-right font-medium text-slate">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-ash/60">
+            <tbody className="divide-y divide-cloud/60">
               {isLoading && (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-fog">
+                  <td colSpan={5} className="px-4 py-8 text-center text-ash">
                     Chargement…
                   </td>
                 </tr>
               )}
               {items.map((item) => (
-                <tr key={item.id} className="hover:bg-paper-mist">
+                <tr key={item.id} className="hover:bg-paper">
                   <td className="px-4 py-3">
                     <p className="font-medium">{item.abreviation ?? item.description.slice(0, 30)}</p>
-                    <p className="text-xs text-fog">{item.description}</p>
+                    <p className="text-xs text-ash">{item.description}</p>
                   </td>
                   <td className="px-4 py-3">{item.bailleur ?? "—"}</td>
                   <td className="px-4 py-3">
@@ -289,7 +290,7 @@ function ProjetsContent() {
             </tbody>
           </table>
         </div>
-      </div>
-    </AdminShell>
+      </main>
+    </div>
   );
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AdminShell } from "@/components/admin-shell";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
@@ -10,6 +9,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/components/auth-provider";
 import { TacheStatutBadge } from "@/components/execution-badge";
 import { ProtectedRoute } from "@/components/protected-route";
+import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import {
   createTache,
@@ -161,17 +161,18 @@ function TachesContent() {
   };
 
   return (
-    <AdminShell>
-        <div className="space-y-8">
+    <div className="flex min-h-screen bg-paper">
+      <Sidebar />
+      <main className="flex-1 space-y-6 p-8">
         <div className="flex items-center justify-between">
           <div>
             <Link
               href={`/admin/planification/${trimestre}`}
-              className="text-sm text-electric-blue hover:underline"
+              className="text-sm text-forest-ink hover:underline"
             >
               ← Retour planification T{trimestre}
             </Link>
-            <h1 className="mt-2 text-2xl font-bold text-charcoal">
+            <h1 className="mt-2 text-2xl font-bold text-graphite">
               Tâches — Activité #{activiteId} — T{trimestre}
             </h1>
           </div>
@@ -183,14 +184,14 @@ function TachesContent() {
         {showForm && canWrite && (
           <form
             onSubmit={handleSubmit}
-            className="space-y-4 rounded-[var(--radius-card)] border border-ash bg-canvas-white p-6"
+            className="space-y-4 rounded-card border border-cloud bg-paper p-6 shadow-sm"
           >
-            <h2 className="text-lg font-semibold text-charcoal">
+            <h2 className="text-lg font-semibold text-graphite">
               {editing ? "Modifier la tâche" : "Nouvelle tâche"}
             </h2>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
-                <label className="mb-1 block text-sm text-steel">
+                <label className="mb-1 block text-sm text-slate">
                   Description
                 </label>
                 <input
@@ -199,11 +200,11 @@ function TachesContent() {
                   onChange={(e) =>
                     setForm((f) => ({ ...f, description: e.target.value }))
                   }
-                  className="w-full rounded-[var(--radius-card)] border border-ash px-3 py-2 text-sm"
+                  className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm text-steel">
+                <label className="mb-1 block text-sm text-slate">
                   Responsable
                 </label>
                 <input
@@ -212,11 +213,11 @@ function TachesContent() {
                   onChange={(e) =>
                     setForm((f) => ({ ...f, responsable: e.target.value }))
                   }
-                  className="w-full rounded-[var(--radius-card)] border border-ash px-3 py-2 text-sm"
+                  className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm text-steel">
+                <label className="mb-1 block text-sm text-slate">
                   Email responsable
                 </label>
                 <input
@@ -228,11 +229,11 @@ function TachesContent() {
                       email_responsable: e.target.value,
                     }))
                   }
-                  className="w-full rounded-[var(--radius-card)] border border-ash px-3 py-2 text-sm"
+                  className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm text-steel">
+                <label className="mb-1 block text-sm text-slate">
                   Pondération (%)
                 </label>
                 <input
@@ -245,26 +246,26 @@ function TachesContent() {
                   onChange={(e) =>
                     setForm((f) => ({ ...f, ponderation: e.target.value }))
                   }
-                  className="w-full rounded-[var(--radius-card)] border border-ash px-3 py-2 text-sm"
+                  className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
                 />
               </div>
             </div>
 
             <div>
-              <p className="mb-2 text-sm font-medium text-steel">
+              <p className="mb-2 text-sm font-medium text-slate">
                 Calendrier des semaines
               </p>
               <div className="overflow-x-auto">
                 <table className="min-w-full border-collapse text-xs">
                   <thead>
                     <tr>
-                      <th className="border border-ash bg-canvas-white px-2 py-1">
+                      <th className="border border-cloud bg-paper px-2 py-1">
                         Mois
                       </th>
                       {[1, 2, 3, 4].map((s) => (
                         <th
                           key={s}
-                          className="border border-ash bg-canvas-white px-2 py-1"
+                          className="border border-cloud bg-paper px-2 py-1"
                         >
                           S{s}
                         </th>
@@ -274,21 +275,21 @@ function TachesContent() {
                   <tbody>
                     {moisList.map((mois) => (
                       <tr key={mois}>
-                        <td className="border border-ash px-2 py-1 font-medium">
+                        <td className="border border-cloud px-2 py-1 font-medium">
                           {MOIS_LABELS[mois - 1]}
                         </td>
                         {[1, 2, 3, 4].map((semaine) => (
                           <td
                             key={semaine}
-                            className="border border-ash p-1 text-center"
+                            className="border border-cloud p-1 text-center"
                           >
                             <button
                               type="button"
                               onClick={() => toggleSemaine(mois, semaine)}
                               className={`h-8 w-full rounded transition-colors ${
                                 isSemaineSelected(mois, semaine)
-                                  ? "bg-midnight-ink text-white"
-                                  : "bg-paper-mist hover:bg-paper-mist"
+                                  ? "bg-forest-ink text-white"
+                                  : "bg-veil hover:bg-veil"
                               }`}
                             >
                               {isSemaineSelected(mois, semaine) ? "✓" : ""}
@@ -314,19 +315,19 @@ function TachesContent() {
         )}
 
         {isLoading ? (
-          <p className="text-sm text-fog">Chargement…</p>
+          <p className="text-sm text-ash">Chargement…</p>
         ) : taches.length === 0 ? (
-          <p className="text-sm text-fog">Aucune tâche pour cette activité.</p>
+          <p className="text-sm text-ash">Aucune tâche pour cette activité.</p>
         ) : (
           <div className="space-y-4">
             {taches.map((tache) => (
               <div
                 key={tache.id}
-                className="rounded-[var(--radius-card)] border border-ash bg-canvas-white p-4"
+                className="rounded-card border border-cloud bg-paper p-4 shadow-sm"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className="font-medium text-charcoal">
+                    <p className="font-medium text-graphite">
                       {tache.description}
                     </p>
                     <p className="mt-1 text-sm text-fog">
@@ -364,13 +365,13 @@ function TachesContent() {
                   <table className="min-w-full border-collapse text-xs">
                     <thead>
                       <tr>
-                        <th className="border border-ash bg-canvas-white px-2 py-1">
+                        <th className="border border-cloud bg-paper px-2 py-1">
                           Mois
                         </th>
                         {[1, 2, 3, 4].map((s) => (
                           <th
                             key={s}
-                            className="border border-ash bg-canvas-white px-2 py-1"
+                            className="border border-cloud bg-paper px-2 py-1"
                           >
                             S{s}
                           </th>
@@ -380,16 +381,16 @@ function TachesContent() {
                     <tbody>
                       {moisList.map((mois) => (
                         <tr key={mois}>
-                          <td className="border border-ash px-2 py-1 font-medium">
+                          <td className="border border-cloud px-2 py-1 font-medium">
                             {MOIS_LABELS[mois - 1]}
                           </td>
                           {[1, 2, 3, 4].map((semaine) => (
                             <td
                               key={semaine}
-                              className={`border border-ash p-1 text-center ${
+                              className={`border border-cloud p-1 text-center ${
                                 isSemainePlanned(tache, mois, semaine)
-                                  ? "bg-paper-mist text-electric-blue"
-                                  : "bg-canvas-white"
+                                  ? "bg-veil text-forest-ink"
+                                  : "bg-paper"
                               }`}
                             >
                               {isSemainePlanned(tache, mois, semaine) ? "●" : ""}
@@ -404,7 +405,7 @@ function TachesContent() {
             ))}
           </div>
         )}
-      </div>
-    </AdminShell>
+      </main>
+    </div>
   );
 }

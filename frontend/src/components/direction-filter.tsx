@@ -23,14 +23,14 @@ export function DirectionFilter({
 
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      <label htmlFor="direction-filter" className="text-sm text-steel">
+      <label htmlFor="direction-filter" className="text-sm text-slate">
         Direction :
       </label>
       <select
         id="direction-filter"
         value={value ?? ""}
         onChange={(e) => onChange(e.target.value || null)}
-        className="dub-input w-auto min-w-[200px]"
+        className="input-grain w-auto min-w-[200px]"
       >
         <option value="">Toutes</option>
         {directions.map((d) => (

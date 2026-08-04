@@ -25,7 +25,7 @@ export function StatCard({
         <CardTitle className="text-sm font-medium text-fog">{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-3xl font-semibold text-charcoal">
+        <p className="text-3xl font-semibold text-graphite">
           {value}
         </p>
         {subtitle && <p className="mt-1 text-xs text-ash">{subtitle}</p>}

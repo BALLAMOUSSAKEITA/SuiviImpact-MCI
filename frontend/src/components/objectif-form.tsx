@@ -37,10 +37,10 @@ export function ObjectifForm({
   if (!canWrite) return null;
 
   return (
-    <div className="panel-dub">
+    <div className="panel-grain">
       <button
         type="button"
-        className="text-sm font-medium text-electric-blue"
+        className="text-sm font-medium text-forest-ink"
         onClick={() => setOpen((v) => !v)}
       >
         {open ? "− Masquer le formulaire" : "+ Ajouter un objectif"}
@@ -57,14 +57,14 @@ export function ObjectifForm({
             placeholder="Code (ex. OC1)"
             value={code}
             onChange={(e) => setCode(e.target.value)}
-            className="dub-input"
+            className="input-grain"
             required
           />
           <input
             placeholder="Description de l'objectif"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="dub-input sm:col-span-2"
+            className="input-grain sm:col-span-2"
             required
           />
           <Button type="submit" disabled={mutation.isPending} className="sm:w-fit">
