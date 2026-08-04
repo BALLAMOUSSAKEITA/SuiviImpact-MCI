@@ -45,7 +45,10 @@ Guide pas à pas **sans Docker** (build Nixpacks natif Railway).
    - **Root Directory** : `backend`
    - **Start Command** : (déjà dans `backend/railway.toml`) `bash start.sh`
 3. **Variables** — voir `.env.railway.backend.example` :
-   - Lier PostgreSQL : **Add Reference** → `${{Postgres.DATABASE_URL}}`
+   - **Obligatoire** : lier PostgreSQL au service backend (pas seulement créer la base) :
+     - **Variables** → **Add Reference** → `${{Postgres.DATABASE_URL}}`
+     - Le nom de la variable doit être exactement `DATABASE_URL`
+     - Sans cela, le backend tente `localhost:5432` et les migrations échouent
    - `SECRET_KEY` : générer avec `openssl rand -hex 32`
    - `DEBUG=false`
    - `ADMIN_PASSWORD` : mot de passe fort
@@ -138,10 +141,12 @@ Configurer SMTP sur le backend si vous activez Celery.
 
 | Problème | Solution |
 |----------|----------|
+| `sh: next: not found` (frontend) | Le projet utilise `output: standalone` — le démarrage passe par `bash start.sh` (`node .next/standalone/server.js`), pas `next start`. Redéployer après mise à jour de `frontend/railway.toml`. |
+| Migrations → `localhost:5432` | `DATABASE_URL` absent sur le service backend. **Add Reference** → `${{Postgres.DATABASE_URL}}` sur le **service backend**, puis redéployer. |
 | CORS error | Vérifier `CORS_ORIGINS` = URL exacte du frontend (https, sans slash final) |
 | API unreachable depuis le frontend | Vérifier `NEXT_PUBLIC_API_URL` puis **redéployer** le frontend |
-| Migrations échouent | Logs backend → vérifier `DATABASE_URL` lié à PostgreSQL |
-| Build frontend échoue | Logs → `npm ci` ; vérifier Node 20+ (Nixpacks auto) |
+| Migrations échouent (URL OK) | Logs backend → vérifier que PostgreSQL est **Running** et lié au bon service |
+| Build frontend échoue | Logs → `npm ci` ; vérifier Root Directory = `frontend` |
 | Fichiers disparus | Ajouter un Volume sur `/app/uploads` |
 
 ---
@@ -162,6 +167,8 @@ Configurer SMTP sur le backend si vous activez Celery.
 | `backend/nixpacks.toml` | Python 3.12 + install |
 | `backend/start.sh` | Migrations + uvicorn sur `$PORT` |
 | `frontend/railway.toml` | Config deploy frontend |
+| `frontend/nixpacks.toml` | Node 20 + build Next.js |
+| `frontend/start.sh` | Démarrage standalone (`server.js`) |
 | `.env.railway.*.example` | Templates variables |
 
 Docker (`docker-compose.yml`) reste disponible pour le développement local — **non utilisé** sur Railway.

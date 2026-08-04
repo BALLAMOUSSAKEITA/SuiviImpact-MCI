@@ -44,9 +44,13 @@ class Settings(BaseSettings):
     @field_validator("DATABASE_URL", mode="before")
     @classmethod
     def normalize_database_url(cls, value: str) -> str:
-        """Railway fournit postgresql:// — SQLAlchemy async exige postgresql+asyncpg://."""
-        if isinstance(value, str) and value.startswith("postgresql://"):
+        """Railway fournit postgresql:// ou postgres:// — async exige postgresql+asyncpg://."""
+        if not isinstance(value, str):
+            return value
+        if value.startswith("postgresql://"):
             return value.replace("postgresql://", "postgresql+asyncpg://", 1)
+        if value.startswith("postgres://"):
+            return value.replace("postgres://", "postgresql+asyncpg://", 1)
         return value
 
     @field_validator("CORS_ORIGINS", mode="before")
