@@ -1,5 +1,19 @@
-from pydantic import field_validator
+from pydantic import computed_field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+def _split_csv(value: str) -> list[str]:
+    stripped = value.strip()
+    if not stripped:
+        return []
+    if stripped.startswith("["):
+        import json
+
+        parsed = json.loads(stripped)
+        if isinstance(parsed, list):
+            return [str(item).strip() for item in parsed if str(item).strip()]
+        return [str(parsed).strip()]
+    return [item.strip() for item in stripped.split(",") if item.strip()]
 
 
 class Settings(BaseSettings):
@@ -14,8 +28,8 @@ class Settings(BaseSettings):
     DATABASE_URL: str = (
         "postgresql+asyncpg://suivi:suivi_dev_password@localhost:5432/suiviimpact"
     )
-    CORS_ORIGINS: list[str] = ["http://localhost:3000"]
-
+    # Chaîne CSV ou JSON — évite le parse JSON automatique de pydantic-settings sur list[str]
+    CORS_ORIGINS: str = "http://localhost:3000"
     SECRET_KEY: str = "change-me-in-production-use-openssl-rand-hex-32"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
@@ -53,19 +67,11 @@ class Settings(BaseSettings):
             return value.replace("postgres://", "postgresql+asyncpg://", 1)
         return value
 
-    @field_validator("CORS_ORIGINS", mode="before")
-    @classmethod
-    def parse_cors_origins(cls, value: str | list[str]) -> list[str]:
-        if isinstance(value, list):
-            return value
-        if isinstance(value, str):
-            stripped = value.strip()
-            if stripped.startswith("["):
-                import json
-
-                return json.loads(stripped)
-            return [origin.strip() for origin in stripped.split(",") if origin.strip()]
-        return ["http://localhost:3000"]
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def cors_origins(self) -> list[str]:
+        origins = _split_csv(self.CORS_ORIGINS)
+        return origins or ["http://localhost:3000"]
 
 
 settings = Settings()
