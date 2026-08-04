@@ -17,7 +17,9 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/admin", label: "Plan d'Action", icon: LayoutDashboard },
-  { href: "/admin/oct", label: "Objectifs 2025", icon: Target },
+  { href: "/admin/oct", label: "OCT 2025", icon: Target },
+  { href: "/admin/omt", label: "OMT 2026", icon: Target },
+  { href: "/admin/olt", label: "OLT 2027", icon: Target },
   { href: "/admin/comptes", label: "Comptes", icon: Users, adminOnly: true },
 ];
 

@@ -1,5 +1,11 @@
 import type {
+  Activite,
+  ActiviteCreate,
   LoginRequest,
+  Objectif,
+  ObjectifCreate,
+  ObjectifType,
+  Direction,
   TokenResponse,
   User,
   UserCreate,
@@ -157,6 +163,64 @@ export async function deactivateUser(id: number): Promise<User> {
 
 export async function deleteUser(id: number): Promise<void> {
   return apiFetch<void>(`/api/v1/users/${id}`, { method: "DELETE" });
+}
+
+export async function listDirections(): Promise<Direction[]> {
+  return apiFetch<Direction[]>("/api/v1/directions");
+}
+
+export async function listObjectifs(type?: ObjectifType): Promise<Objectif[]> {
+  const query = type ? `?type=${type}` : "";
+  return apiFetch<Objectif[]>(`/api/v1/objectifs${query}`);
+}
+
+export async function createObjectif(data: ObjectifCreate): Promise<Objectif> {
+  return apiFetch<Objectif>("/api/v1/objectifs", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateObjectif(
+  id: number,
+  data: Partial<Pick<Objectif, "code" | "description">>,
+): Promise<Objectif> {
+  return apiFetch<Objectif>(`/api/v1/objectifs/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteObjectif(id: number): Promise<void> {
+  return apiFetch<void>(`/api/v1/objectifs/${id}`, { method: "DELETE" });
+}
+
+export async function listActivites(objectifId: number): Promise<Activite[]> {
+  return apiFetch<Activite[]>(`/api/v1/objectifs/${objectifId}/activites`);
+}
+
+export async function createActivite(
+  objectifId: number,
+  data: ActiviteCreate,
+): Promise<Activite> {
+  return apiFetch<Activite>(`/api/v1/objectifs/${objectifId}/activites`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateActivite(
+  id: number,
+  data: Partial<ActiviteCreate>,
+): Promise<Activite> {
+  return apiFetch<Activite>(`/api/v1/activites/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteActivite(id: number): Promise<void> {
+  return apiFetch<void>(`/api/v1/activites/${id}`, { method: "DELETE" });
 }
 
 export { API_BASE_URL };
