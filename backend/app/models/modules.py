@@ -6,7 +6,6 @@ from sqlalchemy import (
     CheckConstraint,
     Date,
     DateTime,
-    Enum,
     ForeignKey,
     Integer,
     Numeric,
@@ -17,6 +16,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base
+from app.db.types import pg_enum
 
 
 class PpmStatut(str, enum.Enum):
@@ -85,7 +85,7 @@ class Ppm(Base):
     financement: Mapped[str | None] = mapped_column(String(50))
     date_marche: Mapped[date | None] = mapped_column(Date)
     statut: Mapped[PpmStatut] = mapped_column(
-        Enum(PpmStatut, name="ppm_statut"), default=PpmStatut.DAO_ELABORE, nullable=False
+        pg_enum(PpmStatut, "ppm_statut"), default=PpmStatut.DAO_ELABORE, nullable=False
     )
     observations: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(

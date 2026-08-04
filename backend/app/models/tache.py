@@ -8,7 +8,6 @@ from sqlalchemy import (
     CheckConstraint,
     Date,
     DateTime,
-    Enum,
     ForeignKey,
     Integer,
     Numeric,
@@ -20,6 +19,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
+from app.db.types import pg_enum
 
 
 class TacheStatut(str, enum.Enum):
@@ -60,7 +60,7 @@ class Tache(Base):
     email_responsable: Mapped[str | None] = mapped_column(String(255))
     ponderation: Mapped[Decimal] = mapped_column(Numeric(5, 2), nullable=False)
     statut: Mapped[TacheStatut] = mapped_column(
-        Enum(TacheStatut, name="tache_statut"), default=TacheStatut.EN_COURS, nullable=False
+        pg_enum(TacheStatut, "tache_statut"), default=TacheStatut.EN_COURS, nullable=False
     )
     observation: Mapped[str | None] = mapped_column(Text)
     fichier_path: Mapped[str | None] = mapped_column(String(500))

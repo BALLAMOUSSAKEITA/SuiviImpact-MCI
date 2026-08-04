@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.core.security import hash_password
-from app.models.user import User, UserRole
+from app.models.user import AccessType, User, UserRole
 
 
 async def seed_admin_user(db: AsyncSession) -> None:
@@ -18,6 +18,7 @@ async def seed_admin_user(db: AsyncSession) -> None:
         password_hash=hash_password(settings.ADMIN_PASSWORD),
         prenom=settings.ADMIN_PRENOM,
         role=UserRole.ADMIN,
+        type_acces=AccessType.ECRITURE,
         etat=True,
     )
     db.add(admin)

@@ -6,7 +6,6 @@ from sqlalchemy import (
     Boolean,
     CheckConstraint,
     DateTime,
-    Enum,
     ForeignKey,
     Integer,
     Numeric,
@@ -18,6 +17,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
+from app.db.types import pg_enum
 
 
 class ObjectifType(str, enum.Enum):
@@ -35,7 +35,7 @@ class Objectif(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     type: Mapped[ObjectifType] = mapped_column(
-        Enum(ObjectifType, name="objectif_type"), nullable=False
+        pg_enum(ObjectifType, "objectif_type"), nullable=False
     )
     code: Mapped[str] = mapped_column(String(20), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
