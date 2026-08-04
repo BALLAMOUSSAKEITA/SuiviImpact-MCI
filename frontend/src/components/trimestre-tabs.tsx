@@ -26,10 +26,10 @@ export function TrimestreTabs({
             key={t}
             href={href}
             className={cn(
-              "rounded-card px-4 py-2 text-sm font-medium transition-colors",
+              "rounded-[var(--radius-btn)] px-4 py-2 text-sm font-medium transition-colors",
               isActive
-                ? "bg-forest-ink text-paper"
-                : "bg-paper text-slate ring-1 ring-cloud hover:bg-veil hover:text-forest-ink",
+                ? "bg-sky-soft text-charcoal"
+                : "border border-ash bg-canvas-white text-steel hover:bg-paper-mist hover:text-charcoal",
             )}
           >
             T{t}

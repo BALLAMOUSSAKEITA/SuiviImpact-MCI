@@ -1,13 +1,13 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { AdminShell } from "@/components/admin-shell";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/components/auth-provider";
 import { ProgressBar } from "@/components/execution-badge";
 import { ProtectedRoute } from "@/components/protected-route";
-import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import {
   createIndicateur,
@@ -122,12 +122,11 @@ function IndicateursContent() {
   };
 
   return (
-    <div className="flex min-h-screen bg-paper">
-      <Sidebar />
-      <main className="flex-1 space-y-6 p-8">
+    <AdminShell>
+        <div className="space-y-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-graphite">Indicateurs</h1>
+            <h1 className="text-2xl font-bold text-charcoal">Indicateurs</h1>
             <p className="mt-1 text-sm text-fog">
               Indicateurs de performance et cibles
             </p>
@@ -140,55 +139,55 @@ function IndicateursContent() {
         {showForm && canWrite && (
           <form
             onSubmit={handleSubmit}
-            className="space-y-4 rounded-card border border-cloud bg-paper p-6 shadow-sm"
+            className="space-y-4 rounded-[var(--radius-card)] border border-ash bg-canvas-white p-6 "
           >
             <h2 className="text-lg font-semibold">
               {editing ? "Modifier" : "Nouvel indicateur"}
             </h2>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <div>
-                <label className="mb-1 block text-sm text-slate">Code</label>
+                <label className="mb-1 block text-sm text-steel">Code</label>
                 <input
                   required
                   value={form.code}
                   onChange={(e) => setForm((f) => ({ ...f, code: e.target.value }))}
-                  className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
+                  className="w-full rounded-[var(--radius-card)] border border-ash px-3 py-2 text-sm"
                 />
               </div>
               <div className="sm:col-span-2">
-                <label className="mb-1 block text-sm text-slate">Libellé</label>
+                <label className="mb-1 block text-sm text-steel">Libellé</label>
                 <input
                   required
                   value={form.libelle}
                   onChange={(e) => setForm((f) => ({ ...f, libelle: e.target.value }))}
-                  className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
+                  className="w-full rounded-[var(--radius-card)] border border-ash px-3 py-2 text-sm"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm text-slate">Référence</label>
+                <label className="mb-1 block text-sm text-steel">Référence</label>
                 <input
                   value={form.reference}
                   onChange={(e) => setForm((f) => ({ ...f, reference: e.target.value }))}
-                  className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
+                  className="w-full rounded-[var(--radius-card)] border border-ash px-3 py-2 text-sm"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm text-slate">Cible</label>
+                <label className="mb-1 block text-sm text-steel">Cible</label>
                 <input
                   type="number"
                   value={form.cible}
                   onChange={(e) => setForm((f) => ({ ...f, cible: e.target.value }))}
-                  className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
+                  className="w-full rounded-[var(--radius-card)] border border-ash px-3 py-2 text-sm"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm text-slate">Réalisé</label>
+                <label className="mb-1 block text-sm text-steel">Réalisé</label>
                 <input
                   type="number"
                   min="0"
                   value={form.realise}
                   onChange={(e) => setForm((f) => ({ ...f, realise: e.target.value }))}
-                  className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
+                  className="w-full rounded-[var(--radius-card)] border border-ash px-3 py-2 text-sm"
                 />
               </div>
             </div>
@@ -201,27 +200,27 @@ function IndicateursContent() {
           </form>
         )}
 
-        <div className="overflow-hidden rounded-card border border-cloud bg-paper shadow-sm">
+        <div className="overflow-hidden rounded-[var(--radius-card)] border border-ash bg-canvas-white ">
           <table className="min-w-full divide-y divide-cloud text-sm">
-            <thead className="bg-paper">
+            <thead className="bg-paper-mist">
               <tr>
-                <th className="px-4 py-3 text-left font-medium text-slate">Code</th>
-                <th className="px-4 py-3 text-left font-medium text-slate">Libellé</th>
-                <th className="px-4 py-3 text-left font-medium text-slate">Cible / Réalisé</th>
-                <th className="px-4 py-3 text-left font-medium text-slate">Progression</th>
-                <th className="px-4 py-3 text-right font-medium text-slate">Actions</th>
+                <th className="px-4 py-3 text-left font-medium text-steel">Code</th>
+                <th className="px-4 py-3 text-left font-medium text-steel">Libellé</th>
+                <th className="px-4 py-3 text-left font-medium text-steel">Cible / Réalisé</th>
+                <th className="px-4 py-3 text-left font-medium text-steel">Progression</th>
+                <th className="px-4 py-3 text-right font-medium text-steel">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-cloud/60">
+            <tbody className="divide-y divide-ash/60">
               {isLoading && (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-ash">
+                  <td colSpan={5} className="px-4 py-8 text-center text-fog">
                     Chargement…
                   </td>
                 </tr>
               )}
               {items.map((item) => (
-                <tr key={item.id} className="hover:bg-paper">
+                <tr key={item.id} className="hover:bg-paper-mist">
                   <td className="px-4 py-3 font-medium">{item.code}</td>
                   <td className="max-w-xs truncate px-4 py-3">{item.libelle}</td>
                   <td className="px-4 py-3">
@@ -259,7 +258,7 @@ function IndicateursContent() {
             </tbody>
           </table>
         </div>
-      </main>
-    </div>
+      </div>
+    </AdminShell>
   );
 }

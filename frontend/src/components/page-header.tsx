@@ -6,6 +6,7 @@ interface PageHeaderProps {
   description?: string;
   className?: string;
   display?: boolean;
+  actions?: React.ReactNode;
 }
 
 export function PageHeader({
@@ -14,29 +15,36 @@ export function PageHeader({
   description,
   className,
   display = false,
+  actions,
 }: PageHeaderProps) {
   return (
-    <header className={cn("space-y-2", className)}>
-      {eyebrow && (
-        <p className="text-xs font-medium uppercase tracking-widest text-forest-ink">
-          {eyebrow}
-        </p>
+    <header
+      className={cn(
+        "flex flex-col gap-4 border-b border-ash pb-6 sm:flex-row sm:items-end sm:justify-between",
+        className,
       )}
-      <h1
-        className={cn(
-          "text-graphite",
-          display
-            ? "font-display text-[32px] leading-[1.25] sm:text-[38px]"
-            : "text-2xl font-semibold text-graphite",
+    >
+      <div className="space-y-2">
+        {eyebrow && (
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-fog">
+            {eyebrow}
+          </p>
         )}
-      >
-        {title}
-      </h1>
-      {description && (
-        <p className="max-w-2xl text-sm leading-relaxed text-slate">
-          {description}
-        </p>
-      )}
+        <h1
+          className={cn(
+            "text-charcoal",
+            display
+              ? "font-display text-[2rem] leading-[1.1] sm:text-[2.25rem]"
+              : "text-xl font-semibold sm:text-2xl",
+          )}
+        >
+          {title}
+        </h1>
+        {description && (
+          <p className="max-w-2xl text-sm leading-relaxed text-fog">{description}</p>
+        )}
+      </div>
+      {actions && <div className="flex shrink-0 gap-2">{actions}</div>}
     </header>
   );
 }

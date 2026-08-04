@@ -39,7 +39,7 @@ export function ObjectifTable({ objectifs, queryKey }: ObjectifTableProps) {
 
   return (
     <div className="table-shell">
-      <table className="table-grain">
+      <table className="table-dub">
         <thead>
           <tr>
             <th>Code</th>
@@ -50,18 +50,18 @@ export function ObjectifTable({ objectifs, queryKey }: ObjectifTableProps) {
         <tbody>
           {objectifs.length === 0 && (
             <tr>
-              <td colSpan={canWrite ? 3 : 2} className="py-8 text-center text-ash">
+              <td colSpan={canWrite ? 3 : 2} className="py-8 text-center text-fog">
                 Aucun objectif enregistré
               </td>
             </tr>
           )}
           {objectifs.map((objectif) => (
             <tr key={objectif.id}>
-              <td className="font-medium text-forest-ink">{objectif.code}</td>
+              <td className="font-medium text-electric-blue">{objectif.code}</td>
               <td>
                 <Link
                   href={`/activite/${objectif.id}`}
-                  className="text-slate hover:text-forest-ink hover:underline"
+                  className="text-steel hover:text-electric-blue hover:underline"
                 >
                   {objectif.description}
                 </Link>

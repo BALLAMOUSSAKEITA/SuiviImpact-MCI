@@ -1,7 +1,8 @@
 import Link from "next/link";
 
+import { AdminShell } from "@/components/admin-shell";
+import { PageHeader } from "@/components/page-header";
 import { ProtectedRoute } from "@/components/protected-route";
-import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -16,31 +17,33 @@ const DASHBOARDS = [
 export default function StatsHubPage() {
   return (
     <ProtectedRoute>
-      <div className="flex min-h-screen bg-paper">
-        <Sidebar />
-        <main className="flex-1 p-8">
-          <h1 className="text-2xl font-bold text-graphite">Statistiques</h1>
-          <p className="mt-2 text-slate">
-            Tableaux de bord et indicateurs de suivi — BSD MIPME.
-          </p>
+      <AdminShell>
+        <div className="space-y-8">
+          <PageHeader
+            eyebrow="Pilotage"
+            title="Statistiques"
+            description="Tableaux de bord et indicateurs de suivi — BSD MIPME."
+          />
 
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {DASHBOARDS.map(({ href, label, desc }) => (
-              <Card key={href}>
+              <Card key={href} className="transition-colors hover:border-smoke">
                 <CardHeader>
-                  <CardTitle className="text-lg">{label}</CardTitle>
+                  <CardTitle className="text-base">{label}</CardTitle>
                   <p className="text-sm text-fog">{desc}</p>
                 </CardHeader>
                 <CardContent>
                   <Link href={href}>
-                    <Button variant="outline">Consulter</Button>
+                    <Button variant="outline" size="sm">
+                      Consulter
+                    </Button>
                   </Link>
                 </CardContent>
               </Card>
             ))}
           </div>
-        </main>
-      </div>
+        </div>
+      </AdminShell>
     </ProtectedRoute>
   );
 }

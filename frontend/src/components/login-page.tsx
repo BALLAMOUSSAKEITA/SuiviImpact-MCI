@@ -1,7 +1,11 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Building2, ShieldCheck } from "lucide-react";
+import {
+  BarChart3,
+  ClipboardList,
+  Target,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -11,6 +15,7 @@ import { z } from "zod";
 import { useAuth } from "@/components/auth-provider";
 import { Button } from "@/components/ui/button";
 import { BRAND } from "@/lib/brand";
+import { cn } from "@/lib/utils";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Identifiant requis"),
@@ -18,6 +23,12 @@ const loginSchema = z.object({
 });
 
 type LoginForm = z.infer<typeof loginSchema>;
+
+const FEATURES = [
+  { label: "Plan d'action OCT / OMT / OLT", color: "bg-tangerine", icon: Target },
+  { label: "Suivi & exécution PAO", color: "bg-vivid-green", icon: ClipboardList },
+  { label: "Statistiques & indicateurs", color: "bg-lavender", icon: BarChart3 },
+] as const;
 
 export function LoginPage() {
   const { login, isAuthenticated, isLoading } = useAuth();
@@ -52,105 +63,114 @@ export function LoginPage() {
 
   if (isLoading) {
     return (
-      <div className="login-shell flex min-h-screen items-center justify-center">
+      <div className="dub-dot-grid flex min-h-screen items-center justify-center">
         <p className="text-sm text-fog">Chargement…</p>
       </div>
     );
   }
 
   return (
-    <div className="login-shell flex min-h-screen flex-col">
-      <main className="flex flex-1 items-center justify-center px-6 py-12">
-        <div className="grid w-full max-w-[980px] items-center gap-12 lg:grid-cols-[1fr_400px] lg:gap-16">
-          {/* Colonne institutionnelle — style Facebook */}
-          <section className="hidden text-center lg:block lg:text-left">
-            <div className="mb-8 flex items-center justify-center gap-4 lg:justify-start">
-              <div className="flex h-14 w-14 items-center justify-center rounded-card bg-forest-ink text-paper shadow-[var(--shadow-card)]">
-                <Building2 className="h-7 w-7" strokeWidth={1.75} />
-              </div>
-              <div>
-                <p className="text-xs font-medium uppercase tracking-widest text-fog">
-                  {BRAND.country}
-                </p>
-                <p className="text-sm font-semibold text-slate">{BRAND.ministry}</p>
-              </div>
+    <div className="dub-dot-grid flex min-h-screen flex-col">
+      <header className="border-b border-ash bg-canvas-white/80 px-6 py-4 backdrop-blur-sm">
+        <div className="mx-auto flex max-w-[1200px] items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-btn)] bg-midnight-ink text-xs font-bold text-canvas-white">
+              SI
             </div>
+            <div>
+              <p className="text-sm font-semibold text-charcoal">{BRAND.appName}</p>
+              <p className="text-[11px] text-fog">{BRAND.ministryShort}</p>
+            </div>
+          </div>
+          <p className="hidden text-xs text-silver sm:block">{BRAND.country}</p>
+        </div>
+      </header>
 
-            <h1 className="font-display text-[3.25rem] leading-[1.05] text-forest-ink">
-              {BRAND.appName}
+      <main className="flex flex-1 items-center justify-center px-4 py-12 sm:px-6">
+        <div className="grid w-full max-w-[1100px] items-center gap-10 lg:grid-cols-[1.1fr_400px] lg:gap-16">
+          <section className="text-center lg:text-left">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-electric-blue">
+              {BRAND.ministry}
+            </p>
+            <h1 className="font-display mt-3 text-[2.5rem] leading-[1.05] text-charcoal sm:text-[3rem] lg:text-[3.25rem]">
+              Suivi d&apos;impact
+              <span className="text-electric-blue"> MIPME</span>
             </h1>
-            <p className="mt-4 max-w-md text-lg leading-relaxed text-slate">
+            <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-steel lg:mx-0">
               {BRAND.tagline}
             </p>
-            <div className="mt-8 inline-flex items-center gap-2 rounded-card border border-cloud bg-paper px-4 py-2.5 text-sm text-slate shadow-[var(--shadow-card)]">
-              <ShieldCheck className="h-4 w-4 shrink-0 text-forest-ink" />
-              <span>
-                {BRAND.bureau} · {BRAND.program}
-              </span>
+
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-2 lg:justify-start">
+              {FEATURES.map(({ label, color, icon: Icon }) => (
+                <span key={label} className="dub-pill">
+                  <span className={cn("dub-pill-dot", color)} />
+                  <Icon className="h-3.5 w-3.5 text-charcoal" strokeWidth={2} />
+                  {label}
+                </span>
+              ))}
             </div>
+
+            <p className="mt-8 text-xs text-silver">
+              {BRAND.bureau} · {BRAND.program}
+            </p>
           </section>
 
-          {/* Formulaire de connexion */}
           <section className="mx-auto w-full max-w-[400px]">
-            <div className="login-card">
-              <div className="mb-6 lg:hidden">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-card bg-forest-ink text-paper">
-                    <Building2 className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="font-display text-xl text-forest-ink">{BRAND.appName}</p>
-                    <p className="text-xs text-fog">{BRAND.ministryShort} · {BRAND.bureauShort}</p>
-                  </div>
-                </div>
-              </div>
-
-              <h2 className="text-xl font-semibold text-graphite">Connexion</h2>
+            <div className="dub-card-elevated">
+              <h2 className="text-lg font-semibold text-charcoal">Connexion</h2>
               <p className="mt-1 text-sm text-fog">{BRAND.loginSubtitle}</p>
 
-              <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-3">
-                <input
-                  {...register("username")}
-                  placeholder="Identifiant"
-                  autoComplete="username"
-                  className="login-input"
-                />
-                {errors.username && (
-                  <p className="text-xs text-red-600">{errors.username.message}</p>
-                )}
+              <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-4">
+                <div>
+                  <label className="label-dub" htmlFor="username">
+                    Identifiant
+                  </label>
+                  <input
+                    id="username"
+                    {...register("username")}
+                    autoComplete="username"
+                    className="dub-input"
+                  />
+                  {errors.username && (
+                    <p className="mt-1 text-xs text-red-600">{errors.username.message}</p>
+                  )}
+                </div>
 
-                <input
-                  type="password"
-                  {...register("password")}
-                  placeholder="Mot de passe"
-                  autoComplete="current-password"
-                  className="login-input"
-                />
-                {errors.password && (
-                  <p className="text-xs text-red-600">{errors.password.message}</p>
-                )}
+                <div>
+                  <label className="label-dub" htmlFor="password">
+                    Mot de passe
+                  </label>
+                  <input
+                    id="password"
+                    type="password"
+                    {...register("password")}
+                    autoComplete="current-password"
+                    className="dub-input"
+                  />
+                  {errors.password && (
+                    <p className="mt-1 text-xs text-red-600">{errors.password.message}</p>
+                  )}
+                </div>
 
                 <Button
                   type="submit"
-                  className="mt-2 h-12 w-full text-base font-semibold"
+                  className="h-10 w-full rounded-[var(--radius-pill)] text-sm font-semibold"
                   disabled={submitting}
                 >
-                  {submitting ? "Connexion en cours…" : "Se connecter"}
+                  {submitting ? "Connexion…" : "Se connecter"}
                 </Button>
               </form>
 
-              <p className="mt-6 border-t border-cloud pt-4 text-center text-xs leading-relaxed text-ash">
-                Plateforme sécurisée — accès réservé au personnel autorisé.
-                <br />
-                En cas de problème, contactez l&apos;administrateur {BRAND.bureauShort}.
+              <p className="mt-5 border-t border-ash pt-4 text-center text-[11px] leading-relaxed text-silver">
+                Accès réservé au personnel autorisé du {BRAND.bureauShort}.
               </p>
             </div>
           </section>
         </div>
       </main>
 
-      <footer className="border-t border-cloud/80 bg-paper px-6 py-4 text-center text-xs text-ash">
-        © {new Date().getFullYear()} {BRAND.country} · {BRAND.ministry} · {BRAND.bureau}
+      <footer className="border-t border-ash bg-canvas-white px-6 py-3 text-center text-[11px] text-silver">
+        © {new Date().getFullYear()} {BRAND.country} · {BRAND.ministry}
       </footer>
     </div>
   );

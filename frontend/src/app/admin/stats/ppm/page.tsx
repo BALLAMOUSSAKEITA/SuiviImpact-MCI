@@ -1,11 +1,11 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { AdminShell } from "@/components/admin-shell";
 import Link from "next/link";
 
 import { ProgressBar } from "@/components/execution-badge";
 import { ProtectedRoute } from "@/components/protected-route";
-import { Sidebar } from "@/components/sidebar";
 import { StatCard, StatGrid } from "@/components/stat-card";
 import { getStatsPpm } from "@/lib/api";
 import { PPM_STATUT_LABELS } from "@/types";
@@ -30,20 +30,19 @@ function StatsPpmContent() {
       : "0";
 
   return (
-    <div className="flex min-h-screen bg-paper">
-      <Sidebar />
-      <main className="flex-1 space-y-6 p-8">
+    <AdminShell>
+        <div className="space-y-8">
         <div>
-          <Link href="/admin/stats" className="text-sm text-forest-ink hover:underline">
+          <Link href="/admin/stats" className="text-sm text-electric-blue hover:underline">
             ← Statistiques
           </Link>
-          <h1 className="mt-2 text-2xl font-bold text-graphite">
+          <h1 className="mt-2 text-2xl font-bold text-charcoal">
             Statistiques — PPM
           </h1>
         </div>
 
         {isLoading ? (
-          <p className="text-sm text-ash">Chargement…</p>
+          <p className="text-sm text-fog">Chargement…</p>
         ) : stats ? (
           <>
             <StatGrid>
@@ -65,7 +64,7 @@ function StatsPpmContent() {
                 value={stats.contrat_signe}
               />
             </StatGrid>
-            <div className="rounded-card border border-cloud bg-paper p-6 shadow-sm">
+            <div className="rounded-[var(--radius-card)] border border-ash bg-canvas-white p-6 ">
               <ProgressBar
                 label="Contrats signés / total"
                 value={progression}
@@ -73,7 +72,7 @@ function StatsPpmContent() {
             </div>
           </>
         ) : null}
-      </main>
-    </div>
+      </div>
+    </AdminShell>
   );
 }
