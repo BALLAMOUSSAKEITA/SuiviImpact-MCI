@@ -16,8 +16,8 @@ down_revision: Union[str, None] = "001"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
-access_type = sa.Enum("lecture", "ecriture", name="access_type")
-user_role = sa.Enum("user", "admin", name="user_role")
+access_type = sa.Enum("lecture", "ecriture", name="access_type", create_type=False)
+user_role = sa.Enum("user", "admin", name="user_role", create_type=False)
 
 
 def upgrade() -> None:
@@ -47,6 +47,7 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("username"),
+        if_not_exists=True,
     )
 
     op.create_table(
@@ -65,6 +66,7 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["user_id"], ["users.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("token_hash"),
+        if_not_exists=True,
     )
 
 

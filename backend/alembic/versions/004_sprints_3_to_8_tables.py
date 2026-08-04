@@ -14,9 +14,16 @@ down_revision: Union[str, None] = "003"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
-tache_statut = sa.Enum("en_cours", "terminee", "en_retard", name="tache_statut")
+tache_statut = sa.Enum(
+    "en_cours", "terminee", "en_retard", name="tache_statut", create_type=False
+)
 ppm_statut = sa.Enum(
-    "dao_elabore", "dao_publie", "marche_attribue", "contrat_signe", name="ppm_statut"
+    "dao_elabore",
+    "dao_publie",
+    "marche_attribue",
+    "contrat_signe",
+    name="ppm_statut",
+    create_type=False,
 )
 
 

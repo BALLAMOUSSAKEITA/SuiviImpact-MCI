@@ -16,7 +16,7 @@ down_revision: Union[str, None] = "002"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
-objectif_type = sa.Enum("oct", "omt", "olt", name="objectif_type")
+objectif_type = sa.Enum("oct", "omt", "olt", name="objectif_type", create_type=False)
 
 
 def upgrade() -> None:

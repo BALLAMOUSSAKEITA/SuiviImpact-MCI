@@ -146,7 +146,7 @@ Configurer SMTP sur le backend si vous activez Celery.
 | Migrations → `localhost:5432` | `DATABASE_URL` absent sur le service backend. **Add Reference** → `${{Postgres.DATABASE_URL}}` sur le **service backend**, puis redéployer. |
 | CORS error | Vérifier `CORS_ORIGINS` = URL exacte du frontend (https, sans slash final) |
 | API unreachable depuis le frontend | Vérifier `NEXT_PUBLIC_API_URL` puis **redéployer** le frontend |
-| Migrations échouent (URL OK) | Logs backend → vérifier que PostgreSQL est **Running** et lié au bon service |
+| Migrations → `user_role already exists` | Migration interrompue : les types ENUM existent sans les tables. Redéployer après le correctif `create_type=False`, ou réinitialiser la base PostgreSQL Railway. |
 | Build frontend échoue | Logs → `npm ci` ; vérifier Root Directory = `frontend` |
 | Fichiers disparus | Ajouter un Volume sur `/app/uploads` |
 
