@@ -24,5 +24,20 @@ class Settings(BaseSettings):
     ADMIN_PASSWORD: str = "admin123"
     ADMIN_PRENOM: str = "Administrateur"
 
+    UPLOAD_DIR: str = "uploads"
+    MAX_UPLOAD_SIZE_MB: int = 50
+    ALLOWED_EXTENSIONS: list[str] = [
+        "pdf", "xlsx", "pptx", "docx", "png", "jpg", "jpeg", "gif"
+    ]
+
+    REDIS_URL: str = "redis://localhost:6379/0"
+    SMTP_HOST: str = ""
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
+    SMTP_FROM: str = "noreply@suiviimpact.gov.gn"
+
+    DEFAULT_ANNEE: int = 2025
+
 
 settings = Settings()
