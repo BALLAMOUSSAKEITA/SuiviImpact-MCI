@@ -90,4 +90,10 @@ SuiviImpact/
 | 8 | Archive GED |
 | 9 | Migration, sécurité, déploiement prod |
 
-Voir [docs/deploiement.md](docs/deploiement.md) pour la mise en production.
+Voir [docs/deploiement.md](docs/deploiement.md) pour la mise en production Docker.
+
+### Déploiement Railway (sans Docker)
+
+Guide complet : **[docs/railway.md](docs/railway.md)**
+
+Résumé : 2 services (backend + frontend) + PostgreSQL, root directories `backend/` et `frontend/`.
