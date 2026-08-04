@@ -3,13 +3,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { ProtectedRoute } from "@/components/protected-route";
 import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import { listObjectifs, updateObjectif } from "@/lib/api";
+import type { Objectif } from "@/types";
 
 export default function ModifierObjectifPage() {
   return (
@@ -22,34 +23,12 @@ export default function ModifierObjectifPage() {
 function ModifierObjectifContent() {
   const params = useParams<{ id: string }>();
   const objectifId = Number(params.id);
-  const router = useRouter();
-  const queryClient = useQueryClient();
 
   const { data: objectifs = [] } = useQuery({
     queryKey: ["objectifs-all"],
     queryFn: () => listObjectifs(),
   });
   const objectif = objectifs.find((o) => o.id === objectifId);
-
-  const [code, setCode] = useState("");
-  const [description, setDescription] = useState("");
-
-  useEffect(() => {
-    if (objectif) {
-      setCode(objectif.code);
-      setDescription(objectif.description);
-    }
-  }, [objectif]);
-
-  const mutation = useMutation({
-    mutationFn: () => updateObjectif(objectifId, { code, description }),
-    onSuccess: () => {
-      toast.success("Objectif mis à jour");
-      queryClient.invalidateQueries({ queryKey: ["objectifs"] });
-      router.push(`/admin/${objectif?.type ?? "oct"}`);
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
 
   if (!objectif) {
     return (
@@ -64,18 +43,39 @@ function ModifierObjectifContent() {
     <div className="flex min-h-screen bg-zinc-50">
       <Sidebar />
       <main className="flex-1 p-8">
-        <CardForm
-          title={`Modifier ${objectif.code}`}
-          code={code}
-          description={description}
-          onCodeChange={setCode}
-          onDescriptionChange={setDescription}
-          onSubmit={() => mutation.mutate()}
-          submitting={mutation.isPending}
-          cancelHref={`/admin/${objectif.type}`}
-        />
+        <ObjectifEditForm key={objectif.id} objectif={objectif} />
       </main>
     </div>
+  );
+}
+
+function ObjectifEditForm({ objectif }: { objectif: Objectif }) {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const [code, setCode] = useState(objectif.code);
+  const [description, setDescription] = useState(objectif.description);
+
+  const mutation = useMutation({
+    mutationFn: () => updateObjectif(objectif.id, { code, description }),
+    onSuccess: () => {
+      toast.success("Objectif mis à jour");
+      queryClient.invalidateQueries({ queryKey: ["objectifs"] });
+      router.push(`/admin/${objectif.type}`);
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  return (
+    <CardForm
+      title={`Modifier ${objectif.code}`}
+      code={code}
+      description={description}
+      onCodeChange={setCode}
+      onDescriptionChange={setDescription}
+      onSubmit={() => mutation.mutate()}
+      submitting={mutation.isPending}
+      cancelHref={`/admin/${objectif.type}`}
+    />
   );
 }
 
