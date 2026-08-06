@@ -6,6 +6,7 @@ import {
   BarChart3,
   Briefcase,
   CalendarDays,
+  ChevronDown,
   ClipboardList,
   Download,
   FolderArchive,
@@ -17,17 +18,33 @@ import {
   Target,
   Users,
 } from "lucide-react";
+import { useState } from "react";
 
 import { useAuth } from "@/components/auth-provider";
 import { Button } from "@/components/ui/button";
 import { BRAND } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 
-const navItems = [
-  { href: "/admin", label: "Plan d'Action", icon: LayoutDashboard },
-  { href: "/admin/objectifs", label: "Objectifs", icon: Target },
-  { href: "/admin/taches", label: "Tâches", icon: ClipboardList },
-  { href: "/admin/projets", label: "Projets", icon: FolderKanban },
+interface NavItem {
+  href: string;
+  label: string;
+  icon: typeof LayoutDashboard;
+  defaultChild?: string;
+  adminOnly?: boolean;
+  children?: NavItem[];
+}
+
+const navItems: NavItem[] = [
+  {
+    href: "/admin",
+    label: "Plan d'Action",
+    icon: LayoutDashboard,
+    children: [
+      { href: "/admin/objectifs", label: "Objectifs", icon: Target },
+      { href: "/admin/taches", label: "Tâches", icon: ClipboardList },
+      { href: "/admin/projets", label: "Projets", icon: FolderKanban },
+    ],
+  },
   { href: "/admin/planification", label: "Planification", icon: CalendarDays },
   { href: "/admin/suivi", label: "Suivi", icon: ClipboardList, defaultChild: "/admin/suivi/1" },
   { href: "/admin/recommandation", label: "RCC", icon: Briefcase, defaultChild: "/admin/recommandation/1" },
@@ -50,11 +67,17 @@ export function Sidebar({ mobileOpen = false, onNavigate }: SidebarProps) {
   const { user, isAdmin, logout } = useAuth();
 
   const isActive = (href: string) => {
-    if (href === "/admin") {
-      return pathname === "/admin";
-    }
+    if (href === "/admin") return pathname === "/admin";
     return pathname === href || pathname.startsWith(`${href}/`);
   };
+
+  const isPlanActionOpen =
+    pathname === "/admin" ||
+    pathname.startsWith("/admin/objectifs") ||
+    pathname.startsWith("/admin/taches") ||
+    pathname.startsWith("/admin/projets");
+
+  const [planOpen, setPlanOpen] = useState(isPlanActionOpen);
 
   const handleLogout = () => {
     onNavigate?.();
@@ -99,12 +122,83 @@ export function Sidebar({ mobileOpen = false, onNavigate }: SidebarProps) {
       <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-4">
         {navItems
           .filter((item) => !item.adminOnly || isAdmin)
-          .map(({ href, label, icon: Icon, defaultChild }) => {
-            const active = isActive(href);
+          .map((item) => {
+            if (item.children) {
+              return (
+                <div key={item.href}>
+                  <button
+                    type="button"
+                    onClick={() => setPlanOpen((v) => !v)}
+                    className={cn(
+                      "group relative flex w-full items-center gap-3 rounded-[var(--radius-card)] px-3 py-2.5 text-[13px] font-medium transition-all duration-[var(--duration-fast)]",
+                      isPlanActionOpen
+                        ? "bg-forest-ink/[0.08] text-forest-ink"
+                        : "text-slate hover:bg-veil/80 hover:text-graphite",
+                    )}
+                  >
+                    {isPlanActionOpen && (
+                      <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-full bg-forest-ink" />
+                    )}
+                    <item.icon
+                      className={cn(
+                        "h-[18px] w-[18px] shrink-0 transition-colors",
+                        isPlanActionOpen ? "text-forest-ink" : "text-ash group-hover:text-slate",
+                      )}
+                      strokeWidth={isPlanActionOpen ? 2.25 : 1.75}
+                    />
+                    <span className="flex-1 text-left">{item.label}</span>
+                    <ChevronDown
+                      className={cn(
+                        "h-4 w-4 shrink-0 text-ash transition-transform duration-200",
+                        planOpen && "rotate-180",
+                      )}
+                    />
+                  </button>
+
+                  {planOpen && (
+                    <div className="ml-5 mt-0.5 space-y-0.5 border-l border-cloud/80 pl-3">
+                      <Link
+                        href="/admin"
+                        onClick={onNavigate}
+                        className={cn(
+                          "flex items-center gap-2.5 rounded-[var(--radius-card)] px-2.5 py-2 text-[12.5px] font-medium transition-all duration-[var(--duration-fast)]",
+                          pathname === "/admin"
+                            ? "text-forest-ink"
+                            : "text-ash hover:text-graphite",
+                        )}
+                      >
+                        Vue d&apos;ensemble
+                      </Link>
+                      {item.children.map(({ href, label, icon: ChildIcon }) => {
+                        const childActive = isActive(href);
+                        return (
+                          <Link
+                            key={href}
+                            href={href}
+                            onClick={onNavigate}
+                            className={cn(
+                              "flex items-center gap-2.5 rounded-[var(--radius-card)] px-2.5 py-2 text-[12.5px] font-medium transition-all duration-[var(--duration-fast)]",
+                              childActive
+                                ? "text-forest-ink"
+                                : "text-ash hover:text-graphite",
+                            )}
+                          >
+                            <ChildIcon className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
+                            {label}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
+            const active = isActive(item.href);
             return (
               <Link
-                key={href}
-                href={defaultChild ?? href}
+                key={item.href}
+                href={item.defaultChild ?? item.href}
                 onClick={onNavigate}
                 className={cn(
                   "group relative flex items-center gap-3 rounded-[var(--radius-card)] px-3 py-2.5 text-[13px] font-medium transition-all duration-[var(--duration-fast)]",
@@ -116,14 +210,14 @@ export function Sidebar({ mobileOpen = false, onNavigate }: SidebarProps) {
                 {active && (
                   <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-full bg-forest-ink" />
                 )}
-                <Icon
+                <item.icon
                   className={cn(
                     "h-[18px] w-[18px] shrink-0 transition-colors",
                     active ? "text-forest-ink" : "text-ash group-hover:text-slate",
                   )}
                   strokeWidth={active ? 2.25 : 1.75}
                 />
-                {label}
+                {item.label}
               </Link>
             );
           })}
