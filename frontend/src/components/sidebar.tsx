@@ -116,16 +116,14 @@ export function Sidebar({ mobileOpen = false, onNavigate }: SidebarProps) {
       )}
     >
       <div className="sidebar-brand px-5 py-6">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-paper/70">
-          {BRAND.ministryShort}
-        </p>
-        <p className="mt-1 font-display text-lg leading-tight text-paper">{BRAND.appName}</p>
-        <p className="mt-1 text-[11px] text-paper/80">
+        <p className="font-mono-label text-silver-mist">{BRAND.ministryShort}</p>
+        <p className="mt-2 font-display text-lg leading-tight text-canvas-white">{BRAND.appName}</p>
+        <p className="mt-1 text-xs text-warm-sand">
           {BRAND.bureauShort} · {BRAND.program}
         </p>
-        <div className="mt-4 rounded-card border border-paper/15 bg-paper/10 px-3 py-2.5 backdrop-blur-sm">
-          <p className="text-sm font-medium text-paper">{user?.prenom}</p>
-          <p className="text-[11px] text-paper/75">
+        <div className="mt-4 rounded-card border border-cloud bg-veil px-3 py-2.5">
+          <p className="text-sm font-medium text-canvas-white">{user?.prenom}</p>
+          <p className="text-[11px] text-silver-mist">
             {user?.type_acces === "ecriture" ? "Accès édition" : "Accès lecture"}
           </p>
         </div>
@@ -199,10 +197,10 @@ export function Sidebar({ mobileOpen = false, onNavigate }: SidebarProps) {
         </div>
       </nav>
 
-      <div className="border-t border-cloud/80 p-3">
+      <div className="border-t border-cloud p-3">
         <Button
           variant="ghost"
-          className="w-full justify-start gap-2 text-slate hover:bg-veil hover:text-graphite"
+          className="w-full justify-start gap-2 text-warm-sand"
           onClick={handleLogout}
         >
           <LogOut className="h-4 w-4" />

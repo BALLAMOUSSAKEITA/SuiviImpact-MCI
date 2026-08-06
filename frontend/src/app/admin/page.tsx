@@ -33,6 +33,7 @@ export default function AdminDashboardPage() {
         title="Plan d'Action"
         description={`Vue d'ensemble — objectifs, tâches et projets du ${BRAND.bureau}.`}
         display
+        aurora
       />
       <div className="grid gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {sections.map(({ href, title, description, icon: Icon }) => (
@@ -40,9 +41,9 @@ export default function AdminDashboardPage() {
             <div className="hub-card-icon mb-4">
               <Icon className="h-5 w-5" strokeWidth={1.75} />
             </div>
-            <h2 className="font-display text-lg text-graphite">{title}</h2>
-            <p className="mt-2 text-sm leading-relaxed text-slate">{description}</p>
-            <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-forest-ink group-hover:gap-2.5 transition-all">
+            <h2 className="font-display text-lg text-canvas-white">{title}</h2>
+            <p className="mt-2 text-sm leading-relaxed text-warm-sand">{description}</p>
+            <span className="mt-4 inline-flex items-center gap-1.5 font-mono-label text-bioluminescent-teal group-hover:gap-2.5 transition-all">
               Accéder
               <ArrowRight className="h-4 w-4" />
             </span>

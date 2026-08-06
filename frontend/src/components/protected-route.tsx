@@ -28,7 +28,7 @@ export function ProtectedRoute({
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-paper text-fog">
+      <div className="flex min-h-screen items-center justify-center bg-midnight-navy text-silver-mist">
         Chargement…
       </div>
     );

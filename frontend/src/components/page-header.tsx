@@ -8,6 +8,7 @@ interface PageHeaderProps {
   display?: boolean;
   actions?: React.ReactNode;
   hero?: boolean;
+  aurora?: boolean;
 }
 
 export function PageHeader({
@@ -18,6 +19,7 @@ export function PageHeader({
   display = false,
   actions,
   hero = true,
+  aurora = false,
 }: PageHeaderProps) {
   return (
     <header
@@ -27,30 +29,29 @@ export function PageHeader({
         className,
       )}
     >
-      <div className="min-w-0 space-y-2">
-        {eyebrow && (
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-forest-ink">
-            {eyebrow}
-          </p>
-        )}
+      {aurora && <div className="aurora-ribbon aurora-ribbon-sm" aria-hidden />}
+      <div className="relative z-[1] min-w-0 space-y-2">
+        {eyebrow && <p className="font-mono-label text-bioluminescent-teal">{eyebrow}</p>}
         <h1
           className={cn(
-            "text-graphite",
+            "text-canvas-white",
             display
-              ? "font-display text-2xl leading-tight sm:text-[32px] lg:text-[38px] lg:leading-[1.25]"
-              : "font-display text-xl sm:text-2xl",
+              ? "font-display text-[2rem] leading-none sm:text-[2.5rem] lg:text-[3rem] lg:tracking-[-0.02em]"
+              : "font-display text-xl sm:text-[1.75rem]",
           )}
         >
           {title}
         </h1>
         {description && (
-          <p className="max-w-2xl text-sm leading-relaxed text-slate sm:text-[0.9375rem]">
+          <p className="max-w-2xl text-sm leading-relaxed text-warm-sand sm:text-base">
             {description}
           </p>
         )}
       </div>
       {actions && (
-        <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>
+        <div className="relative z-[1] flex shrink-0 flex-wrap items-center gap-2">
+          {actions}
+        </div>
       )}
     </header>
   );
