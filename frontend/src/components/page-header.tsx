@@ -20,32 +20,35 @@ export function PageHeader({
   return (
     <header
       className={cn(
-        "flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between",
+        "flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between",
+        "animate-fade-in",
         className,
       )}
     >
-      <div className="min-w-0">
+      <div className="min-w-0 space-y-1.5">
         {eyebrow && (
-          <p className="mb-1 text-xs font-medium text-gray-400 uppercase tracking-wide">
+          <p className="text-[11px] font-bold uppercase tracking-widest text-forest-ink/80">
             {eyebrow}
           </p>
         )}
         <h1
           className={cn(
-            "text-gray-900",
+            "text-graphite tracking-tight",
             display
-              ? "font-display text-2xl sm:text-3xl"
-              : "text-lg font-semibold sm:text-xl",
+              ? "font-display text-2xl leading-tight sm:text-[32px] lg:text-[38px] lg:leading-[1.2]"
+              : "text-xl font-bold sm:text-2xl",
           )}
         >
           {title}
         </h1>
         {description && (
-          <p className="mt-1 text-sm text-gray-500">{description}</p>
+          <p className="max-w-2xl text-sm leading-relaxed text-fog">
+            {description}
+          </p>
         )}
       </div>
       {actions && (
-        <div className="flex shrink-0 items-center gap-2">{actions}</div>
+        <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>
       )}
     </header>
   );

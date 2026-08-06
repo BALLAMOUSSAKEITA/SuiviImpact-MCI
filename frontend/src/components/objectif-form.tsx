@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus } from "lucide-react";
+import { Plus, Minus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -30,53 +30,58 @@ export function ObjectifForm({ queryKey }: { queryKey: string[] }) {
 
   if (!canWrite) return null;
 
-  if (!open) {
-    return (
-      <Button variant="outline" onClick={() => setOpen(true)}>
-        <Plus className="h-4 w-4" />
-        Ajouter un objectif
-      </Button>
-    );
-  }
-
   return (
     <div className="panel-grain">
-      <form
-        className="flex flex-col gap-3 sm:flex-row sm:items-end"
-        onSubmit={(e) => {
-          e.preventDefault();
-          mutation.mutate({ code, description });
-        }}
+      <button
+        type="button"
+        className="flex items-center gap-2 text-sm font-semibold text-forest-ink transition-colors hover:text-vine"
+        onClick={() => setOpen((v) => !v)}
       >
-        <div className="w-full sm:w-24">
-          <label className="label-grain">Code</label>
-          <input
-            placeholder="OC1"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            className="input-grain"
-            required
-          />
-        </div>
-        <div className="flex-1">
-          <label className="label-grain">Description</label>
-          <input
-            placeholder="Description de l'objectif"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="input-grain"
-            required
-          />
-        </div>
-        <div className="flex gap-2">
+        {open ? (
+          <>
+            <Minus className="h-4 w-4" />
+            Masquer le formulaire
+          </>
+        ) : (
+          <>
+            <Plus className="h-4 w-4" />
+            Ajouter un objectif
+          </>
+        )}
+      </button>
+      {open && (
+        <form
+          className="mt-5 grid gap-3 sm:grid-cols-[auto_1fr_auto] sm:items-end"
+          onSubmit={(e) => {
+            e.preventDefault();
+            mutation.mutate({ code, description });
+          }}
+        >
+          <div>
+            <label className="label-grain">Code</label>
+            <input
+              placeholder="Ex. OC1"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              className="input-grain"
+              required
+            />
+          </div>
+          <div>
+            <label className="label-grain">Description</label>
+            <input
+              placeholder="Description de l'objectif"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="input-grain"
+              required
+            />
+          </div>
           <Button type="submit" disabled={mutation.isPending}>
             Enregistrer
           </Button>
-          <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
-            Annuler
-          </Button>
-        </div>
-      </form>
+        </form>
+      )}
     </div>
   );
 }

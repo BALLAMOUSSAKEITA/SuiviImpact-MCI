@@ -17,7 +17,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "SuiviImpact — MCI Guinée",
+  title: "Connexion — SuiviImpact | MCI Guinée",
   description:
     "Plateforme de suivi d'impact du Ministère du Commerce et de l'Industrie — Bureau de Stratégie et de Développement (BSD).",
 };
@@ -30,9 +30,9 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
-      className={`${inter.variable} ${poppins.variable} h-full`}
+      className={`${inter.variable} ${poppins.variable} h-full antialiased`}
     >
-      <body className="min-h-full">
+      <body className="min-h-full flex flex-col bg-paper text-graphite">
         <Providers>{children}</Providers>
       </body>
     </html>

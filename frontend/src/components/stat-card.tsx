@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProgressBar } from "@/components/execution-badge";
 
 interface StatCardProps {
@@ -19,16 +20,20 @@ export function StatCard({
   className,
 }: StatCardProps) {
   return (
-    <div className={cn("rounded-[var(--radius-lg)] border bg-white p-5", className)}>
-      <p className="text-[13px] font-medium text-gray-500">{title}</p>
-      <p className="mt-1 text-2xl font-semibold tabular-nums text-gray-900">
-        {value}
-      </p>
-      {subtitle && <p className="mt-0.5 text-xs text-gray-400">{subtitle}</p>}
-      {showProgress && progressValue != null && (
-        <ProgressBar value={progressValue} className="mt-3" />
-      )}
-    </div>
+    <Card className={cn(className)}>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-medium text-fog">{title}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="text-3xl font-semibold text-graphite">
+          {value}
+        </p>
+        {subtitle && <p className="mt-1 text-xs text-ash">{subtitle}</p>}
+        {showProgress && progressValue != null && (
+          <ProgressBar value={progressValue} className="mt-3" />
+        )}
+      </CardContent>
+    </Card>
   );
 }
 
@@ -41,7 +46,7 @@ export function StatGrid({ children, className }: StatGridProps) {
   return (
     <div
       className={cn(
-        "grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
+        "grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
         className,
       )}
     >
