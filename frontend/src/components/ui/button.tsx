@@ -8,9 +8,10 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-forest-ink text-paper hover:bg-forest-ink/90",
+        default:
+          "bg-forest-ink text-paper shadow-[var(--shadow-card)] hover:bg-forest-ink/92",
         outline:
-          "border border-mist bg-paper text-graphite hover:bg-veil",
+          "border border-mist bg-paper text-graphite shadow-sm hover:border-forest-ink/30 hover:bg-veil",
         ghost: "text-graphite hover:bg-veil hover:text-graphite",
       },
       size: {

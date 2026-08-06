@@ -32,7 +32,7 @@ export default function RootLayout({
       lang="fr"
       className={`${inter.variable} ${poppins.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-paper text-graphite">
+      <body className="min-h-full flex flex-col bg-canvas text-graphite">
         <Providers>{children}</Providers>
       </body>
     </html>
