@@ -29,6 +29,26 @@ class ObjectifRead(BaseModel):
     updated_at: datetime
 
 
+class TachePlanCreate(BaseModel):
+    code: str = Field(min_length=1, max_length=20)
+    description: str = Field(min_length=1)
+
+
+class TachePlanUpdate(BaseModel):
+    code: str | None = Field(default=None, min_length=1, max_length=20)
+    description: str | None = Field(default=None, min_length=1)
+
+
+class TachePlanRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    code: str
+    description: str
+    created_at: datetime
+    updated_at: datetime
+
+
 class DirectionRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

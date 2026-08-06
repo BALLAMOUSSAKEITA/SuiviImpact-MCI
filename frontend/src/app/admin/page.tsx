@@ -17,8 +17,7 @@ const sections = [
   {
     href: "/admin/taches",
     title: "Tâches",
-    description:
-      "Ajouter et planifier les tâches par trimestre, liées aux activités.",
+    description: "Créer et gérer les tâches du plan d'action (code et description).",
     icon: ClipboardList,
   },
   {

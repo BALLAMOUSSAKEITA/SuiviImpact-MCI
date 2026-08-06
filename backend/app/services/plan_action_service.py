@@ -9,6 +9,7 @@ from app.models.plan_action import (
     ActiviteDirection,
     ActiviteTrimestre,
     Objectif,
+    TachePlan,
 )
 from app.schemas.plan_action import (
     ActiviteCreate,
@@ -17,6 +18,9 @@ from app.schemas.plan_action import (
     ObjectifCreate,
     ObjectifRead,
     ObjectifUpdate,
+    TachePlanCreate,
+    TachePlanRead,
+    TachePlanUpdate,
     TrimestrePlan,
 )
 
@@ -72,6 +76,41 @@ async def update_objectif(
 
 async def delete_objectif(db: AsyncSession, objectif: Objectif) -> None:
     await db.delete(objectif)
+    await db.commit()
+
+
+async def list_taches_plan(db: AsyncSession) -> list[TachePlanRead]:
+    result = await db.execute(select(TachePlan).order_by(TachePlan.code))
+    return list(result.scalars().all())
+
+
+async def get_tache_plan(db: AsyncSession, tache_id: int) -> TachePlan | None:
+    result = await db.execute(select(TachePlan).where(TachePlan.id == tache_id))
+    return result.scalar_one_or_none()
+
+
+async def create_tache_plan(db: AsyncSession, data: TachePlanCreate) -> TachePlan:
+    tache = TachePlan(code=data.code, description=data.description)
+    db.add(tache)
+    await db.commit()
+    await db.refresh(tache)
+    return tache
+
+
+async def update_tache_plan(
+    db: AsyncSession, tache: TachePlan, data: TachePlanUpdate
+) -> TachePlan:
+    if data.code is not None:
+        tache.code = data.code
+    if data.description is not None:
+        tache.description = data.description
+    await db.commit()
+    await db.refresh(tache)
+    return tache
+
+
+async def delete_tache_plan(db: AsyncSession, tache: TachePlan) -> None:
+    await db.delete(tache)
     await db.commit()
 
 

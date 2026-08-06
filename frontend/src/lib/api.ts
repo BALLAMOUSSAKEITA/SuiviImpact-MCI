@@ -38,6 +38,10 @@ import type {
 
   ObjectifCreate,
 
+  TachePlan,
+
+  TachePlanCreate,
+
   Direction,
 
   PlanificationActivite,
@@ -594,6 +598,39 @@ export async function deleteObjectif(id: number): Promise<void> {
 
   return apiFetch<void>(`/api/v1/objectifs/${id}`, { method: "DELETE" });
 
+}
+
+
+
+export async function listTachesPlan(): Promise<TachePlan[]> {
+  return apiFetch<TachePlan[]>("/api/v1/taches-plan");
+}
+
+
+
+export async function createTachePlan(data: TachePlanCreate): Promise<TachePlan> {
+  return apiFetch<TachePlan>("/api/v1/taches-plan", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+
+
+export async function updateTachePlan(
+  id: number,
+  data: Partial<Pick<TachePlan, "code" | "description">>,
+): Promise<TachePlan> {
+  return apiFetch<TachePlan>(`/api/v1/taches-plan/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+}
+
+
+
+export async function deleteTachePlan(id: number): Promise<void> {
+  return apiFetch<void>(`/api/v1/taches-plan/${id}`, { method: "DELETE" });
 }
 
 

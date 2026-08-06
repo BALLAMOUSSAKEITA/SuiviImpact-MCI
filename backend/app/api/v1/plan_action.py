@@ -14,6 +14,9 @@ from app.schemas.plan_action import (
     ObjectifCreate,
     ObjectifRead,
     ObjectifUpdate,
+    TachePlanCreate,
+    TachePlanRead,
+    TachePlanUpdate,
 )
 from app.services import plan_action_service as service
 from app.services.plan_action_service import activite_to_read
@@ -82,6 +85,60 @@ async def delete_objectif(
     if objectif is None:
         raise HTTPException(status_code=404, detail="Objectif introuvable")
     await service.delete_objectif(db, objectif)
+
+
+@router.get("/taches-plan", response_model=list[TachePlanRead])
+async def list_taches_plan(
+    _: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> list[TachePlanRead]:
+    return await service.list_taches_plan(db)
+
+
+@router.get("/taches-plan/{tache_id}", response_model=TachePlanRead)
+async def get_tache_plan(
+    tache_id: int,
+    _: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> TachePlanRead:
+    tache = await service.get_tache_plan(db, tache_id)
+    if tache is None:
+        raise HTTPException(status_code=404, detail="Tâche introuvable")
+    return tache
+
+
+@router.post("/taches-plan", response_model=TachePlanRead, status_code=status.HTTP_201_CREATED)
+async def create_tache_plan(
+    body: TachePlanCreate,
+    _: User = Depends(require_write_access),
+    db: AsyncSession = Depends(get_db),
+) -> TachePlanRead:
+    return await service.create_tache_plan(db, body)
+
+
+@router.put("/taches-plan/{tache_id}", response_model=TachePlanRead)
+async def update_tache_plan(
+    tache_id: int,
+    body: TachePlanUpdate,
+    _: User = Depends(require_write_access),
+    db: AsyncSession = Depends(get_db),
+) -> TachePlanRead:
+    tache = await service.get_tache_plan(db, tache_id)
+    if tache is None:
+        raise HTTPException(status_code=404, detail="Tâche introuvable")
+    return await service.update_tache_plan(db, tache, body)
+
+
+@router.delete("/taches-plan/{tache_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_tache_plan(
+    tache_id: int,
+    _: User = Depends(require_write_access),
+    db: AsyncSession = Depends(get_db),
+) -> None:
+    tache = await service.get_tache_plan(db, tache_id)
+    if tache is None:
+        raise HTTPException(status_code=404, detail="Tâche introuvable")
+    await service.delete_tache_plan(db, tache)
 
 
 @router.get("/objectifs/{objectif_id}/activites", response_model=list[ActiviteRead])

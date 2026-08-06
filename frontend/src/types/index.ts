@@ -68,6 +68,19 @@ export interface ObjectifCreate {
   description: string;
 }
 
+export interface TachePlan {
+  id: number;
+  code: string;
+  description: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TachePlanCreate {
+  code: string;
+  description: string;
+}
+
 export interface ActiviteCreate {
   code: string;
   description: string;

@@ -102,3 +102,20 @@ async def test_create_activite_with_trimestres(client: AsyncClient):
     )
     assert activite.status_code == 201
     assert activite.json()["trimestres"] == [{"annee": 2025, "trimestre": 1}]
+
+
+@pytest.mark.asyncio
+async def test_create_and_list_taches_plan(client: AsyncClient):
+    headers = await _auth_headers(client)
+
+    create = await client.post(
+        "/api/v1/taches-plan",
+        headers=headers,
+        json={"code": "T1", "description": "Tâche plan d'action"},
+    )
+    assert create.status_code == 201
+
+    listing = await client.get("/api/v1/taches-plan", headers=headers)
+    assert listing.status_code == 200
+    assert len(listing.json()) == 1
+    assert listing.json()[0]["code"] == "T1"
