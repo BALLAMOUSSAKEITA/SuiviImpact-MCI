@@ -4,21 +4,20 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bioluminescent-teal/40 focus-visible:ring-offset-2 focus-visible:ring-offset-midnight-navy disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-card text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest-ink/30 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
         default:
-          "bg-bioluminescent-teal text-deep-teal shadow-[var(--shadow-cta)] hover:brightness-105",
+          "bg-forest-ink text-paper shadow-[var(--shadow-card)] hover:bg-forest-ink/92",
         outline:
-          "border border-silver-mist/40 bg-transparent text-canvas-white hover:border-bioluminescent-teal/50 hover:bg-veil",
-        ghost:
-          "text-warm-sand hover:bg-veil hover:text-canvas-white",
+          "border border-mist bg-paper text-graphite shadow-sm hover:border-forest-ink/30 hover:bg-veil",
+        ghost: "text-graphite hover:bg-veil hover:text-graphite",
       },
       size: {
-        default: "h-10 px-6 py-2.5",
+        default: "h-10 px-5 py-3",
         lg: "h-11 px-8",
-        sm: "h-8 px-4 text-xs font-medium",
+        sm: "h-8 px-3 text-xs",
       },
     },
     defaultVariants: {

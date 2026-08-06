@@ -11,15 +11,15 @@ export function ExecutionBadge({ value, className }: ExecutionBadgeProps) {
   const pct = typeof value === "string" ? parseFloat(value) : value;
   const color =
     pct >= 100
-      ? "border-bioluminescent-teal/40 bg-bioluminescent-teal/15 text-bioluminescent-teal"
+      ? "bg-veil text-forest-ink"
       : pct >= 50
-        ? "border-bubblegum/40 bg-bubblegum/10 text-bubblegum"
-        : "border-red-400/30 bg-red-500/10 text-red-300";
+        ? "bg-amber-100 text-amber-800"
+        : "bg-red-100 text-red-800";
 
   return (
     <span
       className={cn(
-        "inline-flex rounded-full border px-2.5 py-0.5 text-xs font-medium",
+        "inline-flex rounded-card px-2.5 py-0.5 text-xs font-medium",
         color,
         className,
       )}
@@ -36,15 +36,15 @@ interface TacheStatutBadgeProps {
 
 export function TacheStatutBadge({ statut, className }: TacheStatutBadgeProps) {
   const colors: Record<TacheStatut, string> = {
-    en_cours: "border-cosmic-blue/40 bg-cosmic-blue/15 text-ice-blue",
-    terminee: "border-bioluminescent-teal/40 bg-bioluminescent-teal/15 text-bioluminescent-teal",
-    en_retard: "border-red-400/30 bg-red-500/10 text-red-300",
+    en_cours: "bg-blue-100 text-blue-800",
+    terminee: "bg-veil text-forest-ink",
+    en_retard: "bg-red-100 text-red-800",
   };
 
   return (
     <span
       className={cn(
-        "inline-flex rounded-full border px-2.5 py-0.5 text-xs font-medium",
+        "inline-flex rounded-card px-2.5 py-0.5 text-xs font-medium",
         colors[statut],
         className,
       )}
@@ -70,13 +70,13 @@ export function ProgressBar({ value, label, className }: ProgressBarProps) {
     <div className={cn("space-y-1", className)}>
       {label && (
         <div className="flex justify-between text-sm">
-          <span className="text-silver-mist">{label}</span>
-          <span className="font-medium text-canvas-white">{pct.toFixed(0)} %</span>
+          <span className="text-slate">{label}</span>
+          <span className="font-medium text-graphite">{pct.toFixed(0)} %</span>
         </div>
       )}
-      <div className="h-2 w-full overflow-hidden rounded-full bg-cloud">
+      <div className="h-2.5 w-full overflow-hidden rounded-full bg-cloud">
         <div
-          className="h-full rounded-full bg-bioluminescent-teal transition-all"
+          className="h-full rounded-full bg-forest-ink transition-all"
           style={{ width: `${pct}%` }}
         />
       </div>

@@ -1,19 +1,19 @@
 import type { Metadata } from "next";
-import { DM_Mono, DM_Sans } from "next/font/google";
+import { Inter, Poppins } from "next/font/google";
 
 import { Providers } from "@/components/providers";
 import "./globals.css";
 
-const dmSans = DM_Sans({
-  variable: "--font-dm-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "500", "600"],
 });
 
-const dmMono = DM_Mono({
-  variable: "--font-dm-mono",
+const poppins = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
-  weight: ["400", "500"],
+  weight: ["600"],
 });
 
 export const metadata: Metadata = {
@@ -30,9 +30,9 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
-      className={`${dmSans.variable} ${dmMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${poppins.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-midnight-navy text-canvas-white">
+      <body className="min-h-full flex flex-col bg-canvas text-graphite">
         <Providers>{children}</Providers>
       </body>
     </html>
