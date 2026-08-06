@@ -32,7 +32,7 @@ export function AdminShell({ children, className }: AdminShellProps) {
   }, [mobileOpen]);
 
   return (
-    <div className="flex min-h-screen bg-canvas admin-canvas">
+    <div className="flex min-h-screen bg-paper">
       {/* Overlay mobile */}
       {mobileOpen && (
         <button
@@ -50,7 +50,7 @@ export function AdminShell({ children, className }: AdminShellProps) {
 
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Barre mobile */}
-        <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-cloud/80 bg-paper/90 px-4 py-3 backdrop-blur-md lg:hidden">
+        <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-cloud bg-paper px-4 py-3 lg:hidden">
           <button
             type="button"
             aria-label={mobileOpen ? "Fermer le menu" : "Ouvrir le menu"}
@@ -72,7 +72,7 @@ export function AdminShell({ children, className }: AdminShellProps) {
 
         <main
           className={cn(
-            "min-w-0 flex-1 space-y-6 p-4 sm:space-y-8 sm:p-6 lg:mx-auto lg:max-w-6xl lg:p-8 xl:max-w-7xl",
+            "min-w-0 flex-1 space-y-6 p-4 sm:space-y-8 sm:p-6 lg:p-8",
             className,
           )}
         >

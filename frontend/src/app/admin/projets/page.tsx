@@ -5,7 +5,6 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/components/auth-provider";
-import { PageHeader } from "@/components/page-header";
 import { ExecutionBadge } from "@/components/execution-badge";
 import { Button } from "@/components/ui/button";
 import { createProjet, deleteProjet, listProjets, updateProjet } from "@/lib/api";
@@ -130,16 +129,17 @@ function ProjetsContent() {
 
   return (
     <>
-      <PageHeader
-        eyebrow="Plan d'action"
-        title="Projets"
-        description="Suivi des projets et exécution financière / physique"
-        actions={
-          canWrite && !showForm ? (
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-graphite">Projets</h1>
+            <p className="mt-1 text-sm text-fog">
+              Suivi des projets et exécution financière / physique
+            </p>
+          </div>
+          {canWrite && !showForm && (
             <Button onClick={() => setShowForm(true)}>Nouveau projet</Button>
-          ) : undefined
-        }
-      />
+          )}
+        </div>
 
         {showForm && canWrite && (
           <form
