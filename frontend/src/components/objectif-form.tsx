@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Plus, Minus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -33,34 +34,50 @@ export function ObjectifForm({ queryKey }: { queryKey: string[] }) {
     <div className="panel-grain">
       <button
         type="button"
-        className="text-sm font-medium text-forest-ink"
+        className="flex items-center gap-2 text-sm font-semibold text-forest-ink transition-colors hover:text-vine"
         onClick={() => setOpen((v) => !v)}
       >
-        {open ? "− Masquer le formulaire" : "+ Ajouter un objectif"}
+        {open ? (
+          <>
+            <Minus className="h-4 w-4" />
+            Masquer le formulaire
+          </>
+        ) : (
+          <>
+            <Plus className="h-4 w-4" />
+            Ajouter un objectif
+          </>
+        )}
       </button>
       {open && (
         <form
-          className="mt-4 grid gap-3 sm:grid-cols-3"
+          className="mt-5 grid gap-3 sm:grid-cols-[auto_1fr_auto] sm:items-end"
           onSubmit={(e) => {
             e.preventDefault();
             mutation.mutate({ code, description });
           }}
         >
-          <input
-            placeholder="Code (ex. OC1)"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            className="input-grain"
-            required
-          />
-          <input
-            placeholder="Description de l'objectif"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="input-grain sm:col-span-2"
-            required
-          />
-          <Button type="submit" disabled={mutation.isPending} className="sm:w-fit">
+          <div>
+            <label className="label-grain">Code</label>
+            <input
+              placeholder="Ex. OC1"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              className="input-grain"
+              required
+            />
+          </div>
+          <div>
+            <label className="label-grain">Description</label>
+            <input
+              placeholder="Description de l'objectif"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="input-grain"
+              required
+            />
+          </div>
+          <Button type="submit" disabled={mutation.isPending}>
             Enregistrer
           </Button>
         </form>

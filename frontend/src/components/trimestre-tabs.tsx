@@ -16,7 +16,7 @@ export function TrimestreTabs({
   className,
 }: TrimestreTabsProps) {
   return (
-    <div className={cn("flex flex-wrap gap-2", className)}>
+    <div className={cn("inline-flex gap-1 rounded-[var(--radius-card)] bg-veil/80 p-1", className)}>
       {[1, 2, 3, 4].map((t) => {
         const href = `${basePath}/${t}`;
         const isActive = currentTrimestre === t;
@@ -26,10 +26,10 @@ export function TrimestreTabs({
             key={t}
             href={href}
             className={cn(
-              "rounded-card px-4 py-2 text-sm font-medium transition-colors",
+              "relative rounded-[var(--radius-sm)] px-4 py-2 text-sm font-semibold transition-all duration-[var(--duration-fast)]",
               isActive
-                ? "bg-forest-ink text-paper"
-                : "bg-paper text-slate ring-1 ring-cloud hover:bg-veil hover:text-forest-ink",
+                ? "bg-white text-forest-ink shadow-sm"
+                : "text-fog hover:text-graphite",
             )}
           >
             T{t}

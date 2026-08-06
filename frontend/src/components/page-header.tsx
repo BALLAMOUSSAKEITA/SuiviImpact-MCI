@@ -21,27 +21,28 @@ export function PageHeader({
     <header
       className={cn(
         "flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between",
+        "animate-fade-in",
         className,
       )}
     >
-      <div className="min-w-0 space-y-2">
+      <div className="min-w-0 space-y-1.5">
         {eyebrow && (
-          <p className="text-xs font-medium uppercase tracking-widest text-forest-ink">
+          <p className="text-[11px] font-bold uppercase tracking-widest text-forest-ink/80">
             {eyebrow}
           </p>
         )}
         <h1
           className={cn(
-            "text-graphite",
+            "text-graphite tracking-tight",
             display
-              ? "font-display text-2xl leading-tight sm:text-[32px] lg:text-[38px] lg:leading-[1.25]"
-              : "text-xl font-semibold sm:text-2xl",
+              ? "font-display text-2xl leading-tight sm:text-[32px] lg:text-[38px] lg:leading-[1.2]"
+              : "text-xl font-bold sm:text-2xl",
           )}
         >
           {title}
         </h1>
         {description && (
-          <p className="max-w-2xl text-sm leading-relaxed text-slate">
+          <p className="max-w-2xl text-sm leading-relaxed text-fog">
             {description}
           </p>
         )}

@@ -11,20 +11,20 @@ export function ExecutionBadge({ value, className }: ExecutionBadgeProps) {
   const pct = typeof value === "string" ? parseFloat(value) : value;
   const color =
     pct >= 100
-      ? "bg-veil text-forest-ink"
+      ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
       : pct >= 50
-        ? "bg-amber-100 text-amber-800"
-        : "bg-red-100 text-red-800";
+        ? "bg-amber-50 text-amber-700 ring-1 ring-amber-200"
+        : "bg-red-50 text-red-700 ring-1 ring-red-200";
 
   return (
     <span
       className={cn(
-        "inline-flex rounded-card px-2.5 py-0.5 text-xs font-medium",
+        "inline-flex rounded-full px-2.5 py-1 text-xs font-semibold tabular-nums",
         color,
         className,
       )}
     >
-      {pct.toFixed(0)} %
+      {pct.toFixed(0)}%
     </span>
   );
 }
@@ -36,15 +36,15 @@ interface TacheStatutBadgeProps {
 
 export function TacheStatutBadge({ statut, className }: TacheStatutBadgeProps) {
   const colors: Record<TacheStatut, string> = {
-    en_cours: "bg-blue-100 text-blue-800",
-    terminee: "bg-veil text-forest-ink",
-    en_retard: "bg-red-100 text-red-800",
+    en_cours: "bg-blue-50 text-blue-700 ring-1 ring-blue-200",
+    terminee: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200",
+    en_retard: "bg-red-50 text-red-700 ring-1 ring-red-200",
   };
 
   return (
     <span
       className={cn(
-        "inline-flex rounded-card px-2.5 py-0.5 text-xs font-medium",
+        "inline-flex rounded-full px-2.5 py-1 text-xs font-semibold",
         colors[statut],
         className,
       )}
@@ -66,17 +66,27 @@ export function ProgressBar({ value, label, className }: ProgressBarProps) {
     Math.max(0, typeof value === "string" ? parseFloat(value) : value),
   );
 
+  const barColor =
+    pct >= 100
+      ? "bg-emerald-500"
+      : pct >= 50
+        ? "bg-amber-500"
+        : "bg-red-500";
+
   return (
-    <div className={cn("space-y-1", className)}>
+    <div className={cn("space-y-1.5", className)}>
       {label && (
         <div className="flex justify-between text-sm">
           <span className="text-slate">{label}</span>
-          <span className="font-medium text-graphite">{pct.toFixed(0)} %</span>
+          <span className="font-semibold tabular-nums text-graphite">{pct.toFixed(0)}%</span>
         </div>
       )}
-      <div className="h-2.5 w-full overflow-hidden rounded-full bg-cloud">
+      <div className="h-2 w-full overflow-hidden rounded-full bg-cloud/80">
         <div
-          className="h-full rounded-full bg-forest-ink transition-all"
+          className={cn(
+            "h-full rounded-full transition-all duration-500 ease-[var(--ease-out-expo)]",
+            barColor,
+          )}
           style={{ width: `${pct}%` }}
         />
       </div>

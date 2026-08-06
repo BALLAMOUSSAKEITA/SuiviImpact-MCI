@@ -32,13 +32,13 @@ export function AdminShell({ children, className }: AdminShellProps) {
   }, [mobileOpen]);
 
   return (
-    <div className="flex min-h-screen bg-paper">
+    <div className="flex min-h-screen bg-[var(--background)]">
       {/* Overlay mobile */}
       {mobileOpen && (
         <button
           type="button"
           aria-label="Fermer le menu"
-          className="fixed inset-0 z-40 bg-obsidian/40 lg:hidden"
+          className="fixed inset-0 z-40 bg-obsidian/50 backdrop-blur-sm transition-opacity lg:hidden"
           onClick={() => setMobileOpen(false)}
         />
       )}
@@ -50,18 +50,18 @@ export function AdminShell({ children, className }: AdminShellProps) {
 
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Barre mobile */}
-        <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-cloud bg-paper px-4 py-3 lg:hidden">
+        <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-cloud/60 bg-white/80 px-4 py-3 backdrop-blur-md lg:hidden">
           <button
             type="button"
             aria-label={mobileOpen ? "Fermer le menu" : "Ouvrir le menu"}
             aria-expanded={mobileOpen}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-card text-slate transition-colors hover:bg-veil hover:text-graphite"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-card)] text-slate transition-all hover:bg-veil hover:text-graphite active:scale-95"
             onClick={() => setMobileOpen((open) => !open)}
           >
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-forest-ink">
+            <p className="truncate text-sm font-bold text-forest-ink tracking-tight">
               {BRAND.appName}
             </p>
             <p className="truncate text-[11px] text-ash">
@@ -72,7 +72,8 @@ export function AdminShell({ children, className }: AdminShellProps) {
 
         <main
           className={cn(
-            "min-w-0 flex-1 space-y-6 p-4 sm:space-y-8 sm:p-6 lg:p-8",
+            "min-w-0 flex-1 space-y-6 p-4 sm:space-y-8 sm:p-6 lg:p-8 xl:p-10",
+            "animate-fade-in",
             className,
           )}
         >
