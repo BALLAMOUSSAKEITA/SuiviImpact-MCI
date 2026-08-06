@@ -4,23 +4,20 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-card)] text-sm font-semibold transition-all duration-[var(--duration-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest-ink/30 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.97]",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius)] text-[13px] font-medium transition-colors duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        default:
-          "bg-forest-ink text-white shadow-sm hover:bg-vine hover:shadow-md",
-        outline:
-          "border border-cloud bg-white text-graphite hover:bg-veil hover:border-mist hover:shadow-sm",
-        ghost: "text-slate hover:bg-veil hover:text-graphite",
-        destructive:
-          "bg-red-600 text-white shadow-sm hover:bg-red-700 hover:shadow-md",
+        default: "bg-primary text-white hover:bg-primary-hover",
+        outline: "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900",
+        ghost: "text-gray-600 hover:bg-gray-100 hover:text-gray-900",
+        destructive: "bg-red-600 text-white hover:bg-red-700",
       },
       size: {
-        default: "h-10 px-5 py-3",
-        lg: "h-11 px-8 text-base",
-        sm: "h-8 px-3 text-xs rounded-[var(--radius-sm)]",
-        icon: "h-9 w-9",
+        default: "h-9 px-4",
+        lg: "h-10 px-5 text-sm",
+        sm: "h-7 px-2.5 text-xs",
+        icon: "h-8 w-8",
       },
     },
     defaultVariants: {

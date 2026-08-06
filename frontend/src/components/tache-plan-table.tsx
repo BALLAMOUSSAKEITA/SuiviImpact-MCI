@@ -53,50 +53,55 @@ export function TachePlanTable({ taches, queryKey }: TachePlanTableProps) {
     }
   };
 
+  if (taches.length === 0) {
+    return (
+      <div className="rounded-[var(--radius-lg)] border bg-white py-12 text-center">
+        <p className="text-sm text-gray-400">Aucune tâche enregistrée.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="table-shell">
       <table className="table-grain">
         <thead>
           <tr>
             <th>Code</th>
-            <th>Tâches</th>
-            {canWrite && <th className="text-right">Actions</th>}
+            <th>Tâche</th>
+            {canWrite && <th className="w-[1%] text-right">Actions</th>}
           </tr>
         </thead>
         <tbody>
-          {taches.length === 0 && (
-            <tr>
-              <td colSpan={canWrite ? 3 : 2} className="py-8 text-center text-ash">
-                Aucune tâche enregistrée
-              </td>
-            </tr>
-          )}
           {taches.map((tache) => (
             <tr key={tache.id}>
-              <td className="font-medium text-forest-ink">{tache.code}</td>
+              <td className="w-[80px]">
+                <span className="inline-block rounded bg-primary-subtle px-1.5 py-0.5 text-xs font-medium text-primary">
+                  {tache.code}
+                </span>
+              </td>
               <td>
                 {editingId === tache.id ? (
-                  <div className="grid gap-2 sm:grid-cols-2">
+                  <div className="flex gap-2">
                     <input
                       value={editCode}
                       onChange={(e) => setEditCode(e.target.value)}
-                      className="input-grain"
+                      className="input-grain w-20"
                       required
                     />
                     <input
                       value={editDescription}
                       onChange={(e) => setEditDescription(e.target.value)}
-                      className="input-grain"
+                      className="input-grain flex-1"
                       required
                     />
                   </div>
                 ) : (
-                  <span className="text-slate">{tache.description}</span>
+                  <span className="text-gray-700">{tache.description}</span>
                 )}
               </td>
               {canWrite && (
                 <td className="text-right">
-                  <div className="flex flex-wrap justify-end gap-1 sm:gap-2">
+                  <div className="flex justify-end gap-1">
                     {editingId === tache.id ? (
                       <>
                         <Button
@@ -113,7 +118,7 @@ export function TachePlanTable({ taches, queryKey }: TachePlanTableProps) {
                           Enregistrer
                         </Button>
                         <Button
-                          variant="outline"
+                          variant="ghost"
                           size="sm"
                           onClick={() => setEditingId(null)}
                         >
@@ -122,13 +127,13 @@ export function TachePlanTable({ taches, queryKey }: TachePlanTableProps) {
                       </>
                     ) : (
                       <>
-                        <Button variant="outline" size="sm" onClick={() => startEdit(tache)}>
+                        <Button variant="ghost" size="sm" onClick={() => startEdit(tache)}>
                           Modifier
                         </Button>
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="text-red-600"
+                          className="text-red-600 hover:bg-red-50 hover:text-red-700"
                           onClick={() => handleDelete(tache)}
                         >
                           Supprimer

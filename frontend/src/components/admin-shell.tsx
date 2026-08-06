@@ -32,13 +32,12 @@ export function AdminShell({ children, className }: AdminShellProps) {
   }, [mobileOpen]);
 
   return (
-    <div className="flex min-h-screen bg-[var(--background)]">
-      {/* Overlay mobile */}
+    <div className="flex min-h-screen">
       {mobileOpen && (
         <button
           type="button"
           aria-label="Fermer le menu"
-          className="fixed inset-0 z-40 bg-obsidian/50 backdrop-blur-sm transition-opacity lg:hidden"
+          className="fixed inset-0 z-40 bg-black/30 lg:hidden"
           onClick={() => setMobileOpen(false)}
         />
       )}
@@ -49,35 +48,27 @@ export function AdminShell({ children, className }: AdminShellProps) {
       />
 
       <div className="flex min-w-0 flex-1 flex-col">
-        {/* Barre mobile */}
-        <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-cloud/60 bg-white/80 px-4 py-3 backdrop-blur-md lg:hidden">
+        <header className="sticky top-0 z-30 flex h-12 items-center gap-3 border-b bg-white px-4 lg:hidden">
           <button
             type="button"
             aria-label={mobileOpen ? "Fermer le menu" : "Ouvrir le menu"}
-            aria-expanded={mobileOpen}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-card)] text-slate transition-all hover:bg-veil hover:text-graphite active:scale-95"
-            onClick={() => setMobileOpen((open) => !open)}
+            className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] text-gray-600 hover:bg-gray-100"
+            onClick={() => setMobileOpen((v) => !v)}
           >
-            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
           </button>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-bold text-forest-ink tracking-tight">
-              {BRAND.appName}
-            </p>
-            <p className="truncate text-[11px] text-ash">
-              {BRAND.bureauShort} · {BRAND.program}
-            </p>
-          </div>
+          <p className="text-sm font-semibold text-gray-900">{BRAND.appName}</p>
         </header>
 
         <main
           className={cn(
-            "min-w-0 flex-1 space-y-6 p-4 sm:space-y-8 sm:p-6 lg:p-8 xl:p-10",
-            "animate-fade-in",
+            "min-w-0 flex-1 p-5 sm:p-6 lg:p-8",
             className,
           )}
         >
-          {children}
+          <div className="mx-auto max-w-6xl space-y-6">
+            {children}
+          </div>
         </main>
       </div>
     </div>

@@ -16,20 +16,18 @@ export function TrimestreTabs({
   className,
 }: TrimestreTabsProps) {
   return (
-    <div className={cn("inline-flex gap-1 rounded-[var(--radius-card)] bg-veil/80 p-1", className)}>
+    <div className={cn("inline-flex rounded-[var(--radius)] border bg-gray-50 p-0.5", className)}>
       {[1, 2, 3, 4].map((t) => {
-        const href = `${basePath}/${t}`;
         const isActive = currentTrimestre === t;
-
         return (
           <Link
             key={t}
-            href={href}
+            href={`${basePath}/${t}`}
             className={cn(
-              "relative rounded-[var(--radius-sm)] px-4 py-2 text-sm font-semibold transition-all duration-[var(--duration-fast)]",
+              "rounded-[5px] px-3.5 py-1.5 text-[13px] font-medium transition-colors duration-100",
               isActive
-                ? "bg-white text-forest-ink shadow-sm"
-                : "text-fog hover:text-graphite",
+                ? "bg-white text-gray-900 shadow-sm"
+                : "text-gray-500 hover:text-gray-700",
             )}
           >
             T{t}
