@@ -4,30 +4,26 @@ import { useQuery } from "@tanstack/react-query";
 
 import { ObjectifForm } from "@/components/objectif-form";
 import { ObjectifTable } from "@/components/objectif-table";
-import { ObjectifTabs } from "@/components/objectif-tabs";
 import { PageHeader } from "@/components/page-header";
 import { listObjectifs } from "@/lib/api";
-import { OBJECTIF_LABELS, type ObjectifType } from "@/types";
 
-export function ObjectifsPage({ type }: { type: ObjectifType }) {
-  const queryKey = ["objectifs", type];
-  const { label, year } = OBJECTIF_LABELS[type];
+export function ObjectifsPage() {
+  const queryKey = ["objectifs"];
 
   const { data: objectifs = [], isLoading } = useQuery({
     queryKey,
-    queryFn: () => listObjectifs(type),
+    queryFn: () => listObjectifs(),
   });
 
   return (
     <>
       <PageHeader
         eyebrow="Plan d'action"
-        title={`Objectifs ${label} — ${year}`}
-        description="Objectifs clés de transformation et activités associées"
+        title="Objectifs"
+        description="Définir les objectifs du plan d'action et leurs activités associées"
       />
 
-      <ObjectifTabs />
-      <ObjectifForm type={type} queryKey={queryKey} />
+      <ObjectifForm queryKey={queryKey} />
 
       {isLoading ? (
         <p className="text-sm text-ash">Chargement…</p>

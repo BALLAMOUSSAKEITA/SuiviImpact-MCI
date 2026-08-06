@@ -38,8 +38,6 @@ import type {
 
   ObjectifCreate,
 
-  ObjectifType,
-
   Direction,
 
   PlanificationActivite,
@@ -552,12 +550,8 @@ export async function listDirections(): Promise<Direction[]> {
 
 
 
-export async function listObjectifs(type?: ObjectifType): Promise<Objectif[]> {
-
-  const query = type ? `?type=${type}` : "";
-
-  return apiFetch<Objectif[]>(`/api/v1/objectifs${query}`);
-
+export async function listObjectifs(): Promise<Objectif[]> {
+  return apiFetch<Objectif[]>("/api/v1/objectifs");
 }
 
 

@@ -1,5 +1,5 @@
-import { ObjectifsPage } from "@/components/objectifs-page";
+import { redirect } from "next/navigation";
 
-export default function OmtPage() {
-  return <ObjectifsPage type="omt" />;
+export default function OmtRedirectPage() {
+  redirect("/admin/objectifs");
 }

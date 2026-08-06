@@ -19,7 +19,7 @@ function ModifierObjectifContent() {
   const objectifId = Number(params.id);
 
   const { data: objectifs = [] } = useQuery({
-    queryKey: ["objectifs-all"],
+    queryKey: ["objectifs"],
     queryFn: () => listObjectifs(),
   });
   const objectif = objectifs.find((o) => o.id === objectifId);

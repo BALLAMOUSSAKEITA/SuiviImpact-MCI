@@ -1,14 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
-from enum import Enum
 
 from pydantic import BaseModel, ConfigDict, Field
-
-
-class ObjectifType(str, Enum):
-    OCT = "oct"
-    OMT = "omt"
-    OLT = "olt"
 
 
 class TrimestrePlan(BaseModel):
@@ -17,7 +10,6 @@ class TrimestrePlan(BaseModel):
 
 
 class ObjectifCreate(BaseModel):
-    type: ObjectifType
     code: str = Field(min_length=1, max_length=20)
     description: str = Field(min_length=1)
 
@@ -31,7 +23,6 @@ class ObjectifRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
-    type: ObjectifType
     code: str
     description: str
     created_at: datetime

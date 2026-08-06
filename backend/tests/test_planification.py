@@ -6,7 +6,7 @@ from sqlalchemy.pool import StaticPool
 from app.core.database import Base, get_db
 from app.core.security import hash_password
 from app.main import app
-from app.models.plan_action import Activite, ActiviteTrimestre, Objectif, ObjectifType
+from app.models.plan_action import Activite, ActiviteTrimestre, Objectif
 from app.models.user import AccessType, User, UserRole
 
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
@@ -63,7 +63,7 @@ async def _auth_headers(client: AsyncClient) -> dict[str, str]:
 
 
 async def _seed_activite(db_session: AsyncSession) -> int:
-    objectif = Objectif(type=ObjectifType.OCT, code="OC-P", description="Objectif planif")
+    objectif = Objectif(code="OC-P", description="Objectif planif")
     db_session.add(objectif)
     await db_session.flush()
 

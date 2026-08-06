@@ -7,15 +7,8 @@ import { toast } from "sonner";
 import { useAuth } from "@/components/auth-provider";
 import { Button } from "@/components/ui/button";
 import { createObjectif } from "@/lib/api";
-import type { ObjectifType } from "@/types";
 
-export function ObjectifForm({
-  type,
-  queryKey,
-}: {
-  type: ObjectifType;
-  queryKey: string[];
-}) {
+export function ObjectifForm({ queryKey }: { queryKey: string[] }) {
   const { canWrite } = useAuth();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
@@ -50,7 +43,7 @@ export function ObjectifForm({
           className="mt-4 grid gap-3 sm:grid-cols-3"
           onSubmit={(e) => {
             e.preventDefault();
-            mutation.mutate({ type, code, description });
+            mutation.mutate({ code, description });
           }}
         >
           <input

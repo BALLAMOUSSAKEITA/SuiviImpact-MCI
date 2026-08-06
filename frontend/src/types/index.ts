@@ -31,11 +31,8 @@ export interface UserCreate {
   role?: UserRole;
 }
 
-export type ObjectifType = "oct" | "omt" | "olt";
-
 export interface Objectif {
   id: number;
-  type: ObjectifType;
   code: string;
   description: string;
   created_at: string;
@@ -67,7 +64,6 @@ export interface Activite {
 }
 
 export interface ObjectifCreate {
-  type: ObjectifType;
   code: string;
   description: string;
 }
@@ -79,12 +75,6 @@ export interface ActiviteCreate {
   direction_ids: number[];
   trimestres: TrimestrePlan[];
 }
-
-export const OBJECTIF_LABELS: Record<ObjectifType, { label: string; year: number }> = {
-  oct: { label: "OCT", year: 2025 },
-  omt: { label: "OMT", year: 2026 },
-  olt: { label: "OLT", year: 2027 },
-};
 
 export const DEFAULT_ANNEE = 2025;
 

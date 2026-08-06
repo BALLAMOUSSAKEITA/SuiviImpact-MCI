@@ -9,12 +9,12 @@ import {
   ClipboardList,
   Download,
   FolderArchive,
+  FolderKanban,
   LayoutDashboard,
   LogOut,
   MapPin,
   ShoppingCart,
   Target,
-  TrendingUp,
   Users,
 } from "lucide-react";
 
@@ -25,15 +25,14 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/admin", label: "Plan d'Action", icon: LayoutDashboard },
-  { href: "/admin/oct", label: "OCT 2025", icon: Target },
-  { href: "/admin/omt", label: "OMT 2026", icon: Target },
-  { href: "/admin/olt", label: "OLT 2027", icon: Target },
+  { href: "/admin/objectifs", label: "Objectifs", icon: Target },
+  { href: "/admin/taches", label: "Tâches", icon: ClipboardList },
+  { href: "/admin/projets", label: "Projets", icon: FolderKanban },
   { href: "/admin/planification", label: "Planification", icon: CalendarDays },
   { href: "/admin/suivi", label: "Suivi", icon: ClipboardList, defaultChild: "/admin/suivi/1" },
   { href: "/admin/recommandation", label: "RCC", icon: Briefcase, defaultChild: "/admin/recommandation/1" },
   { href: "/admin/mission", label: "Missions", icon: MapPin, defaultChild: "/admin/mission/1" },
   { href: "/admin/ppm", label: "PPM", icon: ShoppingCart },
-  { href: "/admin/projets", label: "Projets", icon: TrendingUp },
   { href: "/admin/indicateurs", label: "Indicateurs", icon: BarChart3 },
   { href: "/admin/stats", label: "Statistiques", icon: BarChart3 },
   { href: "/admin/export", label: "Export", icon: Download },
@@ -51,7 +50,9 @@ export function Sidebar({ mobileOpen = false, onNavigate }: SidebarProps) {
   const { user, isAdmin, logout } = useAuth();
 
   const isActive = (href: string) => {
-    if (href === "/admin") return pathname === "/admin";
+    if (href === "/admin") {
+      return pathname === "/admin";
+    }
     return pathname === href || pathname.startsWith(`${href}/`);
   };
 

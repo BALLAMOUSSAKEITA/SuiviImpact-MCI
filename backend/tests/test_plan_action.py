@@ -68,11 +68,11 @@ async def test_create_and_list_objectifs(client: AsyncClient):
     create = await client.post(
         "/api/v1/objectifs",
         headers=headers,
-        json={"type": "oct", "code": "OC1", "description": "Objectif test"},
+        json={"code": "OC1", "description": "Objectif test"},
     )
     assert create.status_code == 201
 
-    listing = await client.get("/api/v1/objectifs?type=oct", headers=headers)
+    listing = await client.get("/api/v1/objectifs", headers=headers)
     assert listing.status_code == 200
     assert len(listing.json()) == 1
     assert listing.json()[0]["code"] == "OC1"
@@ -85,7 +85,7 @@ async def test_create_activite_with_trimestres(client: AsyncClient):
     objectif = await client.post(
         "/api/v1/objectifs",
         headers=headers,
-        json={"type": "oct", "code": "OC2", "description": "Objectif activités"},
+        json={"code": "OC2", "description": "Objectif activités"},
     )
     objectif_id = objectif.json()["id"]
 

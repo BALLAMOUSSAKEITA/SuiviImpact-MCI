@@ -7,7 +7,6 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/components/auth-provider";
-import { ObjectifTabs } from "@/components/objectif-tabs";
 import { Button } from "@/components/ui/button";
 import {
   createActivite,
@@ -33,7 +32,7 @@ function ActivitesContent() {
   const queryKey = ["activites", objectifId];
 
   const { data: objectifs = [] } = useQuery({
-    queryKey: ["objectifs-all"],
+    queryKey: ["objectifs"],
     queryFn: () => listObjectifs(),
   });
   const objectif = objectifs.find((o) => o.id === objectifId);
@@ -111,8 +110,8 @@ function ActivitesContent() {
     <>
         <div className="flex items-start justify-between gap-4">
           <div>
-            <Link href="/admin" className="text-sm text-forest-ink hover:underline">
-              ← Plan d&apos;action
+            <Link href="/admin/objectifs" className="text-sm text-forest-ink hover:underline">
+              ← Objectifs
             </Link>
             <h1 className="mt-2 text-2xl font-bold text-graphite">
               Activités — {objectif?.code ?? `Objectif #${objectifId}`}
@@ -120,8 +119,6 @@ function ActivitesContent() {
             <p className="mt-1 text-sm text-fog">{objectif?.description}</p>
           </div>
         </div>
-
-        <ObjectifTabs />
 
         {canWrite && (
           <div className="rounded-card border border-cloud bg-paper p-4 shadow-sm">

@@ -1,9 +1,33 @@
 import Link from "next/link";
+import { ClipboardList, FolderKanban, Target } from "lucide-react";
 
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BRAND } from "@/lib/brand";
+
+const sections = [
+  {
+    href: "/admin/objectifs",
+    title: "Objectifs",
+    description:
+      "Créer et gérer les objectifs du plan d'action, puis leurs activités.",
+    icon: Target,
+  },
+  {
+    href: "/admin/taches",
+    title: "Tâches",
+    description:
+      "Ajouter et planifier les tâches par trimestre, liées aux activités.",
+    icon: ClipboardList,
+  },
+  {
+    href: "/admin/projets",
+    title: "Projets",
+    description: "Suivre les projets et leur exécution financière / physique.",
+    icon: FolderKanban,
+  },
+] as const;
 
 export default function AdminDashboardPage() {
   return (
@@ -11,49 +35,26 @@ export default function AdminDashboardPage() {
       <PageHeader
         eyebrow={`${BRAND.bureauShort} · ${BRAND.program}`}
         title="Plan d'Action"
-        description={`Hub de gestion des objectifs OCT / OMT / OLT — ${BRAND.bureau}.`}
+        description={`Objectifs, tâches et projets — ${BRAND.bureau}.`}
         display
       />
       <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <Card>
-          <CardHeader>
-            <CardTitle>Objectifs 2025 (OCT)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="mb-4 text-sm text-slate">
-              Objectifs clés de transformation pour l&apos;année 2025.
-            </p>
-            <Link href="/admin/oct">
-              <Button variant="outline">Consulter</Button>
-            </Link>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Objectifs 2026 (OMT)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="mb-4 text-sm text-slate">
-              Objectifs moyen terme pour l&apos;année 2026.
-            </p>
-            <Link href="/admin/omt">
-              <Button variant="outline">Consulter</Button>
-            </Link>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Objectifs 2027 (OLT)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="mb-4 text-sm text-slate">
-              Objectifs long terme pour l&apos;année 2027.
-            </p>
-            <Link href="/admin/olt">
-              <Button variant="outline">Consulter</Button>
-            </Link>
-          </CardContent>
-        </Card>
+        {sections.map(({ href, title, description, icon: Icon }) => (
+          <Card key={href}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Icon className="h-5 w-5 text-forest-ink" />
+                {title}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="mb-4 text-sm text-slate">{description}</p>
+              <Link href={href}>
+                <Button variant="outline">Ouvrir</Button>
+              </Link>
+            </CardContent>
+          </Card>
+        ))}
       </div>
     </>
   );

@@ -5,7 +5,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.deps import get_current_user, require_write_access
 from app.core.database import get_db
 from app.models.direction import Direction
-from app.models.plan_action import ObjectifType
 from app.models.user import User
 from app.schemas.plan_action import (
     ActiviteCreate,
@@ -33,11 +32,10 @@ async def list_directions(
 
 @router.get("/objectifs", response_model=list[ObjectifRead])
 async def list_objectifs(
-    type: ObjectifType | None = Query(default=None),
     _: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> list[ObjectifRead]:
-    return await service.list_objectifs(db, type)
+    return await service.list_objectifs(db)
 
 
 @router.get("/objectifs/{objectif_id}", response_model=ObjectifRead)

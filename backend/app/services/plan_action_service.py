@@ -9,7 +9,6 @@ from app.models.plan_action import (
     ActiviteDirection,
     ActiviteTrimestre,
     Objectif,
-    ObjectifType,
 )
 from app.schemas.plan_action import (
     ActiviteCreate,
@@ -41,11 +40,8 @@ def activite_to_read(activite: Activite) -> ActiviteRead:
     )
 
 
-async def list_objectifs(db: AsyncSession, type_: ObjectifType | None) -> list[ObjectifRead]:
-    query = select(Objectif).order_by(Objectif.code)
-    if type_:
-        query = query.where(Objectif.type == type_)
-    result = await db.execute(query)
+async def list_objectifs(db: AsyncSession) -> list[ObjectifRead]:
+    result = await db.execute(select(Objectif).order_by(Objectif.code))
     return list(result.scalars().all())
 
 
@@ -55,7 +51,7 @@ async def get_objectif(db: AsyncSession, objectif_id: int) -> Objectif | None:
 
 
 async def create_objectif(db: AsyncSession, data: ObjectifCreate) -> Objectif:
-    objectif = Objectif(type=data.type, code=data.code, description=data.description)
+    objectif = Objectif(code=data.code, description=data.description)
     db.add(objectif)
     await db.commit()
     await db.refresh(objectif)

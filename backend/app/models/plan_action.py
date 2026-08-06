@@ -1,4 +1,3 @@
-import enum
 from datetime import datetime
 from decimal import Decimal
 
@@ -17,26 +16,13 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
-from app.db.types import pg_enum
-
-
-class ObjectifType(str, enum.Enum):
-    OCT = "oct"
-    OMT = "omt"
-    OLT = "olt"
-
-
-OBJECTIF_YEARS = {"oct": 2025, "omt": 2026, "olt": 2027}
 
 
 class Objectif(Base):
     __tablename__ = "objectifs"
-    __table_args__ = (UniqueConstraint("type", "code"),)
+    __table_args__ = (UniqueConstraint("code"),)
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    type: Mapped[ObjectifType] = mapped_column(
-        pg_enum(ObjectifType, "objectif_type"), nullable=False
-    )
     code: Mapped[str] = mapped_column(String(20), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
