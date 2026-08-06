@@ -11,6 +11,7 @@ import {
   Download,
   FolderArchive,
   FolderKanban,
+  Home,
   LayoutDashboard,
   LogOut,
   MapPin,
@@ -35,8 +36,9 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
+  { href: "/admin", label: "Vue d'ensemble", icon: Home },
   {
-    href: "/admin",
+    href: "/admin/plan-action",
     label: "Plan d'Action",
     icon: LayoutDashboard,
     children: [
@@ -72,7 +74,6 @@ export function Sidebar({ mobileOpen = false, onNavigate }: SidebarProps) {
   };
 
   const isPlanActionOpen =
-    pathname === "/admin" ||
     pathname.startsWith("/admin/objectifs") ||
     pathname.startsWith("/admin/taches") ||
     pathname.startsWith("/admin/projets");
@@ -157,18 +158,6 @@ export function Sidebar({ mobileOpen = false, onNavigate }: SidebarProps) {
 
                   {planOpen && (
                     <div className="ml-5 mt-0.5 space-y-0.5 border-l border-cloud/80 pl-3">
-                      <Link
-                        href="/admin"
-                        onClick={onNavigate}
-                        className={cn(
-                          "flex items-center gap-2.5 rounded-[var(--radius-card)] px-2.5 py-2 text-[12.5px] font-medium transition-all duration-[var(--duration-fast)]",
-                          pathname === "/admin"
-                            ? "text-forest-ink"
-                            : "text-ash hover:text-graphite",
-                        )}
-                      >
-                        Vue d&apos;ensemble
-                      </Link>
                       {item.children.map(({ href, label, icon: ChildIcon }) => {
                         const childActive = isActive(href);
                         return (

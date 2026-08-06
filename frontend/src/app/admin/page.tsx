@@ -1,70 +1,257 @@
-import Link from "next/link";
-import { ClipboardList, FolderKanban, Target } from "lucide-react";
+"use client";
 
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+
+import { DirectionFilter } from "@/components/direction-filter";
+import { ProgressBar } from "@/components/execution-badge";
 import { PageHeader } from "@/components/page-header";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { StatCard, StatGrid } from "@/components/stat-card";
 import { BRAND } from "@/lib/brand";
+import {
+  getStatsActivites,
+  getStatsMissions,
+  getStatsPpm,
+  getStatsProjets,
+  getStatsRcc,
+} from "@/lib/api";
+import { DEFAULT_ANNEE, PPM_STATUT_LABELS } from "@/types";
+import { cn } from "@/lib/utils";
 
-const sections = [
-  {
-    href: "/admin/objectifs",
-    title: "Objectifs",
-    description:
-      "Créer et gérer les objectifs du plan d'action, puis leurs activités.",
-    icon: Target,
-    color: "text-emerald-600 bg-emerald-50",
-  },
-  {
-    href: "/admin/taches",
-    title: "Tâches",
-    description: "Créer et gérer les tâches du plan d'action (code et description).",
-    icon: ClipboardList,
-    color: "text-blue-600 bg-blue-50",
-  },
-  {
-    href: "/admin/projets",
-    title: "Projets",
-    description: "Suivre les projets et leur exécution financière / physique.",
-    icon: FolderKanban,
-    color: "text-violet-600 bg-violet-50",
-  },
+const views = [
+  { id: "activites", label: "Activités" },
+  { id: "rcc", label: "RCC" },
+  { id: "missions", label: "Missions" },
+  { id: "ppm", label: "PPM" },
+  { id: "projets", label: "Projets" },
 ] as const;
 
+type ViewId = (typeof views)[number]["id"];
+
 export default function AdminDashboardPage() {
+  const [currentView, setCurrentView] = useState<ViewId>("activites");
+
   return (
     <>
       <PageHeader
         eyebrow={`${BRAND.bureauShort} · ${BRAND.program}`}
-        title="Plan d'Action"
-        description={`Objectifs, tâches et projets — ${BRAND.bureau}.`}
+        title="Tableau de bord"
+        description="Vue d'ensemble des indicateurs de suivi."
         display
       />
-      <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {sections.map(({ href, title, description, icon: Icon, color }, i) => (
-          <Link key={href} href={href} className="group block">
-            <Card className="h-full transition-all duration-[var(--duration-normal)] group-hover:-translate-y-1 group-hover:shadow-[var(--shadow-elevated)]">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-3">
-                  <span className={`flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)] ${color}`}>
-                    <Icon className="h-[18px] w-[18px]" />
-                  </span>
-                  {title}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="mb-4 text-sm leading-relaxed text-fog">{description}</p>
-                <span className="inline-flex items-center gap-1 text-sm font-semibold text-forest-ink group-hover:gap-2 transition-all">
-                  Ouvrir
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                  </svg>
-                </span>
-              </CardContent>
-            </Card>
-          </Link>
+
+      {/* Sélecteur de vue */}
+      <div className="flex flex-wrap gap-1.5 rounded-[var(--radius-card)] border border-cloud bg-paper p-1.5">
+        {views.map((view) => (
+          <button
+            key={view.id}
+            type="button"
+            onClick={() => setCurrentView(view.id)}
+            className={cn(
+              "rounded-[var(--radius-card)] px-4 py-2 text-[13px] font-medium transition-all duration-[var(--duration-fast)]",
+              currentView === view.id
+                ? "bg-forest-ink text-white shadow-sm"
+                : "text-slate hover:bg-veil hover:text-graphite",
+            )}
+          >
+            {view.label}
+          </button>
         ))}
       </div>
+
+      {/* Contenu selon la vue */}
+      {currentView === "activites" && <ActivitesView />}
+      {currentView === "rcc" && <RccView />}
+      {currentView === "missions" && <MissionsView />}
+      {currentView === "ppm" && <PpmView />}
+      {currentView === "projets" && <ProjetsView />}
+    </>
+  );
+}
+
+function ActivitesView() {
+  const [direction, setDirection] = useState<string | null>(null);
+
+  const { data: stats, isLoading } = useQuery({
+    queryKey: ["stats-activites", direction],
+    queryFn: () => getStatsActivites(direction ?? undefined),
+  });
+
+  return (
+    <>
+      <DirectionFilter value={direction} onChange={setDirection} />
+      {isLoading ? (
+        <p className="text-sm text-ash">Chargement…</p>
+      ) : stats ? (
+        <>
+          <StatGrid>
+            <StatCard title="Total activités" value={stats.total} />
+            <StatCard title="Non démarrées" value={stats.non_demare} />
+            <StatCard title="En cours" value={stats.en_cours} />
+            <StatCard title="Terminées" value={stats.termine} />
+            <StatCard title="En retard" value={stats.en_retard} />
+          </StatGrid>
+          <div className="rounded-[var(--radius-card)] border border-cloud bg-paper p-6 shadow-[var(--shadow-card)]">
+            <ProgressBar label="Progression globale" value={stats.progression} />
+          </div>
+        </>
+      ) : null}
+    </>
+  );
+}
+
+function TrimestreSelector({ value, onChange }: { value: number | undefined; onChange: (v: number | undefined) => void }) {
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      <button
+        type="button"
+        onClick={() => onChange(undefined)}
+        className={cn(
+          "rounded-[var(--radius-card)] px-3 py-1.5 text-sm font-medium transition-colors",
+          value === undefined
+            ? "bg-forest-ink text-white"
+            : "bg-paper ring-1 ring-cloud text-slate hover:bg-veil",
+        )}
+      >
+        Année
+      </button>
+      {[1, 2, 3, 4].map((t) => (
+        <button
+          key={t}
+          type="button"
+          onClick={() => onChange(t)}
+          className={cn(
+            "rounded-[var(--radius-card)] px-3 py-1.5 text-sm font-medium transition-colors",
+            value === t
+              ? "bg-forest-ink text-white"
+              : "bg-paper ring-1 ring-cloud text-slate hover:bg-veil",
+          )}
+        >
+          T{t}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function RccView() {
+  const [trimestre, setTrimestre] = useState<number | undefined>(undefined);
+
+  const { data: stats, isLoading } = useQuery({
+    queryKey: ["stats-rcc", trimestre, DEFAULT_ANNEE],
+    queryFn: () => getStatsRcc({ trimestre, annee: DEFAULT_ANNEE }),
+  });
+
+  return (
+    <>
+      <TrimestreSelector value={trimestre} onChange={setTrimestre} />
+      {isLoading ? (
+        <p className="text-sm text-ash">Chargement…</p>
+      ) : stats ? (
+        <>
+          <StatGrid>
+            <StatCard title="Total RCC" value={stats.total} />
+            <StatCard title="Non démarrées" value={stats.non_demare} />
+            <StatCard title="En cours" value={stats.en_cours} />
+            <StatCard title="Terminées" value={stats.termine} />
+          </StatGrid>
+          <div className="rounded-[var(--radius-card)] border border-cloud bg-paper p-6 shadow-[var(--shadow-card)]">
+            <ProgressBar label="Progression" value={stats.progression} />
+          </div>
+        </>
+      ) : null}
+    </>
+  );
+}
+
+function MissionsView() {
+  const [trimestre, setTrimestre] = useState<number | undefined>(undefined);
+
+  const { data: stats, isLoading } = useQuery({
+    queryKey: ["stats-missions", trimestre, DEFAULT_ANNEE],
+    queryFn: () => getStatsMissions({ trimestre, annee: DEFAULT_ANNEE }),
+  });
+
+  return (
+    <>
+      <TrimestreSelector value={trimestre} onChange={setTrimestre} />
+      {isLoading ? (
+        <p className="text-sm text-ash">Chargement…</p>
+      ) : stats ? (
+        <>
+          <StatGrid>
+            <StatCard title="Total missions" value={stats.total} />
+            <StatCard title="Non démarrées" value={stats.non_demare} />
+            <StatCard title="En cours" value={stats.en_cours} />
+            <StatCard title="Terminées" value={stats.termine} />
+          </StatGrid>
+          <div className="rounded-[var(--radius-card)] border border-cloud bg-paper p-6 shadow-[var(--shadow-card)]">
+            <ProgressBar label="Progression" value={stats.progression} />
+          </div>
+        </>
+      ) : null}
+    </>
+  );
+}
+
+function PpmView() {
+  const { data: stats, isLoading } = useQuery({
+    queryKey: ["stats-ppm"],
+    queryFn: () => getStatsPpm(),
+  });
+
+  const progression =
+    stats && stats.total > 0
+      ? ((stats.contrat_signe / stats.total) * 100).toFixed(0)
+      : "0";
+
+  return (
+    <>
+      {isLoading ? (
+        <p className="text-sm text-ash">Chargement…</p>
+      ) : stats ? (
+        <>
+          <StatGrid>
+            <StatCard title="Total marchés" value={stats.total} />
+            <StatCard title={PPM_STATUT_LABELS.dao_elabore} value={stats.dao_elabore} />
+            <StatCard title={PPM_STATUT_LABELS.dao_publie} value={stats.dao_publie} />
+            <StatCard title={PPM_STATUT_LABELS.marche_attribue} value={stats.marche_attribue} />
+            <StatCard title={PPM_STATUT_LABELS.contrat_signe} value={stats.contrat_signe} />
+          </StatGrid>
+          <div className="rounded-[var(--radius-card)] border border-cloud bg-paper p-6 shadow-[var(--shadow-card)]">
+            <ProgressBar label="Contrats signés / total" value={progression} />
+          </div>
+        </>
+      ) : null}
+    </>
+  );
+}
+
+function ProjetsView() {
+  const { data: stats, isLoading } = useQuery({
+    queryKey: ["stats-projets"],
+    queryFn: () => getStatsProjets(),
+  });
+
+  return (
+    <>
+      {isLoading ? (
+        <p className="text-sm text-ash">Chargement…</p>
+      ) : stats ? (
+        <>
+          <StatGrid>
+            <StatCard title="Total projets" value={stats.total} />
+          </StatGrid>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="rounded-[var(--radius-card)] border border-cloud bg-paper p-6 shadow-[var(--shadow-card)]">
+              <ProgressBar label="Exécution financière moyenne" value={stats.execution_financiere} />
+            </div>
+            <div className="rounded-[var(--radius-card)] border border-cloud bg-paper p-6 shadow-[var(--shadow-card)]">
+              <ProgressBar label="Exécution physique moyenne" value={stats.execution_physique} />
+            </div>
+          </div>
+        </>
+      ) : null}
     </>
   );
 }
