@@ -7,7 +7,7 @@ from app.schemas.parametrage import MinistreParametrageRead, MinistreParametrage
 
 
 async def _ensure_ministre_row(db: AsyncSession) -> MinistreParametrage:
-    row = await db.get(MinstreParametrage, MINISTRE_PARAMETRAGE_ID)
+    row = await db.get(MinistreParametrage, MINISTRE_PARAMETRAGE_ID)
     if row is None:
         row = MinistreParametrage(
             id=MINISTRE_PARAMETRAGE_ID,
