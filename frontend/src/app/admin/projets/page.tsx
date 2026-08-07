@@ -138,6 +138,11 @@ function ProjetsContent() {
   const projectLabel = (item: Projet) =>
     item.abreviation?.trim() || item.description.slice(0, 40);
 
+  const updateConfirmDescription =
+    editing !== null
+      ? `Enregistrer les modifications du projet « ${projectLabel(editing)} » ?`
+      : "";
+
   return (
     <>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -293,7 +298,7 @@ function ProjetsContent() {
       <ConfirmDialog
         open={confirmUpdate && editing !== null}
         title="Confirmer la modification"
-        description={`Enregistrer les modifications du projet « ${projectLabel(editing!)} » ?`}
+        description={updateConfirmDescription}
         confirmLabel="Oui, enregistrer"
         loading={updateMutation.isPending}
         onCancel={() => setConfirmUpdate(false)}
