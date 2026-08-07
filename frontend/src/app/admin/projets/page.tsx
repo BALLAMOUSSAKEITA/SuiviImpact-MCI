@@ -5,6 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/components/auth-provider";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { ExecutionBadge } from "@/components/execution-badge";
 import { Button } from "@/components/ui/button";
 import { createProjet, deleteProjet, listProjets, updateProjet } from "@/lib/api";
@@ -19,6 +20,8 @@ function ProjetsContent() {
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Projet | null>(null);
+  const [confirmUpdate, setConfirmUpdate] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<Projet | null>(null);
   const [form, setForm] = useState({
     description: "",
     abreviation: "",
@@ -80,6 +83,7 @@ function ProjetsContent() {
     mutationFn: deleteProjet,
     onSuccess: () => {
       toast.success("Projet supprimé");
+      setDeleteTarget(null);
       invalidate();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -88,6 +92,7 @@ function ProjetsContent() {
   const resetForm = () => {
     setShowForm(false);
     setEditing(null);
+    setConfirmUpdate(false);
     setForm({
       description: "",
       abreviation: "",
@@ -123,9 +128,15 @@ function ProjetsContent() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (editing) updateMutation.mutate();
-    else createMutation.mutate();
+    if (editing) {
+      setConfirmUpdate(true);
+      return;
+    }
+    createMutation.mutate();
   };
+
+  const projectLabel = (item: Projet) =>
+    item.abreviation?.trim() || item.description.slice(0, 40);
 
   return (
     <>
@@ -266,11 +277,7 @@ function ProjetsContent() {
                         <Button
                           variant="ghost"
                           className="h-8 px-3 text-xs text-red-600"
-                          onClick={() => {
-                            if (window.confirm("Supprimer ?")) {
-                              deleteMutation.mutate(item.id);
-                            }
-                          }}
+                          onClick={() => setDeleteTarget(item)}
                         >
                           Supprimer
                         </Button>
@@ -282,6 +289,31 @@ function ProjetsContent() {
             </tbody>
           </table>
         </div>
+
+      <ConfirmDialog
+        open={confirmUpdate && editing !== null}
+        title="Confirmer la modification"
+        description={`Enregistrer les modifications du projet « ${projectLabel(editing!)} » ?`}
+        confirmLabel="Oui, enregistrer"
+        loading={updateMutation.isPending}
+        onCancel={() => setConfirmUpdate(false)}
+        onConfirm={() => updateMutation.mutate()}
+      />
+
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        title="Supprimer le projet"
+        description={
+          deleteTarget
+            ? `Supprimer le projet « ${projectLabel(deleteTarget)} » ? Cette action est irréversible.`
+            : ""
+        }
+        confirmLabel="Supprimer"
+        variant="destructive"
+        loading={deleteMutation.isPending}
+        onCancel={() => setDeleteTarget(null)}
+        onConfirm={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}
+      />
     </>
   );
 }

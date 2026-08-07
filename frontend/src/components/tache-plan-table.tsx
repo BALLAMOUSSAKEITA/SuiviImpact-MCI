@@ -1,10 +1,12 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/components/auth-provider";
+import { ConfirmDialog, FormDialog } from "@/components/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { deleteTachePlan, updateTachePlan } from "@/lib/api";
 import type { TachePlan } from "@/types";
@@ -17,131 +19,165 @@ interface TachePlanTableProps {
 export function TachePlanTable({ taches, queryKey }: TachePlanTableProps) {
   const { canWrite } = useAuth();
   const queryClient = useQueryClient();
-  const [editingId, setEditingId] = useState<number | null>(null);
+
+  const [editing, setEditing] = useState<TachePlan | null>(null);
   const [editCode, setEditCode] = useState("");
   const [editDescription, setEditDescription] = useState("");
+  const [confirmUpdate, setConfirmUpdate] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<TachePlan | null>(null);
 
   const deleteMutation = useMutation({
     mutationFn: deleteTachePlan,
     onSuccess: () => {
       toast.success("Tâche supprimée");
       queryClient.invalidateQueries({ queryKey });
+      setDeleteTarget(null);
     },
     onError: (e: Error) => toast.error(e.message),
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, code, description }: { id: number; code: string; description: string }) =>
-      updateTachePlan(id, { code, description }),
+    mutationFn: () =>
+      updateTachePlan(editing!.id, {
+        code: editCode.trim(),
+        description: editDescription.trim(),
+      }),
     onSuccess: () => {
       toast.success("Tâche mise à jour");
-      setEditingId(null);
       queryClient.invalidateQueries({ queryKey });
+      setConfirmUpdate(false);
+      setEditing(null);
     },
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const startEdit = (tache: TachePlan) => {
-    setEditingId(tache.id);
+  const openEdit = (tache: TachePlan) => {
+    setEditing(tache);
     setEditCode(tache.code);
     setEditDescription(tache.description);
   };
 
-  const handleDelete = (tache: TachePlan) => {
-    if (window.confirm(`Supprimer la tâche ${tache.code} ?`)) {
-      deleteMutation.mutate(tache.id);
-    }
+  const closeEdit = () => {
+    if (updateMutation.isPending) return;
+    setEditing(null);
+    setConfirmUpdate(false);
+  };
+
+  const requestSave = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editCode.trim() || !editDescription.trim()) return;
+    setConfirmUpdate(true);
   };
 
   return (
-    <div className="table-shell">
-      <table className="table-grain">
-        <thead>
-          <tr>
-            <th>Code</th>
-            <th>Tâches</th>
-            {canWrite && <th className="text-right">Actions</th>}
-          </tr>
-        </thead>
-        <tbody>
-          {taches.length === 0 && (
+    <>
+      <div className="table-shell">
+        <table className="table-grain">
+          <thead>
             <tr>
-              <td colSpan={canWrite ? 3 : 2} className="py-8 text-center text-ash">
-                Aucune tâche enregistrée
-              </td>
+              <th>Code</th>
+              <th>Tâches</th>
+              {canWrite && <th className="text-right">Actions</th>}
             </tr>
-          )}
-          {taches.map((tache) => (
-            <tr key={tache.id}>
-              <td className="font-medium text-forest-ink">{tache.code}</td>
-              <td>
-                {editingId === tache.id ? (
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    <input
-                      value={editCode}
-                      onChange={(e) => setEditCode(e.target.value)}
-                      className="input-grain"
-                      required
-                    />
-                    <input
-                      value={editDescription}
-                      onChange={(e) => setEditDescription(e.target.value)}
-                      className="input-grain"
-                      required
-                    />
-                  </div>
-                ) : (
-                  <span className="text-slate">{tache.description}</span>
-                )}
-              </td>
-              {canWrite && (
-                <td className="text-right">
-                  <div className="flex flex-wrap justify-end gap-1 sm:gap-2">
-                    {editingId === tache.id ? (
-                      <>
-                        <Button
-                          size="sm"
-                          disabled={updateMutation.isPending}
-                          onClick={() =>
-                            updateMutation.mutate({
-                              id: tache.id,
-                              code: editCode,
-                              description: editDescription,
-                            })
-                          }
-                        >
-                          Enregistrer
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setEditingId(null)}
-                        >
-                          Annuler
-                        </Button>
-                      </>
-                    ) : (
-                      <>
-                        <Button variant="outline" size="sm" onClick={() => startEdit(tache)}>
-                          Modifier
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-red-600"
-                          onClick={() => handleDelete(tache)}
-                        >
-                          Supprimer
-                        </Button>
-                      </>
-                    )}
-                  </div>
+          </thead>
+          <tbody>
+            {taches.length === 0 && (
+              <tr>
+                <td colSpan={canWrite ? 3 : 2} className="py-8 text-center text-ash">
+                  Aucune tâche enregistrée
                 </td>
-              )}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+              </tr>
+            )}
+            {taches.map((tache) => (
+              <tr key={tache.id}>
+                <td>
+                  <span className="inline-flex rounded-full bg-forest-ink/8 px-2.5 py-0.5 text-xs font-bold text-forest-ink">
+                    {tache.code}
+                  </span>
+                </td>
+                <td className="text-slate">{tache.description}</td>
+                {canWrite && (
+                  <td className="text-right">
+                    <div className="flex flex-wrap justify-end gap-1 sm:gap-1.5">
+                      <Button variant="outline" size="sm" onClick={() => openEdit(tache)}>
+                        <Pencil className="h-3.5 w-3.5" />
+                        Modifier
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                        onClick={() => setDeleteTarget(tache)}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        Supprimer
+                      </Button>
+                    </div>
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <FormDialog
+        open={editing !== null && !confirmUpdate}
+        title="Modifier la tâche"
+        onClose={closeEdit}
+      >
+        <form onSubmit={requestSave} className="space-y-4">
+          <div>
+            <label className="label-grain">Code</label>
+            <input
+              required
+              value={editCode}
+              onChange={(e) => setEditCode(e.target.value)}
+              className="input-grain"
+            />
+          </div>
+          <div>
+            <label className="label-grain">Description</label>
+            <input
+              required
+              value={editDescription}
+              onChange={(e) => setEditDescription(e.target.value)}
+              className="input-grain"
+            />
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button type="button" variant="outline" onClick={closeEdit}>
+              Annuler
+            </Button>
+            <Button type="submit">Enregistrer</Button>
+          </div>
+        </form>
+      </FormDialog>
+
+      <ConfirmDialog
+        open={confirmUpdate && editing !== null}
+        title="Confirmer la modification"
+        description={`Enregistrer les modifications de la tâche « ${editCode} » ?`}
+        confirmLabel="Oui, enregistrer"
+        loading={updateMutation.isPending}
+        onCancel={() => setConfirmUpdate(false)}
+        onConfirm={() => updateMutation.mutate()}
+      />
+
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        title="Supprimer la tâche"
+        description={
+          deleteTarget
+            ? `Supprimer la tâche « ${deleteTarget.code} » ? Cette action est irréversible.`
+            : ""
+        }
+        confirmLabel="Supprimer"
+        variant="destructive"
+        loading={deleteMutation.isPending}
+        onCancel={() => setDeleteTarget(null)}
+        onConfirm={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}
+      />
+    </>
   );
 }

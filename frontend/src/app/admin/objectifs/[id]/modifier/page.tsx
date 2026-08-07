@@ -46,7 +46,7 @@ function ObjectifEditForm({ objectif }: { objectif: Objectif }) {
     onSuccess: () => {
       toast.success("Objectif mis à jour");
       queryClient.invalidateQueries({ queryKey: ["objectifs"] });
-      router.push(`/activite/${objectif.id}`);
+      router.push("/admin/objectifs");
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -55,10 +55,10 @@ function ObjectifEditForm({ objectif }: { objectif: Objectif }) {
     <div className="mx-auto max-w-2xl space-y-6">
       <div>
         <Link
-          href={`/activite/${objectif.id}`}
+          href="/admin/objectifs"
           className="text-sm text-forest-ink hover:underline"
         >
-          ← Retour aux activités
+          ← Retour aux objectifs
         </Link>
         <h1 className="mt-2 text-xl font-bold text-graphite sm:text-2xl">
           Modifier l&apos;objectif
@@ -95,7 +95,7 @@ function ObjectifEditForm({ objectif }: { objectif: Objectif }) {
           <Button type="submit" disabled={mutation.isPending}>
             {mutation.isPending ? "Enregistrement…" : "Enregistrer"}
           </Button>
-          <Link href={`/activite/${objectif.id}`}>
+          <Link href="/admin/objectifs">
             <Button type="button" variant="outline">
               Annuler
             </Button>
