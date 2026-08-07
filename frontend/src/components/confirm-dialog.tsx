@@ -33,14 +33,14 @@ export function ConfirmDialog({
       <button
         type="button"
         aria-label="Fermer"
-        className="absolute inset-0 bg-obsidian/40"
+        className="absolute inset-0 bg-obsidian/40 backdrop-blur-[2px]"
         onClick={onCancel}
       />
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="confirm-dialog-title"
-        className="relative w-full max-w-md rounded-[var(--radius-card)] border border-cloud bg-white p-6 shadow-[var(--shadow-elevated)]"
+        className="relative w-full max-w-md rounded-[var(--radius-card)] border border-cloud bg-white p-6 shadow-[var(--shadow-elevated)] animate-scale-in"
       >
         <h2 id="confirm-dialog-title" className="text-base font-semibold text-graphite">
           {title}
@@ -86,14 +86,14 @@ export function FormDialog({
       <button
         type="button"
         aria-label="Fermer"
-        className="absolute inset-0 bg-obsidian/40"
+        className="absolute inset-0 bg-obsidian/40 backdrop-blur-[2px]"
         onClick={onClose}
       />
       <div
         role="dialog"
         aria-modal="true"
         className={cn(
-          "relative w-full max-w-lg rounded-[var(--radius-card)] border border-cloud bg-white p-6 shadow-[var(--shadow-elevated)]",
+          "relative w-full max-w-lg rounded-[var(--radius-card)] border border-cloud bg-white p-6 shadow-[var(--shadow-elevated)] animate-scale-in",
           className,
         )}
       >
