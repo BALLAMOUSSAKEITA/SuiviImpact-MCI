@@ -6,6 +6,11 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/components/auth-provider";
+import {
+  DetailDrawer,
+  DetailDrawerRows,
+  DetailRow,
+} from "@/components/detail-drawer";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,9 +19,11 @@ import {
   listPlanificationProjet,
   listProjets,
 } from "@/lib/api";
+import { cn } from "@/lib/utils";
 import type {
   PlanificationProjetComposanteInput,
   PlanificationProjetCreate,
+  PlanificationProjetPlan,
   TypeBudgetProjet,
 } from "@/types";
 
@@ -75,6 +82,7 @@ function PlanificationProjetContent() {
   const [emailMinistre, setEmailMinistre] = useState("");
   const [composantes, setComposantes] = useState<ComposanteBlock[]>([]);
   const [keySeq, setKeySeq] = useState(0);
+  const [selected, setSelected] = useState<PlanificationProjetPlan | null>(null);
 
   const resetForm = () => {
     setProjetId("");
@@ -192,6 +200,13 @@ function PlanificationProjetContent() {
   };
 
   const budgetLabel = (b: TypeBudgetProjet) => (b === "FINEX" ? "FINEX" : "BND");
+
+  function composanteSummary(p: PlanificationProjetPlan) {
+    const nbComp = p.composantes.length;
+    const nbAct = p.composantes.reduce((n, c) => n + c.activites.length, 0);
+    if (nbComp === 0) return null;
+    return `${nbComp} composante${nbComp > 1 ? "s" : ""} · ${nbAct} activité${nbAct > 1 ? "s" : ""}`;
+  }
 
   return (
     <>
@@ -460,69 +475,146 @@ function PlanificationProjetContent() {
       )}
 
       <div className="table-shell">
+        <p className="mb-3 text-xs text-ash">
+          Cliquez sur une ligne pour afficher le détail de la planification.
+        </p>
         <table className="table-grain">
           <thead>
             <tr>
               <th>Projet</th>
-              <th>Budget</th>
-              <th>Lieu</th>
+              <th className="w-[90px]">Budget</th>
               <th>Période</th>
-              <th>Montant</th>
-              <th>Direction</th>
-              <th>Composantes</th>
+              <th className="text-right">Montant</th>
             </tr>
           </thead>
           <tbody>
             {isLoading && (
               <tr>
-                <td colSpan={7} className="py-8 text-center text-ash">
+                <td colSpan={4} className="py-8 text-center text-ash">
                   Chargement…
                 </td>
               </tr>
             )}
             {!isLoading && planifications.length === 0 && (
               <tr>
-                <td colSpan={7} className="py-8 text-center text-ash">
+                <td colSpan={4} className="py-8 text-center text-ash">
                   Aucune planification projet enregistrée.
                 </td>
               </tr>
             )}
-            {planifications.map((p) => (
-              <tr key={p.id}>
+            {planifications.map((p) => {
+              const summary = composanteSummary(p);
+              return (
+              <tr
+                key={p.id}
+                tabIndex={0}
+                role="button"
+                onClick={() => setSelected(p)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setSelected(p);
+                  }
+                }}
+                className={cn(
+                  "cursor-pointer transition-colors hover:bg-forest-ink/[0.04]",
+                  selected?.id === p.id && "bg-forest-ink/[0.06]",
+                )}
+              >
                 <td>
                   <span className="font-medium text-graphite">{p.projet_description}</span>
-                  <span className="mt-0.5 block text-[11px] text-ash">{p.projet_code}</span>
+                  <span className="mt-0.5 flex flex-wrap items-center gap-2 text-[11px] text-ash">
+                    <span className="inline-flex rounded-full bg-forest-ink/8 px-2 py-0.5 font-bold text-forest-ink">
+                      {p.projet_code}
+                    </span>
+                    {summary && <span>{summary}</span>}
+                  </span>
                 </td>
-                <td>{budgetLabel(p.type_budget)}</td>
-                <td className="text-sm">{p.lieu}</td>
+                <td>
+                  <span
+                    className={cn(
+                      "inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold",
+                      p.type_budget === "FINEX"
+                        ? "bg-sky-100 text-sky-900"
+                        : "bg-amber-100 text-amber-950",
+                    )}
+                  >
+                    {budgetLabel(p.type_budget)}
+                  </span>
+                </td>
                 <td className="whitespace-nowrap text-sm text-slate">
                   {p.date_debut} → {p.date_fin}
                 </td>
-                <td className="tabular-nums text-sm">{p.montant}</td>
-                <td className="text-sm">{p.direction_code}</td>
-                <td className="text-sm text-slate">
-                  {p.composantes.length === 0 ? (
-                    "—"
-                  ) : (
-                    <ul className="list-inside list-disc space-y-1">
-                      {p.composantes.map((c) => (
-                        <li key={c.id}>
-                          {c.libelle?.trim() || `Composante ${c.ordre}`}
-                          {c.activites.length > 0 && (
-                            <span className="block pl-4 text-[11px] text-ash">
-                              {c.activites.map((a) => a.titre).join(" · ")}
-                            </span>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </td>
+                <td className="text-right text-sm tabular-nums text-graphite">{p.montant}</td>
               </tr>
-            ))}
+            );
+            })}
           </tbody>
         </table>
       </div>
+
+      <DetailDrawer
+        open={selected !== null}
+        title={selected?.projet_description ?? ""}
+        subtitle={selected ? `Réf. ${selected.projet_code}` : undefined}
+        onClose={() => setSelected(null)}
+      >
+        {selected && (
+          <DetailDrawerRows>
+            <DetailRow label="Type de budget">
+              <span
+                className={cn(
+                  "inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold",
+                  selected.type_budget === "FINEX"
+                    ? "bg-sky-100 text-sky-900"
+                    : "bg-amber-100 text-amber-950",
+                )}
+              >
+                {budgetLabel(selected.type_budget)}
+              </span>
+            </DetailRow>
+            <DetailRow label="Montant">{selected.montant} GNF</DetailRow>
+            <DetailRow label="Lieu">{selected.lieu}</DetailRow>
+            <DetailRow label="Période">
+              {selected.date_debut} → {selected.date_fin}
+            </DetailRow>
+            <DetailRow label="Direction">
+              {selected.direction_code} — {selected.direction_libelle}
+            </DetailRow>
+            <DetailRow label="Responsable principal">{selected.email_responsable}</DetailRow>
+            <DetailRow label="Ministre">{selected.email_ministre}</DetailRow>
+            <DetailRow label="Composantes et activités">
+              {selected.composantes.length === 0 ? (
+                <span className="text-ash">Aucune composante enregistrée</span>
+              ) : (
+                <div className="space-y-3">
+                  {selected.composantes.map((c) => (
+                    <div
+                      key={c.id}
+                      className="rounded-[var(--radius-card)] border border-cloud/70 bg-veil/50 p-3"
+                    >
+                      <p className="text-sm font-semibold text-forest-ink">
+                        {c.libelle?.trim() || `Composante ${c.ordre}`}
+                      </p>
+                      {c.activites.length === 0 ? (
+                        <p className="mt-2 text-xs text-ash">Aucune activité</p>
+                      ) : (
+                        <ol className="mt-2 list-decimal space-y-1.5 pl-4">
+                          {c.activites.map((a) => (
+                            <li key={a.id} className="text-sm text-graphite">
+                              {a.titre}
+                            </li>
+                          ))}
+                        </ol>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </DetailRow>
+          </DetailDrawerRows>
+        )}
+      </DetailDrawer>
     </>
   );
 }

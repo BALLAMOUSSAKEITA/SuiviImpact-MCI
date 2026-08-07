@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile, status
+from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user, require_write_access
@@ -15,6 +16,7 @@ from app.schemas.planification import (
     TacheUpdate,
 )
 from app.services import planification_service as service
+from app.services.storage_service import storage_service
 
 router = APIRouter()
 
@@ -46,6 +48,26 @@ async def create_pao_activite(
             detail=f"Données invalides : {exc}",
         ) from exc
     return await service.create_pao_activite(db, body, tdr)
+
+
+@router.get("/planification/pao/{activite_id}/tdr")
+async def download_pao_tdr(
+    activite_id: int,
+    inline: bool = Query(default=False, description="Afficher dans le navigateur si possible"),
+    _: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> FileResponse:
+    activite = await service.get_pao_activite_for_tdr(db, activite_id)
+    path = storage_service.resolve_path(activite.tdr_chemin)
+    filename = activite.tdr_nom_original or "tdr.pdf"
+    media_type = service.guess_document_media_type(filename)
+    disposition = "inline" if inline else "attachment"
+    return FileResponse(
+        path=path,
+        media_type=media_type,
+        filename=filename,
+        content_disposition_type=disposition,
+    )
 
 
 @router.get("/planification/projet", response_model=list[PlanificationProjetRead])

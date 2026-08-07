@@ -36,6 +36,32 @@ from app.schemas.planification import (
 from app.services.storage_service import storage_service
 
 
+DOCUMENT_MEDIA_TYPES: dict[str, str] = {
+    "pdf": "application/pdf",
+    "png": "image/png",
+    "jpg": "image/jpeg",
+    "jpeg": "image/jpeg",
+    "gif": "image/gif",
+    "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+}
+
+
+def guess_document_media_type(filename: str) -> str:
+    ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
+    return DOCUMENT_MEDIA_TYPES.get(ext, "application/octet-stream")
+
+
+async def get_pao_activite_for_tdr(db: AsyncSession, activite_id: int) -> Activite:
+    activite = await db.get(Activite, activite_id)
+    if activite is None or activite.date_debut is None:
+        raise HTTPException(status_code=404, detail="Activité planifiée introuvable")
+    if not activite.tdr_chemin:
+        raise HTTPException(status_code=404, detail="Aucun TDR joint à cette activité")
+    return activite
+
+
 def tache_to_read(tache: Tache) -> TacheRead:
     return TacheRead(
         id=tache.id,

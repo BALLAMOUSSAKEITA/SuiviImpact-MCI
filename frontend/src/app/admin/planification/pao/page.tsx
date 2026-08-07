@@ -6,6 +6,12 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/components/auth-provider";
+import {
+  DetailDrawer,
+  DetailDrawerRows,
+  DetailRow,
+  StoredDocumentMenu,
+} from "@/components/detail-drawer";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,7 +21,9 @@ import {
   listPlanificationPao,
   listTachesPlan,
 } from "@/lib/api";
-import type { PlanificationPaoCreate, PlanificationPaoTacheItem } from "@/types";
+import { fetchPlanificationPaoTdr } from "@/lib/stored-documents";
+import type { PlanificationPaoActivite, PlanificationPaoCreate, PlanificationPaoTacheItem } from "@/types";
+import { cn } from "@/lib/utils";
 
 const PONDERATIONS = [5, 15, 25, 45, 50, 60] as const;
 const MAX_TACHES = 5;
@@ -71,6 +79,7 @@ function PlanificationPaoContent() {
   const [tdrFile, setTdrFile] = useState<File | null>(null);
   const [slots, setSlots] = useState<TacheSlot[]>([]);
   const [slotKey, setSlotKey] = useState(0);
+  const [selected, setSelected] = useState<PlanificationPaoActivite | null>(null);
 
   const resetForm = () => {
     setDescription("");
@@ -408,7 +417,22 @@ function PlanificationPaoContent() {
               </tr>
             )}
             {activites.map((a) => (
-              <tr key={a.id}>
+              <tr
+                key={a.id}
+                tabIndex={0}
+                role="button"
+                onClick={() => setSelected(a)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setSelected(a);
+                  }
+                }}
+                className={cn(
+                  "cursor-pointer transition-colors hover:bg-forest-ink/[0.04]",
+                  selected?.id === a.id && "bg-forest-ink/[0.06]",
+                )}
+              >
                 <td>
                   <span className="inline-flex rounded-full bg-forest-ink/8 px-2.5 py-0.5 text-xs font-bold text-forest-ink">
                     {a.code}
@@ -429,12 +453,77 @@ function PlanificationPaoContent() {
                   {a.date_debut} → {a.date_fin}
                 </td>
                 <td className="text-sm tabular-nums">{a.budget}</td>
-                <td className="text-sm text-ash">{a.tdr_nom_original ?? "—"}</td>
+                <td className="text-sm text-ash" onClick={(e) => e.stopPropagation()}>
+                  {a.tdr_nom_original ? (
+                    <StoredDocumentMenu
+                      label={a.tdr_nom_original}
+                      fetchForOpen={() => fetchPlanificationPaoTdr(a.id, true)}
+                      fetchForDownload={() => fetchPlanificationPaoTdr(a.id, false)}
+                    />
+                  ) : (
+                    "—"
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      <DetailDrawer
+        open={selected !== null}
+        title={selected?.description ?? ""}
+        subtitle={selected ? `Code ${selected.code}` : undefined}
+        onClose={() => setSelected(null)}
+      >
+        {selected && (
+          <DetailDrawerRows>
+            <DetailRow label="Objectif">
+              {selected.objectif_code} — {selected.objectif_description}
+            </DetailRow>
+            <DetailRow label="Direction">
+              {selected.direction_code} — {selected.direction_libelle}
+            </DetailRow>
+            <DetailRow label="Période">
+              {selected.date_debut} → {selected.date_fin}
+            </DetailRow>
+            <DetailRow label="Montant">{selected.budget} GNF</DetailRow>
+            <DetailRow label="Responsable principal">{selected.email_responsable}</DetailRow>
+            <DetailRow label="Ministre">{selected.email_ministre}</DetailRow>
+            <DetailRow label="Tâches du plan d&apos;action">
+              {selected.taches.length === 0 ? (
+                <span className="text-ash">Aucune tâche associée</span>
+              ) : (
+                <ul className="space-y-2">
+                  {selected.taches.map((t) => (
+                    <li
+                      key={t.tache_plan_id}
+                      className="rounded-[var(--radius-card)] bg-veil/80 px-3 py-2 text-sm"
+                    >
+                      <span className="font-medium">{t.tache_plan_code}</span>
+                      <span className="text-slate"> — {t.tache_plan_description}</span>
+                      <span className="mt-0.5 block text-xs text-forest-ink">
+                        Pondération {t.ponderation} %
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </DetailRow>
+            <DetailRow label="TDR">
+              {selected.tdr_nom_original ? (
+                <StoredDocumentMenu
+                  label={selected.tdr_nom_original}
+                  fetchForOpen={() => fetchPlanificationPaoTdr(selected.id, true)}
+                  fetchForDownload={() => fetchPlanificationPaoTdr(selected.id, false)}
+                />
+              ) : (
+                <span className="text-ash">Non joint</span>
+              )}
+            </DetailRow>
+          </DetailDrawerRows>
+        )}
+      </DetailDrawer>
     </>
   );
 }
