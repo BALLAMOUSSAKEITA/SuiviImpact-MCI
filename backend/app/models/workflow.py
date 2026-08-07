@@ -11,10 +11,10 @@ from sqlalchemy import (
     Text,
     func,
 )
-from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
+from app.db.types import pg_enum
 
 
 class WorkflowStepRole(str, enum.Enum):
@@ -54,13 +54,6 @@ class ActionType(str, enum.Enum):
     UPLOAD = "upload"
 
 
-# Types ENUM gérés par Alembic (create_type=False évite une recréation au runtime)
-_workflow_status_enum = ENUM(WorkflowStatus, name="workflow_status_enum", create_type=False)
-_step_role_enum = ENUM(WorkflowStepRole, name="workflow_step_role_enum", create_type=False)
-_step_status_enum = ENUM(StepStatus, name="step_status_enum", create_type=False)
-_action_type_enum = ENUM(ActionType, name="action_type_enum", create_type=False)
-
-
 class Workflow(Base):
     __tablename__ = "workflows"
 
@@ -69,7 +62,7 @@ class Workflow(Base):
     ref: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     type: Mapped[str] = mapped_column(String(100), nullable=False)
     status: Mapped[WorkflowStatus] = mapped_column(
-        _workflow_status_enum,
+        pg_enum(WorkflowStatus, "workflow_status_enum"),
         default=WorkflowStatus.EN_COURS,
         nullable=False,
     )
@@ -99,11 +92,11 @@ class WorkflowStep(Base):
         ForeignKey("workflows.id", ondelete="CASCADE"), nullable=False
     )
     role: Mapped[WorkflowStepRole] = mapped_column(
-        _step_role_enum, nullable=False
+        pg_enum(WorkflowStepRole, "workflow_step_role_enum"), nullable=False
     )
     ordre: Mapped[int] = mapped_column(Integer, nullable=False)
     status: Mapped[StepStatus] = mapped_column(
-        _step_status_enum,
+        pg_enum(StepStatus, "step_status_enum"),
         default=StepStatus.WAITING,
         nullable=False,
     )
@@ -133,13 +126,13 @@ class WorkflowAction(Base):
         ForeignKey("users.id"), nullable=False
     )
     action_type: Mapped[ActionType] = mapped_column(
-        _action_type_enum, nullable=False
+        pg_enum(ActionType, "action_type_enum"), nullable=False
     )
     comment: Mapped[str | None] = mapped_column(Text, nullable=True)
     file_path: Mapped[str | None] = mapped_column(String(500), nullable=True)
     file_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
     target_role: Mapped[WorkflowStepRole | None] = mapped_column(
-        _step_role_enum, nullable=True
+        pg_enum(WorkflowStepRole, "workflow_step_role_enum"), nullable=True
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
