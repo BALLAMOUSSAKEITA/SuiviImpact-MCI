@@ -1,3 +1,5 @@
+import re
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
@@ -11,7 +13,6 @@ from app.schemas.plan_action import (
     ActiviteCreate,
     ActiviteRead,
     ActiviteUpdate,
-    DirectionCategorie,
     DirectionCreate,
     DirectionRead,
     DirectionUpdate,
@@ -28,16 +29,26 @@ from app.services.plan_action_service import activite_to_read
 router = APIRouter()
 
 
+async def _direction_code_from_libelle(db: AsyncSession, libelle: str) -> str:
+    cleaned = re.sub(r"[^A-Za-z0-9]", "", libelle.upper())
+    base = cleaned[:20] if cleaned else "DIR"
+    for suffix in range(100):
+        code = base if suffix == 0 else f"{base[:18]}{suffix}"[:20]
+        existing = await db.execute(select(Direction.id).where(Direction.code == code))
+        if existing.scalar_one_or_none() is None:
+            return code
+    raise HTTPException(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        detail="Impossible de générer un identifiant pour cette direction",
+    )
+
+
 @router.get("/directions", response_model=list[DirectionRead])
 async def list_directions(
-    categorie: DirectionCategorie | None = Query(default=None),
     _: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> list[Direction]:
-    query = select(Direction).order_by(Direction.code)
-    if categorie is not None:
-        query = query.where(Direction.categorie == categorie.value)
-    result = await db.execute(query)
+    result = await db.execute(select(Direction).order_by(Direction.libelle))
     return list(result.scalars().all())
 
 
@@ -51,12 +62,12 @@ async def create_direction(
     _: User = Depends(require_write_access),
     db: AsyncSession = Depends(get_db),
 ) -> Direction:
+    code = await _direction_code_from_libelle(db, body.libelle)
     direction = Direction(
-        code=body.code.strip().upper(),
+        code=code,
         libelle=body.libelle.strip(),
         directeur_nom=body.directeur_nom.strip(),
         email_directeur=body.email_directeur.strip(),
-        categorie=body.categorie.value,
     )
     db.add(direction)
     try:
@@ -65,7 +76,7 @@ async def create_direction(
         await db.rollback()
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Une direction avec cet acronyme existe déjà",
+            detail="Une direction similaire existe déjà",
         ) from exc
     await db.refresh(direction)
     return direction
@@ -81,23 +92,19 @@ async def update_direction(
     direction = await db.get(Direction, direction_id)
     if direction is None:
         raise HTTPException(status_code=404, detail="Direction introuvable")
-    if body.code is not None:
-        direction.code = body.code.strip().upper()
     if body.libelle is not None:
         direction.libelle = body.libelle.strip()
     if body.directeur_nom is not None:
         direction.directeur_nom = body.directeur_nom.strip()
     if body.email_directeur is not None:
         direction.email_directeur = body.email_directeur.strip()
-    if body.categorie is not None:
-        direction.categorie = body.categorie.value
     try:
         await db.commit()
     except IntegrityError as exc:
         await db.rollback()
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Une direction avec cet acronyme existe déjà",
+            detail="Une direction similaire existe déjà",
         ) from exc
     await db.refresh(direction)
     return direction

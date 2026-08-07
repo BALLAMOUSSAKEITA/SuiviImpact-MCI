@@ -48,8 +48,6 @@ import type {
 
   DirectionUpdate,
 
-  DirectionCategorie,
-
   MinistreParametrage,
 
   MinistreParametrageUpdate,
@@ -103,6 +101,8 @@ import type {
   UserCreate,
 
 } from "@/types";
+
+import { messageFromFailedResponse } from "./api-errors";
 
 
 
@@ -234,9 +234,9 @@ async function handleResponse<T>(response: Response): Promise<T> {
 
   if (!response.ok) {
 
-    const error = await response.json().catch(() => ({}));
+    const error = (await response.json().catch(() => ({}))) as Record<string, unknown>;
 
-    throw new Error(error.detail ?? `Erreur API (${response.status})`);
+    throw new Error(messageFromFailedResponse(error, response.status));
 
   }
 
@@ -396,9 +396,9 @@ async function apiFetchBlob(
 
   if (!response.ok) {
 
-    const error = await response.json().catch(() => ({}));
+    const error = (await response.json().catch(() => ({}))) as Record<string, unknown>;
 
-    throw new Error(error.detail ?? `Erreur API (${response.status})`);
+    throw new Error(messageFromFailedResponse(error, response.status));
 
   }
 
@@ -564,9 +564,8 @@ export async function deleteUser(id: number): Promise<void> {
 
 
 
-export async function listDirections(categorie?: DirectionCategorie): Promise<Direction[]> {
-  const query = categorie ? `?categorie=${categorie}` : "";
-  return apiFetch<Direction[]>(`/api/v1/directions${query}`);
+export async function listDirections(): Promise<Direction[]> {
+  return apiFetch<Direction[]>("/api/v1/directions");
 }
 
 export async function createDirection(data: DirectionCreate): Promise<Direction> {

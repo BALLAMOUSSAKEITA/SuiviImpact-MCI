@@ -131,3 +131,37 @@ async def test_create_tache_with_ponderation_validation(
     )
     assert second.status_code == 400
     assert "Pondération" in second.json()["detail"]
+
+
+@pytest.mark.asyncio
+async def test_update_and_delete_tache(client: AsyncClient, db_session: AsyncSession):
+    activite_id = await _seed_activite(db_session)
+    headers = await _auth_headers(client)
+
+    payload = {
+        "trimestre": 1,
+        "annee": 2025,
+        "description": "Tâche à modifier",
+        "responsable": "M. Diallo",
+        "email_responsable": "diallo@mipme.gov.gn",
+        "ponderation": 40,
+        "semaines": [],
+    }
+    create = await client.post(
+        f"/api/v1/activites/{activite_id}/taches",
+        headers=headers,
+        json=payload,
+    )
+    assert create.status_code == 201
+    tache_id = create.json()["id"]
+
+    update = await client.put(
+        f"/api/v1/taches/{tache_id}",
+        headers=headers,
+        json={"description": "Tâche modifiée", "ponderation": 40},
+    )
+    assert update.status_code == 200
+    assert update.json()["description"] == "Tâche modifiée"
+
+    delete = await client.delete(f"/api/v1/taches/{tache_id}", headers=headers)
+    assert delete.status_code == 204

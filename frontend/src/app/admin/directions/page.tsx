@@ -18,15 +18,7 @@ import {
   updateDirection,
   updateMinistreParametrage,
 } from "@/lib/api";
-import { cn } from "@/lib/utils";
-import type { Direction, DirectionCategorie } from "@/types";
-import { DIRECTION_CATEGORIE_LABELS } from "@/types";
-
-const CATEGORIES: DirectionCategorie[] = [
-  "ministere",
-  "pouvoir_supreme",
-  "pouvoir_indirect",
-];
+import type { Direction } from "@/types";
 
 export default function DirectionsPage() {
   return <DirectionsContent />;
@@ -35,26 +27,22 @@ export default function DirectionsPage() {
 function DirectionsContent() {
   const { canWrite } = useAuth();
   const queryClient = useQueryClient();
-  const [activeCategorie, setActiveCategorie] = useState<DirectionCategorie>("ministere");
-  const queryKey = ["directions", activeCategorie];
+  const queryKey = ["directions"];
 
   const { data: directions = [], isLoading } = useQuery({
     queryKey,
-    queryFn: () => listDirections(activeCategorie),
+    queryFn: listDirections,
   });
 
   const [showCreate, setShowCreate] = useState(false);
-  const [code, setCode] = useState("");
   const [libelle, setLibelle] = useState("");
   const [directeurNom, setDirecteurNom] = useState("");
   const [emailDirecteur, setEmailDirecteur] = useState("");
 
   const [editing, setEditing] = useState<Direction | null>(null);
-  const [editCode, setEditCode] = useState("");
   const [editLibelle, setEditLibelle] = useState("");
   const [editDirecteurNom, setEditDirecteurNom] = useState("");
   const [editEmailDirecteur, setEditEmailDirecteur] = useState("");
-  const [editCategorie, setEditCategorie] = useState<DirectionCategorie>("ministere");
   const [confirmUpdate, setConfirmUpdate] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Direction | null>(null);
 
@@ -66,6 +54,12 @@ function DirectionsContent() {
   const [ministrePrenom, setMinistrePrenom] = useState("");
   const [ministreNom, setMinistreNom] = useState("");
   const [ministreEmail, setMinistreEmail] = useState("");
+  const [editingMinistre, setEditingMinistre] = useState(false);
+
+  const ministreConfigured = Boolean(
+    ministre?.prenom?.trim() && ministre?.nom?.trim() && ministre?.email?.trim(),
+  );
+  const showMinistreForm = !ministreConfigured || editingMinistre;
 
   useEffect(() => {
     if (ministre) {
@@ -75,12 +69,20 @@ function DirectionsContent() {
     }
   }, [ministre]);
 
+  const cancelMinistreEdit = () => {
+    if (ministre) {
+      setMinistrePrenom(ministre.prenom ?? "");
+      setMinistreNom(ministre.nom ?? "");
+      setMinistreEmail(ministre.email ?? "");
+    }
+    setEditingMinistre(false);
+  };
+
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ["directions"] });
   };
 
   const resetCreateForm = () => {
-    setCode("");
     setLibelle("");
     setDirecteurNom("");
     setEmailDirecteur("");
@@ -89,14 +91,12 @@ function DirectionsContent() {
   const createMutation = useMutation({
     mutationFn: () =>
       createDirection({
-        code: code.trim(),
         libelle: libelle.trim(),
         directeur_nom: directeurNom.trim(),
         email_directeur: emailDirecteur.trim(),
-        categorie: activeCategorie,
       }),
     onSuccess: (d) => {
-      toast.success(`Direction créée — ${d.code}`);
+      toast.success(`Direction enregistrée — ${d.libelle}`);
       resetCreateForm();
       setShowCreate(false);
       invalidate();
@@ -123,6 +123,7 @@ function DirectionsContent() {
       }),
     onSuccess: () => {
       toast.success("Fiche ministre enregistrée");
+      setEditingMinistre(false);
       queryClient.invalidateQueries({ queryKey: ministreQueryKey });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -131,11 +132,9 @@ function DirectionsContent() {
   const updateMutation = useMutation({
     mutationFn: () =>
       updateDirection(editing!.id, {
-        code: editCode.trim(),
         libelle: editLibelle.trim(),
         directeur_nom: editDirecteurNom.trim(),
         email_directeur: editEmailDirecteur.trim(),
-        categorie: editCategorie,
       }),
     onSuccess: () => {
       toast.success("Direction mise à jour");
@@ -148,11 +147,9 @@ function DirectionsContent() {
 
   const openEdit = (item: Direction) => {
     setEditing(item);
-    setEditCode(item.code);
     setEditLibelle(item.libelle);
     setEditDirecteurNom(item.directeur_nom ?? "");
     setEditEmailDirecteur(item.email_directeur ?? "");
-    setEditCategorie(item.categorie);
     setConfirmUpdate(false);
   };
 
@@ -165,7 +162,6 @@ function DirectionsContent() {
   const requestSave = (e: React.FormEvent) => {
     e.preventDefault();
     if (
-      !editCode.trim() ||
       !editLibelle.trim() ||
       !editDirecteurNom.trim() ||
       !editEmailDirecteur.trim()
@@ -180,7 +176,7 @@ function DirectionsContent() {
       <PageHeader
         eyebrow="Paramétrage"
         title="Directions"
-        description="Ministre, directions du ministère, pouvoirs suprêmes et pouvoirs indirects."
+        description="Ministre et référentiel des directions : libellé, directeur et e-mail."
         actions={
           canWrite && !showCreate ? (
             <Button onClick={() => setShowCreate(true)}>
@@ -192,89 +188,114 @@ function DirectionsContent() {
       />
 
       <div className="panel-grain mb-6">
-        <h3 className="mb-4 text-base font-semibold text-graphite">Ministre</h3>
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+          <h3 className="text-base font-semibold text-graphite">Ministre</h3>
+          {ministreConfigured && !showMinistreForm && canWrite && (
+            <Button type="button" variant="outline" size="sm" onClick={() => setEditingMinistre(true)}>
+              Modifier
+            </Button>
+          )}
+        </div>
         {loadingMinistre ? (
           <p className="text-sm text-ash">Chargement…</p>
-        ) : (
-          <form
-            className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:items-end"
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (!canWrite) return;
-              ministreMutation.mutate();
-            }}
-          >
-            <div>
-              <label className="label-grain">Prénom</label>
-              <input
-                required
-                value={ministrePrenom}
-                onChange={(e) => setMinistrePrenom(e.target.value)}
-                className="input-grain"
-                disabled={!canWrite}
-                placeholder="Prénom"
-              />
-            </div>
-            <div>
-              <label className="label-grain">Nom</label>
-              <input
-                required
-                value={ministreNom}
-                onChange={(e) => setMinistreNom(e.target.value)}
-                className="input-grain"
-                disabled={!canWrite}
-                placeholder="Nom"
-              />
-            </div>
-            <div>
-              <label className="label-grain">E-mail du ministre</label>
-              <input
-                required
-                type="email"
-                value={ministreEmail}
-                onChange={(e) => setMinistreEmail(e.target.value)}
-                className="input-grain"
-                disabled={!canWrite}
-                placeholder="ministre@mci.gov.gn"
-              />
-            </div>
-            {canWrite && (
+        ) : showMinistreForm ? (
+          <>
+            {!ministreConfigured && (
+              <p className="mb-4 text-sm text-slate">
+                Renseignez la fiche du ministre une fois ; elle pourra être modifiée ensuite.
+              </p>
+            )}
+            <form
+              className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:items-end"
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!canWrite) return;
+                ministreMutation.mutate();
+              }}
+            >
               <div>
-                <Button type="submit" disabled={ministreMutation.isPending} className="w-full sm:w-auto">
-                  Enregistrer le ministre
-                </Button>
+                <label className="label-grain">Prénom</label>
+                <input
+                  required
+                  value={ministrePrenom}
+                  onChange={(e) => setMinistrePrenom(e.target.value)}
+                  className="input-grain"
+                  disabled={!canWrite}
+                  placeholder="Prénom"
+                />
+              </div>
+              <div>
+                <label className="label-grain">Nom</label>
+                <input
+                  required
+                  value={ministreNom}
+                  onChange={(e) => setMinistreNom(e.target.value)}
+                  className="input-grain"
+                  disabled={!canWrite}
+                  placeholder="Nom"
+                />
+              </div>
+              <div>
+                <label className="label-grain">E-mail du ministre</label>
+                <input
+                  required
+                  type="email"
+                  value={ministreEmail}
+                  onChange={(e) => setMinistreEmail(e.target.value)}
+                  className="input-grain"
+                  disabled={!canWrite}
+                  placeholder="ministre@mci.gov.gn"
+                />
+              </div>
+              {canWrite && (
+                <div className="flex flex-wrap gap-2">
+                  <Button type="submit" disabled={ministreMutation.isPending} className="w-full sm:w-auto">
+                    {ministreMutation.isPending ? "Enregistrement…" : "Enregistrer"}
+                  </Button>
+                  {ministreConfigured && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      disabled={ministreMutation.isPending}
+                      onClick={cancelMinistreEdit}
+                    >
+                      Annuler
+                    </Button>
+                  )}
+                </div>
+              )}
+            </form>
+          </>
+        ) : ministre ? (
+          <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div>
+              <dt className="text-xs font-medium uppercase tracking-wide text-ash">Identité</dt>
+              <dd className="mt-1 text-base font-medium text-graphite">
+                {[ministre.prenom, ministre.nom].filter(Boolean).join(" ")}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs font-medium uppercase tracking-wide text-ash">E-mail</dt>
+              <dd className="mt-1 text-sm text-slate">{ministre.email}</dd>
+            </div>
+            {ministre.updated_at && (
+              <div>
+                <dt className="text-xs font-medium uppercase tracking-wide text-ash">Dernière mise à jour</dt>
+                <dd className="mt-1 text-sm text-slate">
+                  {new Date(ministre.updated_at).toLocaleString("fr-FR", {
+                    dateStyle: "medium",
+                    timeStyle: "short",
+                  })}
+                </dd>
               </div>
             )}
-          </form>
-        )}
-      </div>
-
-      <div className="mb-6 flex flex-wrap gap-2">
-        {CATEGORIES.map((cat) => (
-          <button
-            key={cat}
-            type="button"
-            onClick={() => {
-              setActiveCategorie(cat);
-              setShowCreate(false);
-              resetCreateForm();
-            }}
-            className={cn(
-              "rounded-[var(--radius-pill)] px-4 py-2 text-sm font-medium transition-colors",
-              activeCategorie === cat
-                ? "bg-forest-ink text-white shadow-[var(--shadow-soft)]"
-                : "bg-white/80 text-slate hover:bg-veil",
-            )}
-          >
-            {DIRECTION_CATEGORIE_LABELS[cat]}
-          </button>
-        ))}
+          </dl>
+        ) : null}
       </div>
 
       {showCreate && canWrite && (
         <div className="panel-grain mb-6">
-          <h3 className="mb-1 text-base font-semibold text-graphite">Nouvelle direction</h3>
-          <p className="mb-4 text-sm text-ash">{DIRECTION_CATEGORIE_LABELS[activeCategorie]}</p>
+          <h3 className="mb-4 text-base font-semibold text-graphite">Nouvelle direction</h3>
           <form
             className="grid gap-4 sm:grid-cols-2"
             onSubmit={(e) => {
@@ -282,24 +303,14 @@ function DirectionsContent() {
               createMutation.mutate();
             }}
           >
-            <div>
-              <label className="label-grain">Acronyme</label>
-              <input
-                required
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                className="input-grain"
-                placeholder="Ex. DNI"
-              />
-            </div>
-            <div>
+            <div className="sm:col-span-2">
               <label className="label-grain">Direction</label>
               <input
                 required
                 value={libelle}
                 onChange={(e) => setLibelle(e.target.value)}
                 className="input-grain"
-                placeholder="Libellé complet"
+                placeholder="Libellé de la direction"
               />
             </div>
             <div>
@@ -346,7 +357,6 @@ function DirectionsContent() {
         <table className="table-grain">
           <thead>
             <tr>
-              <th className="w-[100px]">Acronyme</th>
               <th>Direction</th>
               <th>Directeur</th>
               <th>E-mail du directeur</th>
@@ -356,25 +366,20 @@ function DirectionsContent() {
           <tbody>
             {isLoading && (
               <tr>
-                <td colSpan={canWrite ? 5 : 4} className="py-8 text-center text-ash">
+                <td colSpan={canWrite ? 4 : 3} className="py-8 text-center text-ash">
                   Chargement…
                 </td>
               </tr>
             )}
             {!isLoading && directions.length === 0 && (
               <tr>
-                <td colSpan={canWrite ? 5 : 4} className="py-8 text-center text-ash">
-                  Aucune direction dans cette catégorie
+                <td colSpan={canWrite ? 4 : 3} className="py-8 text-center text-ash">
+                  Aucune direction enregistrée
                 </td>
               </tr>
             )}
             {directions.map((d) => (
               <tr key={d.id}>
-                <td>
-                  <span className="inline-flex rounded-full bg-forest-ink/8 px-2.5 py-0.5 text-xs font-bold text-forest-ink">
-                    {d.code}
-                  </span>
-                </td>
                 <td className="font-medium text-graphite">{d.libelle}</td>
                 <td className="text-slate">{d.directeur_nom?.trim() || "—"}</td>
                 <td className="text-sm text-slate">{d.email_directeur?.trim() || "—"}</td>
@@ -392,35 +397,8 @@ function DirectionsContent() {
         </table>
       </div>
 
-      <FormDialog
-        open={editing !== null && !confirmUpdate}
-        title="Modifier la direction"
-        onClose={closeEdit}
-      >
+      <FormDialog open={editing !== null && !confirmUpdate} title="Modifier la direction" onClose={closeEdit}>
         <form onSubmit={requestSave} className="space-y-4">
-          <div>
-            <label className="label-grain">Catégorie</label>
-            <select
-              value={editCategorie}
-              onChange={(e) => setEditCategorie(e.target.value as DirectionCategorie)}
-              className="input-grain"
-            >
-              {CATEGORIES.map((cat) => (
-                <option key={cat} value={cat}>
-                  {DIRECTION_CATEGORIE_LABELS[cat]}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="label-grain">Acronyme</label>
-            <input
-              required
-              value={editCode}
-              onChange={(e) => setEditCode(e.target.value)}
-              className="input-grain"
-            />
-          </div>
           <div>
             <label className="label-grain">Direction</label>
             <input
@@ -461,7 +439,7 @@ function DirectionsContent() {
       <ConfirmDialog
         open={confirmUpdate && editing !== null}
         title="Confirmer la modification"
-        description={`Enregistrer les modifications de la direction « ${editCode} » ?`}
+        description={`Enregistrer les modifications de « ${editLibelle} » ?`}
         confirmLabel="Oui, enregistrer"
         loading={updateMutation.isPending}
         onCancel={() => setConfirmUpdate(false)}
@@ -473,7 +451,7 @@ function DirectionsContent() {
         title="Supprimer la direction"
         description={
           deleteTarget
-            ? `Supprimer la direction « ${deleteTarget.code} » ? Cette action est irréversible.`
+            ? `Supprimer la direction « ${deleteTarget.libelle} » ? Cette action est irréversible.`
             : ""
         }
         confirmLabel="Supprimer"

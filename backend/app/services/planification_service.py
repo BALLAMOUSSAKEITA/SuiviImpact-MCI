@@ -3,7 +3,7 @@ from decimal import Decimal
 import secrets
 
 from fastapi import HTTPException, UploadFile, status
-from sqlalchemy import delete, func, select
+from sqlalchemy import delete, func, inspect as sa_inspect, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -933,8 +933,13 @@ async def update_planification_projet(
             comp_by_id[composante.id] = composante
 
         kept_act_ids = {a.id for a in comp_data.activites if a.id is not None}
-        act_by_id = {a.id: a for a in composante.activites}
-        for activite in list(composante.activites):
+        comp_insp = sa_inspect(composante)
+        if "activites" in comp_insp.unloaded:
+            activites_loaded: list = []
+        else:
+            activites_loaded = list(composante.activites)
+        act_by_id = {a.id: a for a in activites_loaded}
+        for activite in activites_loaded:
             if activite.id not in kept_act_ids:
                 if activite.terminee:
                     raise HTTPException(
