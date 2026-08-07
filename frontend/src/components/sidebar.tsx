@@ -21,6 +21,7 @@ import {
   MapPin,
   ShoppingCart,
   Target,
+  UserCircle,
   Users,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -80,6 +81,7 @@ const navItems: NavItem[] = [
   { href: "/admin/workflow", label: "Workflow", icon: GitBranch },
   { href: "/admin/export", label: "Export", icon: Download },
   { href: "/admin/archive", label: "Archive", icon: FolderArchive },
+  { href: "/admin/profil", label: "Mon profil", icon: UserCircle },
   { href: "/admin/comptes", label: "Comptes", icon: Users, adminOnly: true },
 ];
 
@@ -196,9 +198,12 @@ export function Sidebar({
         <Link
           href="/admin/profil"
           onClick={onNavigate}
+          title="Mon profil"
+          aria-label="Mon profil"
           className={cn(
-            "mt-4 flex items-center border-t border-cloud/60 pt-4 transition-opacity hover:opacity-90",
-            narrow ? "justify-center" : "gap-3",
+            "mt-4 flex items-center border-t border-cloud/60 pt-4 transition-colors hover:bg-veil/80 rounded-[var(--radius-sm)]",
+            narrow ? "justify-center px-1 py-2" : "gap-3 px-1 py-1",
+            pathname.startsWith("/admin/profil") && "bg-forest-ink/[0.07]",
           )}
         >
           <UserAvatar
@@ -213,7 +218,8 @@ export function Sidebar({
                 {[user?.prenom, user?.nom].filter(Boolean).join(" ") || "Profil"}
               </p>
               <p className="text-[11px] text-ash">
-                {user ? ROLE_LABELS[user.role] : "Mon profil"}
+                {user ? ROLE_LABELS[user.role] : "Mon profil"} ·{" "}
+                <span className="text-forest-ink">Voir le profil</span>
               </p>
             </div>
           )}

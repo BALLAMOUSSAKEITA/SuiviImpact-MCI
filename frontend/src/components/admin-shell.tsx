@@ -1,9 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 
+import { useAuth } from "@/components/auth-provider";
 import { Sidebar } from "@/components/sidebar";
+import { UserAvatar } from "@/components/user-avatar";
 import { BRAND } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 
@@ -15,6 +18,7 @@ interface AdminShellProps {
 }
 
 export function AdminShell({ children, className }: AdminShellProps) {
+  const { user } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [hydrated, setHydrated] = useState(false);
@@ -92,6 +96,18 @@ export function AdminShell({ children, className }: AdminShellProps) {
               {BRAND.bureauShort} · {BRAND.program}
             </p>
           </div>
+          <Link
+            href="/admin/profil"
+            className="flex shrink-0 rounded-full ring-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest-ink/30"
+            aria-label="Mon profil"
+          >
+            <UserAvatar
+              prenom={user?.prenom ?? ""}
+              nom={user?.nom}
+              hasAvatar={user?.has_avatar}
+              size="sm"
+            />
+          </Link>
         </header>
 
         <main

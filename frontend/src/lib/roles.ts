@@ -23,11 +23,10 @@ export function canWritePlatform(role: UserRole | undefined, typeAcces: string |
 
 /** Chemins autorisés (hors préfixe /admin). Vue d'ensemble = exact /admin. */
 export function isPathAllowed(role: UserRole | undefined, pathname: string): boolean {
-  if (!role || role === "admin" || role === "user") return true;
-
   const path = pathname.split("?")[0];
-
   if (path === "/admin/profil" || path.startsWith("/admin/profil/")) return true;
+
+  if (!role || role === "admin" || role === "user") return true;
 
   if (role === "directeur") {
     const allowed = [
@@ -60,6 +59,7 @@ function matchesAllowed(path: string, allowed: string[]): boolean {
 
 export function canSeeNavHref(role: UserRole | undefined, href: string, adminOnly?: boolean): boolean {
   if (!role) return false;
+  if (href === "/admin/profil" || href.startsWith("/admin/profil/")) return true;
   if (adminOnly) return role === "admin";
   if (role === "admin" || role === "user") return true;
 

@@ -48,7 +48,11 @@ function ProfilContent() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  if (!user) return null;
+  if (!user) {
+    return (
+      <p className="text-sm text-ash">Impossible de charger votre profil. Reconnectez-vous.</p>
+    );
+  }
 
   const displayName = [user.prenom, user.nom].filter(Boolean).join(" ");
 
@@ -65,7 +69,7 @@ function ProfilContent() {
           <UserAvatar
             key={avatarKey}
             prenom={user.prenom}
-            nom={user.nom}
+            nom={user.nom ?? ""}
             hasAvatar={user.has_avatar}
             size="lg"
           />
@@ -126,7 +130,8 @@ function ProfilContent() {
           </div>
           <p className="text-xs text-ash">
             L&apos;identifiant de connexion ({user.username}) est géré par l&apos;administrateur.
-            {!canWrite && " Votre rôle ne permet pas de modifier les données métier de la plateforme."}
+            {!canWrite &&
+              " Votre rôle ne permet pas de modifier les données métier de la plateforme."}
           </p>
           <Button type="submit" disabled={profileMutation.isPending}>
             {profileMutation.isPending ? "Enregistrement…" : "Enregistrer le profil"}
