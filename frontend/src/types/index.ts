@@ -185,6 +185,106 @@ export interface PlanificationActivite {
   nb_taches: number;
 }
 
+export interface PlanificationPaoTacheItem {
+  tache_plan_id: number;
+  ponderation: number;
+}
+
+export interface PlanificationPaoCreate {
+  description: string;
+  objectif_id: number;
+  budget: number;
+  date_debut: string;
+  date_fin: string;
+  direction_id: number;
+  email_responsable: string;
+  email_ministre: string;
+  taches: PlanificationPaoTacheItem[];
+}
+
+export interface PlanificationPaoTacheRead {
+  tache_plan_id: number;
+  tache_plan_code: string;
+  tache_plan_description: string;
+  ponderation: string;
+}
+
+export interface PlanificationPaoActivite {
+  id: number;
+  code: string;
+  description: string;
+  budget: string;
+  objectif_id: number;
+  objectif_code: string;
+  objectif_description: string;
+  date_debut: string;
+  date_fin: string;
+  direction_id: number;
+  direction_code: string;
+  direction_libelle: string;
+  email_responsable: string;
+  email_ministre: string;
+  tdr_nom_original: string | null;
+  taches: PlanificationPaoTacheRead[];
+  created_at: string;
+}
+
+export type TypeBudgetProjet = "BND" | "FINEX";
+
+export interface PlanificationProjetActiviteInput {
+  titre: string;
+}
+
+export interface PlanificationProjetComposanteInput {
+  libelle?: string | null;
+  activites: PlanificationProjetActiviteInput[];
+}
+
+export interface PlanificationProjetCreate {
+  projet_id: number;
+  type_budget: TypeBudgetProjet;
+  composantes: PlanificationProjetComposanteInput[];
+  montant: number;
+  lieu: string;
+  date_debut: string;
+  date_fin: string;
+  direction_id: number;
+  email_responsable: string;
+  email_ministre: string;
+}
+
+export interface PlanificationProjetActiviteRead {
+  id: number;
+  ordre: number;
+  titre: string;
+}
+
+export interface PlanificationProjetComposanteRead {
+  id: number;
+  ordre: number;
+  libelle: string | null;
+  activites: PlanificationProjetActiviteRead[];
+}
+
+export interface PlanificationProjetPlan {
+  id: number;
+  projet_id: number;
+  projet_code: string;
+  projet_description: string;
+  type_budget: TypeBudgetProjet;
+  montant: string;
+  lieu: string;
+  date_debut: string;
+  date_fin: string;
+  direction_id: number;
+  direction_code: string;
+  direction_libelle: string;
+  email_responsable: string;
+  email_ministre: string;
+  composantes: PlanificationProjetComposanteRead[];
+  created_at: string;
+}
+
 export interface SuiviActivite {
   id: number;
   code: string;

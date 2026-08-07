@@ -1,9 +1,10 @@
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 
 from sqlalchemy import (
     Boolean,
     CheckConstraint,
+    Date,
     DateTime,
     ForeignKey,
     Integer,
@@ -66,6 +67,12 @@ class Activite(Base):
     description: Mapped[str] = mapped_column(Text, nullable=False)
     budget: Mapped[Decimal] = mapped_column(Numeric(15, 2), default=0)
     execution: Mapped[Decimal] = mapped_column(Numeric(5, 2), default=0)
+    date_debut: Mapped[date | None] = mapped_column(Date, nullable=True)
+    date_fin: Mapped[date | None] = mapped_column(Date, nullable=True)
+    email_responsable: Mapped[str | None] = mapped_column(String(255))
+    email_ministre: Mapped[str | None] = mapped_column(String(255))
+    tdr_chemin: Mapped[str | None] = mapped_column(String(500))
+    tdr_nom_original: Mapped[str | None] = mapped_column(String(255))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )

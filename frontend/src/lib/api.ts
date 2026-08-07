@@ -46,6 +46,14 @@ import type {
 
   PlanificationActivite,
 
+  PlanificationPaoActivite,
+
+  PlanificationPaoCreate,
+
+  PlanificationProjetCreate,
+
+  PlanificationProjetPlan,
+
   Ppm,
 
   PpmCreate,
@@ -692,6 +700,46 @@ export async function deleteActivite(id: number): Promise<void> {
 
 
 // --- Planification ---
+
+
+
+export async function listPlanificationPao(): Promise<PlanificationPaoActivite[]> {
+  return apiFetch<PlanificationPaoActivite[]>("/api/v1/planification/pao");
+}
+
+
+
+export async function createPlanificationPao(
+  data: PlanificationPaoCreate,
+  tdr?: File | null,
+): Promise<PlanificationPaoActivite> {
+  const formData = new FormData();
+  formData.append("payload", JSON.stringify(data));
+  if (tdr) {
+    formData.append("tdr", tdr);
+  }
+  return apiFetchFormData<PlanificationPaoActivite>(
+    "/api/v1/planification/pao",
+    formData,
+  );
+}
+
+
+
+export async function listPlanificationProjet(): Promise<PlanificationProjetPlan[]> {
+  return apiFetch<PlanificationProjetPlan[]>("/api/v1/planification/projet");
+}
+
+
+
+export async function createPlanificationProjet(
+  data: PlanificationProjetCreate,
+): Promise<PlanificationProjetPlan> {
+  return apiFetch<PlanificationProjetPlan>("/api/v1/planification/projet", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
 
 
 

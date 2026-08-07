@@ -1,13 +1,72 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user, require_write_access
 from app.core.database import get_db
 from app.models.user import User
-from app.schemas.planification import PlanificationActiviteRead, TacheCreate, TacheRead, TacheUpdate
+from app.schemas.planification import (
+    PlanificationActiviteRead,
+    PlanificationPaoCreate,
+    PlanificationPaoRead,
+    PlanificationProjetCreate,
+    PlanificationProjetRead,
+    TacheCreate,
+    TacheRead,
+    TacheUpdate,
+)
 from app.services import planification_service as service
 
 router = APIRouter()
+
+
+@router.get("/planification/pao", response_model=list[PlanificationPaoRead])
+async def list_pao_activites(
+    _: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> list[PlanificationPaoRead]:
+    return await service.list_pao_activites(db)
+
+
+@router.post(
+    "/planification/pao",
+    response_model=PlanificationPaoRead,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_pao_activite(
+    payload: str = Form(...),
+    tdr: UploadFile | None = File(default=None),
+    _: User = Depends(require_write_access),
+    db: AsyncSession = Depends(get_db),
+) -> PlanificationPaoRead:
+    try:
+        body = PlanificationPaoCreate.model_validate_json(payload)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Données invalides : {exc}",
+        ) from exc
+    return await service.create_pao_activite(db, body, tdr)
+
+
+@router.get("/planification/projet", response_model=list[PlanificationProjetRead])
+async def list_planifications_projet(
+    _: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> list[PlanificationProjetRead]:
+    return await service.list_planifications_projet(db)
+
+
+@router.post(
+    "/planification/projet",
+    response_model=PlanificationProjetRead,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_planification_projet(
+    body: PlanificationProjetCreate,
+    _: User = Depends(require_write_access),
+    db: AsyncSession = Depends(get_db),
+) -> PlanificationProjetRead:
+    return await service.create_planification_projet(db, body)
 
 
 @router.get(

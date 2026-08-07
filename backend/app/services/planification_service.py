@@ -1,21 +1,39 @@
+from datetime import date
 from decimal import Decimal
+import secrets
 
-from fastapi import HTTPException, status
+from fastapi import HTTPException, UploadFile, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.models.direction import Direction
-from app.models.plan_action import Activite, ActiviteDirection, ActiviteTrimestre
+from app.models.plan_action import Activite, ActiviteDirection, ActiviteTrimestre, Objectif, TachePlan
 from app.models.tache import TRIMESTRE_MOIS, Tache, TacheSemaine, TacheStatut, end_of_week_in_month
+from app.models.modules import Projet
+from app.models.planification_projet import (
+    PlanificationProjet,
+    PlanificationProjetActivite,
+    PlanificationProjetComposante,
+)
 from app.schemas.planification import (
+    PAO_PONDERATIONS,
     PlanificationActiviteRead,
+    PlanificationPaoCreate,
+    PlanificationPaoRead,
+    PlanificationPaoTacheRead,
+    PlanificationProjetCreate,
+    PlanificationProjetRead,
+    PlanificationProjetComposanteRead,
+    PlanificationProjetActiviteRead,
     SemaineRead,
     TacheCreate,
     TacheFichierRead,
     TacheRead,
     TacheUpdate,
+    TypeBudgetProjet,
 )
+from app.services.storage_service import storage_service
 
 
 def tache_to_read(tache: Tache) -> TacheRead:
@@ -260,3 +278,424 @@ async def update_tache(
 async def delete_tache(db: AsyncSession, tache: Tache) -> None:
     await db.delete(tache)
     await db.commit()
+
+
+def _trimestre_from_date(d: date) -> tuple[int, int]:
+    annee = d.year
+    if annee < 2025 or annee > 2027:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="L'année doit être entre 2025 et 2027",
+        )
+    trimestre = (d.month - 1) // 3 + 1
+    return annee, trimestre
+
+
+def _trimestres_between(debut: date, fin: date) -> list[tuple[int, int]]:
+    if fin < debut:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="La date de fin doit être postérieure ou égale à la date de début",
+        )
+    seen: set[tuple[int, int]] = set()
+    y, t = _trimestre_from_date(debut)
+    y_end, t_end = _trimestre_from_date(fin)
+    while (y, t) <= (y_end, t_end):
+        seen.add((y, t))
+        t += 1
+        if t > 4:
+            t = 1
+            y += 1
+    return sorted(seen)
+
+
+async def _generate_activite_code(db: AsyncSession) -> str:
+    for _ in range(20):
+        code = secrets.token_hex(4).upper()
+        existing = await db.execute(select(Activite.id).where(Activite.code == code))
+        if existing.scalar_one_or_none() is None:
+            return code
+    raise HTTPException(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        detail="Impossible de générer un code d'activité unique",
+    )
+
+
+def _validate_pao_taches(taches: list) -> None:
+    if len(taches) > 5:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Maximum 5 tâches par activité",
+        )
+    ids = [t.tache_plan_id for t in taches]
+    if len(ids) != len(set(ids)):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Chaque tâche du plan d'action ne peut être sélectionnée qu'une fois",
+        )
+    total = Decimal("0")
+    for item in taches:
+        p = Decimal(str(item.ponderation))
+        if float(p) not in PAO_PONDERATIONS:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Pondération invalide ({p}%). Valeurs autorisées : 5, 15, 25, 45, 50, 60",
+            )
+        total += p
+    if total > Decimal("100"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"La somme des pondérations ne peut pas dépasser 100% ({total}%)",
+        )
+
+
+async def create_pao_activite(
+    db: AsyncSession,
+    data: PlanificationPaoCreate,
+    tdr_file: UploadFile | None = None,
+) -> PlanificationPaoRead:
+    _validate_pao_taches(data.taches)
+
+    objectif = await db.get(Objectif, data.objectif_id)
+    if objectif is None:
+        raise HTTPException(status_code=404, detail="Objectif introuvable")
+
+    direction = await db.get(Direction, data.direction_id)
+    if direction is None:
+        raise HTTPException(status_code=404, detail="Direction introuvable")
+
+    tache_plans: dict[int, TachePlan] = {}
+    for item in data.taches:
+        if item.tache_plan_id in tache_plans:
+            continue
+        tp = await db.get(TachePlan, item.tache_plan_id)
+        if tp is None:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Tâche plan {item.tache_plan_id} introuvable",
+            )
+        tache_plans[item.tache_plan_id] = tp
+
+    tdr_chemin: str | None = None
+    tdr_nom: str | None = None
+    if tdr_file is not None and tdr_file.filename:
+        tdr_chemin, tdr_nom, _ = await storage_service.save_upload(tdr_file, "tdr")
+
+    code = await _generate_activite_code(db)
+    annee, trimestre = _trimestre_from_date(data.date_debut)
+
+    activite = Activite(
+        objectif_id=data.objectif_id,
+        code=code,
+        description=data.description,
+        budget=data.budget,
+        execution=Decimal("0"),
+        date_debut=data.date_debut,
+        date_fin=data.date_fin,
+        email_responsable=data.email_responsable,
+        email_ministre=data.email_ministre,
+        tdr_chemin=tdr_chemin,
+        tdr_nom_original=tdr_nom,
+    )
+    db.add(activite)
+    await db.flush()
+
+    db.add(ActiviteDirection(activite_id=activite.id, direction_id=data.direction_id))
+    for an, tr in _trimestres_between(data.date_debut, data.date_fin):
+        db.add(
+            ActiviteTrimestre(
+                activite_id=activite.id,
+                annee=an,
+                trimestre=tr,
+                planifie=True,
+            )
+        )
+
+    responsable_label = direction.libelle[:100]
+    taches_read: list[PlanificationPaoTacheRead] = []
+    for item in data.taches:
+        tp = tache_plans[item.tache_plan_id]
+        desc = f"{tp.code} — {tp.description}"
+        tache = Tache(
+            activite_id=activite.id,
+            tache_plan_id=tp.id,
+            trimestre=trimestre,
+            annee=annee,
+            description=desc,
+            responsable=responsable_label,
+            email_responsable=data.email_responsable,
+            ponderation=Decimal(str(item.ponderation)),
+            statut=TacheStatut.EN_COURS,
+        )
+        db.add(tache)
+        taches_read.append(
+            PlanificationPaoTacheRead(
+                tache_plan_id=tp.id,
+                tache_plan_code=tp.code,
+                tache_plan_description=tp.description,
+                ponderation=Decimal(str(item.ponderation)),
+            )
+        )
+
+    await db.commit()
+    await db.refresh(activite)
+
+    return PlanificationPaoRead(
+        id=activite.id,
+        code=activite.code,
+        description=activite.description,
+        budget=activite.budget,
+        objectif_id=objectif.id,
+        objectif_code=objectif.code,
+        objectif_description=objectif.description,
+        date_debut=data.date_debut,
+        date_fin=data.date_fin,
+        direction_id=direction.id,
+        direction_code=direction.code,
+        direction_libelle=direction.libelle,
+        email_responsable=data.email_responsable,
+        email_ministre=data.email_ministre,
+        tdr_nom_original=tdr_nom,
+        taches=taches_read,
+        created_at=activite.created_at,
+    )
+
+
+async def list_pao_activites(db: AsyncSession) -> list[PlanificationPaoRead]:
+    result = await db.execute(
+        select(Activite)
+        .where(Activite.date_debut.isnot(None))
+        .options(
+            selectinload(Activite.objectif),
+            selectinload(Activite.directions),
+        )
+        .order_by(Activite.created_at.desc())
+    )
+    activites = result.scalars().all()
+    if not activites:
+        return []
+
+    activite_ids = [a.id for a in activites]
+    taches_result = await db.execute(
+        select(Tache).where(
+            Tache.activite_id.in_(activite_ids),
+            Tache.tache_plan_id.isnot(None),
+        )
+    )
+    taches_by_activite: dict[int, list[Tache]] = {}
+    tache_plan_ids = set()
+    for t in taches_result.scalars().all():
+        taches_by_activite.setdefault(t.activite_id, []).append(t)
+        if t.tache_plan_id:
+            tache_plan_ids.add(t.tache_plan_id)
+
+    tp_map: dict[int, TachePlan] = {}
+    if tache_plan_ids:
+        tp_result = await db.execute(
+            select(TachePlan).where(TachePlan.id.in_(tache_plan_ids))
+        )
+        tp_map = {tp.id: tp for tp in tp_result.scalars().all()}
+
+    direction_ids = {
+        d.direction_id for a in activites for d in a.directions
+    }
+    dir_map: dict[int, Direction] = {}
+    if direction_ids:
+        dir_result = await db.execute(
+            select(Direction).where(Direction.id.in_(direction_ids))
+        )
+        dir_map = {d.id: d for d in dir_result.scalars().all()}
+
+    out: list[PlanificationPaoRead] = []
+    for a in activites:
+        if a.date_debut is None or a.date_fin is None:
+            continue
+        dir_id = a.directions[0].direction_id if a.directions else 0
+        direction = dir_map.get(dir_id)
+        if direction is None or a.objectif is None:
+            continue
+        taches_read: list[PlanificationPaoTacheRead] = []
+        for t in taches_by_activite.get(a.id, []):
+            tp = tp_map.get(t.tache_plan_id) if t.tache_plan_id else None
+            if tp is None:
+                continue
+            taches_read.append(
+                PlanificationPaoTacheRead(
+                    tache_plan_id=tp.id,
+                    tache_plan_code=tp.code,
+                    tache_plan_description=tp.description,
+                    ponderation=t.ponderation,
+                )
+            )
+        out.append(
+            PlanificationPaoRead(
+                id=a.id,
+                code=a.code,
+                description=a.description,
+                budget=a.budget,
+                objectif_id=a.objectif_id,
+                objectif_code=a.objectif.code,
+                objectif_description=a.objectif.description,
+                date_debut=a.date_debut,
+                date_fin=a.date_fin,
+                direction_id=direction.id,
+                direction_code=direction.code,
+                direction_libelle=direction.libelle,
+                email_responsable=a.email_responsable or "",
+                email_ministre=a.email_ministre or "",
+                tdr_nom_original=a.tdr_nom_original,
+                taches=taches_read,
+                created_at=a.created_at,
+            )
+        )
+    return out
+
+
+def _planif_projet_to_read(
+    planif: PlanificationProjet,
+    projet: Projet,
+    direction: Direction,
+) -> PlanificationProjetRead:
+    return PlanificationProjetRead(
+        id=planif.id,
+        projet_id=projet.id,
+        projet_code=projet.code,
+        projet_description=projet.description,
+        type_budget=TypeBudgetProjet(planif.type_budget),
+        montant=planif.montant,
+        lieu=planif.lieu,
+        date_debut=planif.date_debut,
+        date_fin=planif.date_fin,
+        direction_id=direction.id,
+        direction_code=direction.code,
+        direction_libelle=direction.libelle,
+        email_responsable=planif.email_responsable,
+        email_ministre=planif.email_ministre,
+        composantes=[
+            PlanificationProjetComposanteRead(
+                id=c.id,
+                ordre=c.ordre,
+                libelle=c.libelle,
+                activites=[
+                    PlanificationProjetActiviteRead(
+                        id=a.id,
+                        ordre=a.ordre,
+                        titre=a.titre,
+                    )
+                    for a in c.activites
+                ],
+            )
+            for c in planif.composantes
+        ],
+        created_at=planif.created_at,
+    )
+
+
+async def create_planification_projet(
+    db: AsyncSession,
+    data: PlanificationProjetCreate,
+) -> PlanificationProjetRead:
+    if len(data.composantes) > 2:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Maximum 2 composantes par planification",
+        )
+    for comp in data.composantes:
+        if len(comp.activites) > 5:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Maximum 5 activités par composante",
+            )
+
+    projet = await db.get(Projet, data.projet_id)
+    if projet is None:
+        raise HTTPException(status_code=404, detail="Projet introuvable")
+
+    direction = await db.get(Direction, data.direction_id)
+    if direction is None:
+        raise HTTPException(status_code=404, detail="Direction introuvable")
+
+    planif = PlanificationProjet(
+        projet_id=data.projet_id,
+        type_budget=data.type_budget.value,
+        montant=data.montant,
+        lieu=data.lieu.strip(),
+        date_debut=data.date_debut,
+        date_fin=data.date_fin,
+        direction_id=data.direction_id,
+        email_responsable=data.email_responsable.strip(),
+        email_ministre=data.email_ministre.strip(),
+    )
+    db.add(planif)
+    await db.flush()
+
+    for idx, comp_data in enumerate(data.composantes, start=1):
+        libelle = (comp_data.libelle or "").strip() or None
+        composante = PlanificationProjetComposante(
+            planification_id=planif.id,
+            ordre=idx,
+            libelle=libelle,
+        )
+        db.add(composante)
+        await db.flush()
+        for act_idx, act in enumerate(comp_data.activites, start=1):
+            db.add(
+                PlanificationProjetActivite(
+                    composante_id=composante.id,
+                    ordre=act_idx,
+                    titre=act.titre.strip(),
+                )
+            )
+
+    await db.commit()
+
+    loaded = await db.execute(
+        select(PlanificationProjet)
+        .where(PlanificationProjet.id == planif.id)
+        .options(
+            selectinload(PlanificationProjet.composantes).selectinload(
+                PlanificationProjetComposante.activites
+            ),
+        )
+    )
+    planif_loaded = loaded.scalar_one()
+    return _planif_projet_to_read(planif_loaded, projet, direction)
+
+
+async def list_planifications_projet(
+    db: AsyncSession,
+) -> list[PlanificationProjetRead]:
+    result = await db.execute(
+        select(PlanificationProjet)
+        .options(
+            selectinload(PlanificationProjet.composantes).selectinload(
+                PlanificationProjetComposante.activites
+            ),
+        )
+        .order_by(PlanificationProjet.created_at.desc())
+    )
+    planifs = result.scalars().all()
+    if not planifs:
+        return []
+
+    projet_ids = {p.projet_id for p in planifs}
+    direction_ids = {p.direction_id for p in planifs}
+
+    projets_result = await db.execute(
+        select(Projet).where(Projet.id.in_(projet_ids))
+    )
+    projets_map = {p.id: p for p in projets_result.scalars().all()}
+
+    dirs_result = await db.execute(
+        select(Direction).where(Direction.id.in_(direction_ids))
+    )
+    dirs_map = {d.id: d for d in dirs_result.scalars().all()}
+
+    out: list[PlanificationProjetRead] = []
+    for planif in planifs:
+        projet = projets_map.get(planif.projet_id)
+        direction = dirs_map.get(planif.direction_id)
+        if projet is None or direction is None:
+            continue
+        out.append(_planif_projet_to_read(planif, projet, direction))
+    return out

@@ -53,6 +53,9 @@ class Tache(Base):
     activite_id: Mapped[int] = mapped_column(
         ForeignKey("activites.id", ondelete="CASCADE"), nullable=False
     )
+    tache_plan_id: Mapped[int | None] = mapped_column(
+        ForeignKey("taches_plan.id", ondelete="SET NULL"), nullable=True
+    )
     trimestre: Mapped[int] = mapped_column(Integer, nullable=False)
     annee: Mapped[int] = mapped_column(Integer, default=2025, nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)

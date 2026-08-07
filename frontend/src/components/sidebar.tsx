@@ -50,7 +50,15 @@ const navItems: NavItem[] = [
       { href: "/admin/projets", label: "Projets", icon: FolderKanban },
     ],
   },
-  { href: "/admin/planification", label: "Planification", icon: CalendarDays },
+  {
+    href: "/admin/planification",
+    label: "Planification",
+    icon: CalendarDays,
+    children: [
+      { href: "/admin/planification/pao", label: "PAO", icon: ClipboardList },
+      { href: "/admin/planification/projet", label: "Projet", icon: FolderKanban },
+    ],
+  },
   { href: "/admin/suivi", label: "Suivi", icon: ClipboardList, defaultChild: "/admin/suivi/1" },
   { href: "/admin/recommandation", label: "RCC", icon: Briefcase, defaultChild: "/admin/recommandation/1" },
   { href: "/admin/mission", label: "Missions", icon: MapPin, defaultChild: "/admin/mission/1" },
@@ -84,20 +92,24 @@ export function Sidebar({
     return pathname === href || pathname.startsWith(`${href}/`);
   };
 
-  const isPlanActionOpen =
-    pathname.startsWith("/admin/objectifs") ||
-    pathname.startsWith("/admin/taches") ||
-    pathname.startsWith("/admin/projets");
+  const isGroupActive = (item: NavItem) => {
+    if (!item.children?.length) return false;
+    return item.children.some((c) => isActive(c.href));
+  };
 
-  const [planOpen, setPlanOpen] = useState(isPlanActionOpen);
-  const [planFlyout, setPlanFlyout] = useState(false);
-
-  useEffect(() => {
-    if (isPlanActionOpen) setPlanOpen(true);
-  }, [isPlanActionOpen]);
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [flyoutHref, setFlyoutHref] = useState<string | null>(null);
 
   useEffect(() => {
-    setPlanFlyout(false);
+    navItems.forEach((item) => {
+      if (item.children && isGroupActive(item)) {
+        setExpanded((prev) => ({ ...prev, [item.href]: true }));
+      }
+    });
+  }, [pathname]);
+
+  useEffect(() => {
+    setFlyoutHref(null);
   }, [pathname, collapsed]);
 
   const narrow = collapsed && !mobileOpen;
@@ -198,7 +210,8 @@ export function Sidebar({
           .filter((item) => !item.adminOnly || isAdmin)
           .map((item) => {
             if (item.children) {
-              const sectionActive = isPlanActionOpen;
+              const sectionActive = isGroupActive(item);
+              const isOpen = expanded[item.href] ?? sectionActive;
 
               if (narrow) {
                 return (
@@ -206,8 +219,10 @@ export function Sidebar({
                     <button
                       type="button"
                       title={item.label}
-                      aria-expanded={planFlyout}
-                      onClick={() => setPlanFlyout((v) => !v)}
+                      aria-expanded={flyoutHref === item.href}
+                      onClick={() =>
+                        setFlyoutHref((v) => (v === item.href ? null : item.href))
+                      }
                       className={navLinkClass(sectionActive)}
                     >
                       {sectionActive && (
@@ -221,13 +236,13 @@ export function Sidebar({
                         strokeWidth={sectionActive ? 2.25 : 1.75}
                       />
                     </button>
-                    {planFlyout && (
+                    {flyoutHref === item.href && (
                       <>
                         <button
                           type="button"
                           aria-label="Fermer le sous-menu"
                           className="fixed inset-0 z-40"
-                          onClick={() => setPlanFlyout(false)}
+                          onClick={() => setFlyoutHref(null)}
                         />
                         <div className="absolute left-full top-0 z-50 ml-2 min-w-[180px] rounded-[var(--radius-card)] border border-cloud bg-white py-1.5 shadow-[var(--shadow-elevated)]">
                           <p className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-fog">
@@ -240,7 +255,7 @@ export function Sidebar({
                                 key={href}
                                 href={href}
                                 onClick={() => {
-                                  setPlanFlyout(false);
+                                  setFlyoutHref(null);
                                   onNavigate?.();
                                 }}
                                 className={cn(
@@ -266,7 +281,12 @@ export function Sidebar({
                 <div key={item.href}>
                   <button
                     type="button"
-                    onClick={() => setPlanOpen((v) => !v)}
+                    onClick={() =>
+                      setExpanded((prev) => ({
+                        ...prev,
+                        [item.href]: !(prev[item.href] ?? sectionActive),
+                      }))
+                    }
                     className={cn(navLinkClass(sectionActive), "w-full")}
                   >
                     {sectionActive && (
@@ -283,12 +303,12 @@ export function Sidebar({
                     <ChevronDown
                       className={cn(
                         "h-4 w-4 shrink-0 text-ash transition-transform duration-200",
-                        planOpen && "rotate-180",
+                        isOpen && "rotate-180",
                       )}
                     />
                   </button>
 
-                  {planOpen && (
+                  {isOpen && (
                     <div className="ml-5 mt-0.5 space-y-0.5 border-l border-cloud/80 pl-3">
                       {item.children.map(({ href, label, icon: ChildIcon }) => {
                         const childActive = isActive(href);
