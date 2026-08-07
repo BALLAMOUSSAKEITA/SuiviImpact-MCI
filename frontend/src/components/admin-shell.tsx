@@ -74,7 +74,7 @@ export function AdminShell({ children, className }: AdminShellProps) {
       />
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-cloud/60 bg-white/90 px-4 py-3 backdrop-blur-md lg:hidden">
+        <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-cloud/60 bg-white/80 px-4 py-3 backdrop-blur-md lg:hidden">
           <button
             type="button"
             aria-label={mobileOpen ? "Fermer le menu" : "Ouvrir le menu"}
@@ -91,9 +91,6 @@ export function AdminShell({ children, className }: AdminShellProps) {
             <p className="truncate text-[11px] text-ash">
               {BRAND.bureauShort} · {BRAND.program}
             </p>
-          </div>
-          <div className="h-8 w-8 rounded-full bg-forest-ink/10 flex items-center justify-center text-forest-ink text-xs font-bold shrink-0">
-            SI
           </div>
         </header>
 

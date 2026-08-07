@@ -21,10 +21,11 @@ export function PageHeader({
     <header
       className={cn(
         "flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between",
+        "animate-fade-in",
         className,
       )}
     >
-      <div className="min-w-0 space-y-1.5 animate-fade-in">
+      <div className="min-w-0 space-y-1.5">
         {eyebrow && (
           <p className="text-[11px] font-bold uppercase tracking-widest text-forest-ink/80">
             {eyebrow}
@@ -47,7 +48,7 @@ export function PageHeader({
         )}
       </div>
       {actions && (
-        <div className="flex shrink-0 flex-wrap items-center gap-2 animate-fade-in [animation-delay:50ms]">{actions}</div>
+        <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>
       )}
     </header>
   );

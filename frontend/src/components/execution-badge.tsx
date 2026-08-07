@@ -68,23 +68,23 @@ export function ProgressBar({ value, label, className }: ProgressBarProps) {
 
   const barColor =
     pct >= 100
-      ? "bg-gradient-to-r from-emerald-500 to-emerald-400"
+      ? "bg-emerald-500"
       : pct >= 50
-        ? "bg-gradient-to-r from-amber-500 to-amber-400"
-        : "bg-gradient-to-r from-red-500 to-red-400";
+        ? "bg-amber-500"
+        : "bg-red-500";
 
   return (
-    <div className={cn("space-y-2", className)}>
+    <div className={cn("space-y-1.5", className)}>
       {label && (
         <div className="flex justify-between text-sm">
-          <span className="font-medium text-slate">{label}</span>
-          <span className="font-bold tabular-nums text-graphite">{pct.toFixed(0)}%</span>
+          <span className="text-slate">{label}</span>
+          <span className="font-semibold tabular-nums text-graphite">{pct.toFixed(0)}%</span>
         </div>
       )}
-      <div className="h-2.5 w-full overflow-hidden rounded-full bg-cloud/80">
+      <div className="h-2 w-full overflow-hidden rounded-full bg-cloud/80">
         <div
           className={cn(
-            "h-full rounded-full transition-all duration-700 ease-[var(--ease-out-expo)]",
+            "h-full rounded-full transition-all duration-500 ease-[var(--ease-out-expo)]",
             barColor,
           )}
           style={{ width: `${pct}%` }}

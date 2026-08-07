@@ -1,15 +1,6 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import {
-  Activity,
-  AlertTriangle,
-  CheckCircle2,
-  Clock,
-  FolderKanban,
-  Pause,
-  TrendingUp,
-} from "lucide-react";
 import { useState } from "react";
 
 import { DirectionFilter } from "@/components/direction-filter";
@@ -50,17 +41,17 @@ export default function AdminDashboardPage() {
       />
 
       {/* Sélecteur de vue */}
-      <div className="flex flex-wrap gap-1 rounded-[var(--radius-card)] border border-cloud/80 bg-veil/50 p-1">
+      <div className="flex flex-wrap gap-1.5 rounded-[var(--radius-card)] border border-cloud bg-paper p-1.5">
         {views.map((view) => (
           <button
             key={view.id}
             type="button"
             onClick={() => setCurrentView(view.id)}
             className={cn(
-              "rounded-[calc(var(--radius-card)-4px)] px-4 py-2 text-[13px] font-medium transition-all duration-[var(--duration-fast)]",
+              "rounded-[var(--radius-card)] px-4 py-2 text-[13px] font-medium transition-all duration-[var(--duration-fast)]",
               currentView === view.id
-                ? "bg-white text-forest-ink shadow-sm ring-1 ring-cloud/80"
-                : "text-slate hover:text-graphite",
+                ? "bg-forest-ink text-white shadow-sm"
+                : "text-slate hover:bg-veil hover:text-graphite",
             )}
           >
             {view.label}
@@ -90,21 +81,17 @@ function ActivitesView() {
     <>
       <DirectionFilter value={direction} onChange={setDirection} />
       {isLoading ? (
-        <StatGrid>
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="skeleton h-28 rounded-[var(--radius-card)]" />
-          ))}
-        </StatGrid>
+        <p className="text-sm text-ash">Chargement…</p>
       ) : stats ? (
         <>
           <StatGrid>
-            <StatCard title="Total activités" value={stats.total} icon={Activity} accent="default" />
-            <StatCard title="Non démarrées" value={stats.non_demare} icon={Pause} accent="blue" />
-            <StatCard title="En cours" value={stats.en_cours} icon={Clock} accent="amber" />
-            <StatCard title="Terminées" value={stats.termine} icon={CheckCircle2} accent="green" />
-            <StatCard title="En retard" value={stats.en_retard} icon={AlertTriangle} accent="red" />
+            <StatCard title="Total activités" value={stats.total} />
+            <StatCard title="Non démarrées" value={stats.non_demare} />
+            <StatCard title="En cours" value={stats.en_cours} />
+            <StatCard title="Terminées" value={stats.termine} />
+            <StatCard title="En retard" value={stats.en_retard} />
           </StatGrid>
-          <div className="rounded-[var(--radius-card)] border border-cloud bg-white p-6 shadow-[var(--shadow-card)]">
+          <div className="rounded-[var(--radius-card)] border border-cloud bg-paper p-6 shadow-[var(--shadow-card)]">
             <ProgressBar label="Progression globale" value={stats.progression} />
           </div>
         </>
@@ -115,15 +102,15 @@ function ActivitesView() {
 
 function TrimestreSelector({ value, onChange }: { value: number | undefined; onChange: (v: number | undefined) => void }) {
   return (
-    <div className="flex flex-wrap gap-1 rounded-[var(--radius-card)] border border-cloud/80 bg-veil/50 p-1 w-fit">
+    <div className="flex flex-wrap gap-1.5">
       <button
         type="button"
         onClick={() => onChange(undefined)}
         className={cn(
-          "rounded-[calc(var(--radius-card)-4px)] px-3.5 py-1.5 text-sm font-medium transition-all",
+          "rounded-[var(--radius-card)] px-3 py-1.5 text-sm font-medium transition-colors",
           value === undefined
-            ? "bg-white text-forest-ink shadow-sm ring-1 ring-cloud/80"
-            : "text-slate hover:text-graphite",
+            ? "bg-forest-ink text-white"
+            : "bg-paper ring-1 ring-cloud text-slate hover:bg-veil",
         )}
       >
         Année
@@ -134,10 +121,10 @@ function TrimestreSelector({ value, onChange }: { value: number | undefined; onC
           type="button"
           onClick={() => onChange(t)}
           className={cn(
-            "rounded-[calc(var(--radius-card)-4px)] px-3.5 py-1.5 text-sm font-medium transition-all",
+            "rounded-[var(--radius-card)] px-3 py-1.5 text-sm font-medium transition-colors",
             value === t
-              ? "bg-white text-forest-ink shadow-sm ring-1 ring-cloud/80"
-              : "text-slate hover:text-graphite",
+              ? "bg-forest-ink text-white"
+              : "bg-paper ring-1 ring-cloud text-slate hover:bg-veil",
           )}
         >
           T{t}
@@ -159,20 +146,16 @@ function RccView() {
     <>
       <TrimestreSelector value={trimestre} onChange={setTrimestre} />
       {isLoading ? (
-        <StatGrid>
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="skeleton h-28 rounded-[var(--radius-card)]" />
-          ))}
-        </StatGrid>
+        <p className="text-sm text-ash">Chargement…</p>
       ) : stats ? (
         <>
           <StatGrid>
-            <StatCard title="Total RCC" value={stats.total} icon={Activity} accent="default" />
-            <StatCard title="Non démarrées" value={stats.non_demare} icon={Pause} accent="blue" />
-            <StatCard title="En cours" value={stats.en_cours} icon={Clock} accent="amber" />
-            <StatCard title="Terminées" value={stats.termine} icon={CheckCircle2} accent="green" />
+            <StatCard title="Total RCC" value={stats.total} />
+            <StatCard title="Non démarrées" value={stats.non_demare} />
+            <StatCard title="En cours" value={stats.en_cours} />
+            <StatCard title="Terminées" value={stats.termine} />
           </StatGrid>
-          <div className="rounded-[var(--radius-card)] border border-cloud bg-white p-6 shadow-[var(--shadow-card)]">
+          <div className="rounded-[var(--radius-card)] border border-cloud bg-paper p-6 shadow-[var(--shadow-card)]">
             <ProgressBar label="Progression" value={stats.progression} />
           </div>
         </>
@@ -193,20 +176,16 @@ function MissionsView() {
     <>
       <TrimestreSelector value={trimestre} onChange={setTrimestre} />
       {isLoading ? (
-        <StatGrid>
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="skeleton h-28 rounded-[var(--radius-card)]" />
-          ))}
-        </StatGrid>
+        <p className="text-sm text-ash">Chargement…</p>
       ) : stats ? (
         <>
           <StatGrid>
-            <StatCard title="Total missions" value={stats.total} icon={Activity} accent="default" />
-            <StatCard title="Non démarrées" value={stats.non_demare} icon={Pause} accent="blue" />
-            <StatCard title="En cours" value={stats.en_cours} icon={Clock} accent="amber" />
-            <StatCard title="Terminées" value={stats.termine} icon={CheckCircle2} accent="green" />
+            <StatCard title="Total missions" value={stats.total} />
+            <StatCard title="Non démarrées" value={stats.non_demare} />
+            <StatCard title="En cours" value={stats.en_cours} />
+            <StatCard title="Terminées" value={stats.termine} />
           </StatGrid>
-          <div className="rounded-[var(--radius-card)] border border-cloud bg-white p-6 shadow-[var(--shadow-card)]">
+          <div className="rounded-[var(--radius-card)] border border-cloud bg-paper p-6 shadow-[var(--shadow-card)]">
             <ProgressBar label="Progression" value={stats.progression} />
           </div>
         </>
@@ -229,21 +208,17 @@ function PpmView() {
   return (
     <>
       {isLoading ? (
-        <StatGrid>
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="skeleton h-28 rounded-[var(--radius-card)]" />
-          ))}
-        </StatGrid>
+        <p className="text-sm text-ash">Chargement…</p>
       ) : stats ? (
         <>
           <StatGrid>
-            <StatCard title="Total marchés" value={stats.total} icon={Activity} accent="default" />
-            <StatCard title={PPM_STATUT_LABELS.dao_elabore} value={stats.dao_elabore} accent="blue" />
-            <StatCard title={PPM_STATUT_LABELS.dao_publie} value={stats.dao_publie} accent="amber" />
-            <StatCard title={PPM_STATUT_LABELS.marche_attribue} value={stats.marche_attribue} accent="green" />
-            <StatCard title={PPM_STATUT_LABELS.contrat_signe} value={stats.contrat_signe} icon={CheckCircle2} accent="green" />
+            <StatCard title="Total marchés" value={stats.total} />
+            <StatCard title={PPM_STATUT_LABELS.dao_elabore} value={stats.dao_elabore} />
+            <StatCard title={PPM_STATUT_LABELS.dao_publie} value={stats.dao_publie} />
+            <StatCard title={PPM_STATUT_LABELS.marche_attribue} value={stats.marche_attribue} />
+            <StatCard title={PPM_STATUT_LABELS.contrat_signe} value={stats.contrat_signe} />
           </StatGrid>
-          <div className="rounded-[var(--radius-card)] border border-cloud bg-white p-6 shadow-[var(--shadow-card)]">
+          <div className="rounded-[var(--radius-card)] border border-cloud bg-paper p-6 shadow-[var(--shadow-card)]">
             <ProgressBar label="Contrats signés / total" value={progression} />
           </div>
         </>
@@ -261,19 +236,17 @@ function ProjetsView() {
   return (
     <>
       {isLoading ? (
-        <StatGrid>
-          <div className="skeleton h-28 rounded-[var(--radius-card)]" />
-        </StatGrid>
+        <p className="text-sm text-ash">Chargement…</p>
       ) : stats ? (
         <>
           <StatGrid>
-            <StatCard title="Total projets" value={stats.total} icon={FolderKanban} accent="default" />
+            <StatCard title="Total projets" value={stats.total} />
           </StatGrid>
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-[var(--radius-card)] border border-cloud bg-white p-6 shadow-[var(--shadow-card)]">
+            <div className="rounded-[var(--radius-card)] border border-cloud bg-paper p-6 shadow-[var(--shadow-card)]">
               <ProgressBar label="Exécution financière moyenne" value={stats.execution_financiere} />
             </div>
-            <div className="rounded-[var(--radius-card)] border border-cloud bg-white p-6 shadow-[var(--shadow-card)]">
+            <div className="rounded-[var(--radius-card)] border border-cloud bg-paper p-6 shadow-[var(--shadow-card)]">
               <ProgressBar label="Exécution physique moyenne" value={stats.execution_physique} />
             </div>
           </div>
