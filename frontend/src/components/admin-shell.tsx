@@ -7,6 +7,8 @@ import { Sidebar } from "@/components/sidebar";
 import { BRAND } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 
+const SIDEBAR_COLLAPSED_KEY = "suiviimpact-sidebar-collapsed";
+
 interface AdminShellProps {
   children: React.ReactNode;
   className?: string;
@@ -14,6 +16,26 @@ interface AdminShellProps {
 
 export function AdminShell({ children, className }: AdminShellProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    try {
+      setCollapsed(localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === "true");
+    } catch {
+      /* ignore */
+    }
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    try {
+      localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(collapsed));
+    } catch {
+      /* ignore */
+    }
+  }, [collapsed, hydrated]);
 
   useEffect(() => {
     if (!mobileOpen) return;
@@ -31,9 +53,10 @@ export function AdminShell({ children, className }: AdminShellProps) {
     };
   }, [mobileOpen]);
 
+  const toggleCollapsed = () => setCollapsed((v) => !v);
+
   return (
     <div className="flex min-h-screen bg-[var(--background)]">
-      {/* Overlay mobile */}
       {mobileOpen && (
         <button
           type="button"
@@ -45,11 +68,12 @@ export function AdminShell({ children, className }: AdminShellProps) {
 
       <Sidebar
         mobileOpen={mobileOpen}
+        collapsed={collapsed}
+        onToggleCollapsed={toggleCollapsed}
         onNavigate={() => setMobileOpen(false)}
       />
 
       <div className="flex min-w-0 flex-1 flex-col">
-        {/* Barre mobile */}
         <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-cloud/60 bg-white/80 px-4 py-3 backdrop-blur-md lg:hidden">
           <button
             type="button"

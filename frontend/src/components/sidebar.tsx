@@ -7,6 +7,8 @@ import {
   Briefcase,
   CalendarDays,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   ClipboardList,
   Download,
   FolderArchive,
@@ -20,7 +22,7 @@ import {
   Target,
   Users,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useAuth } from "@/components/auth-provider";
 import { Button } from "@/components/ui/button";
@@ -63,10 +65,17 @@ const navItems: NavItem[] = [
 
 interface SidebarProps {
   mobileOpen?: boolean;
+  collapsed?: boolean;
+  onToggleCollapsed?: () => void;
   onNavigate?: () => void;
 }
 
-export function Sidebar({ mobileOpen = false, onNavigate }: SidebarProps) {
+export function Sidebar({
+  mobileOpen = false,
+  collapsed = false,
+  onToggleCollapsed,
+  onNavigate,
+}: SidebarProps) {
   const pathname = usePathname();
   const { user, isAdmin, logout } = useAuth();
 
@@ -81,73 +90,194 @@ export function Sidebar({ mobileOpen = false, onNavigate }: SidebarProps) {
     pathname.startsWith("/admin/projets");
 
   const [planOpen, setPlanOpen] = useState(isPlanActionOpen);
+  const [planFlyout, setPlanFlyout] = useState(false);
+
+  useEffect(() => {
+    if (isPlanActionOpen) setPlanOpen(true);
+  }, [isPlanActionOpen]);
+
+  useEffect(() => {
+    setPlanFlyout(false);
+  }, [pathname, collapsed]);
+
+  const narrow = collapsed && !mobileOpen;
 
   const handleLogout = () => {
     onNavigate?.();
     logout();
   };
 
+  const navLinkClass = (active: boolean) =>
+    cn(
+      "group relative flex items-center rounded-[var(--radius-card)] text-[13px] font-medium transition-all duration-[var(--duration-fast)]",
+      narrow ? "justify-center px-2 py-2.5" : "gap-3 px-3 py-2.5",
+      active
+        ? "bg-forest-ink/[0.08] text-forest-ink shadow-sm"
+        : "text-slate hover:bg-veil/80 hover:text-graphite",
+    );
+
   return (
     <aside
       className={cn(
-        "flex w-[272px] shrink-0 flex-col border-r border-cloud/80 bg-white",
-        "fixed inset-y-0 left-0 z-50 transition-transform duration-300 ease-[var(--ease-out-expo)] lg:static lg:translate-x-0",
+        "flex shrink-0 flex-col border-r border-cloud/80 bg-white",
+        "fixed inset-y-0 left-0 z-50 transition-[width,transform] duration-300 ease-[var(--ease-out-expo)] lg:static lg:translate-x-0",
+        narrow ? "w-[72px]" : "w-[272px]",
         mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
       )}
     >
-      {/* En-tête sidebar */}
-      <div className="relative overflow-hidden border-b border-cloud/60 px-5 py-5">
+      {/* En-tête */}
+      <div
+        className={cn(
+          "relative overflow-hidden border-b border-cloud/60",
+          narrow ? "px-2 py-4" : "px-5 py-5",
+        )}
+      >
         <div className="absolute inset-0 grain-gradient opacity-60" />
-        <div className="relative">
-          <p className="text-[10px] font-semibold uppercase leading-tight tracking-wider text-fog">
-            {BRAND.ministryShort}
-          </p>
-          <p className="mt-1.5 text-base font-bold text-forest-ink tracking-tight">
-            {BRAND.appName}
-          </p>
-          <p className="text-[11px] text-ash">{BRAND.bureauShort} · {BRAND.program}</p>
+        <div className="relative flex items-start justify-between gap-2">
+          <div className={cn("min-w-0 flex-1", narrow && "flex justify-center")}>
+            {narrow ? (
+              <div
+                className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-card)] bg-forest-ink text-xs font-bold text-white"
+                title={BRAND.appName}
+              >
+                SI
+              </div>
+            ) : (
+              <>
+                <p className="text-[10px] font-semibold uppercase leading-tight tracking-wider text-fog">
+                  {BRAND.ministryShort}
+                </p>
+                <p className="mt-1.5 text-base font-bold text-forest-ink tracking-tight">
+                  {BRAND.appName}
+                </p>
+                <p className="text-[11px] text-ash">
+                  {BRAND.bureauShort} · {BRAND.program}
+                </p>
+              </>
+            )}
+          </div>
+          {!narrow && onToggleCollapsed && (
+            <button
+              type="button"
+              onClick={onToggleCollapsed}
+              className="hidden shrink-0 rounded-[var(--radius-card)] p-1.5 text-ash transition-colors hover:bg-veil hover:text-graphite lg:flex"
+              aria-label="Replier le menu"
+              title="Replier le menu"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+          )}
+        </div>
 
-          <div className="mt-4 flex items-center gap-3 border-t border-cloud/60 pt-4">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-forest-ink/10 text-forest-ink">
-              <span className="text-sm font-bold">{user?.prenom?.charAt(0) ?? "U"}</span>
-            </div>
+        <div
+          className={cn(
+            "mt-4 flex items-center border-t border-cloud/60 pt-4",
+            narrow ? "justify-center" : "gap-3",
+          )}
+        >
+          <div
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-forest-ink/10 text-forest-ink"
+            title={user?.prenom ?? "Utilisateur"}
+          >
+            <span className="text-sm font-bold">{user?.prenom?.charAt(0) ?? "U"}</span>
+          </div>
+          {!narrow && (
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold text-graphite">{user?.prenom}</p>
               <p className="text-[11px] text-ash">
                 {user?.type_acces === "ecriture" ? "Accès édition" : "Accès lecture"}
               </p>
             </div>
-          </div>
+          )}
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-4">
+      <nav className={cn("flex-1 space-y-0.5 overflow-y-auto py-4", narrow ? "px-2" : "px-3")}>
         {navItems
           .filter((item) => !item.adminOnly || isAdmin)
           .map((item) => {
             if (item.children) {
+              const sectionActive = isPlanActionOpen;
+
+              if (narrow) {
+                return (
+                  <div key={item.href} className="relative">
+                    <button
+                      type="button"
+                      title={item.label}
+                      aria-expanded={planFlyout}
+                      onClick={() => setPlanFlyout((v) => !v)}
+                      className={navLinkClass(sectionActive)}
+                    >
+                      {sectionActive && (
+                        <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-full bg-forest-ink" />
+                      )}
+                      <item.icon
+                        className={cn(
+                          "h-[18px] w-[18px] shrink-0",
+                          sectionActive ? "text-forest-ink" : "text-ash group-hover:text-slate",
+                        )}
+                        strokeWidth={sectionActive ? 2.25 : 1.75}
+                      />
+                    </button>
+                    {planFlyout && (
+                      <>
+                        <button
+                          type="button"
+                          aria-label="Fermer le sous-menu"
+                          className="fixed inset-0 z-40"
+                          onClick={() => setPlanFlyout(false)}
+                        />
+                        <div className="absolute left-full top-0 z-50 ml-2 min-w-[180px] rounded-[var(--radius-card)] border border-cloud bg-white py-1.5 shadow-[var(--shadow-elevated)]">
+                          <p className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-fog">
+                            {item.label}
+                          </p>
+                          {item.children.map(({ href, label, icon: ChildIcon }) => {
+                            const childActive = isActive(href);
+                            return (
+                              <Link
+                                key={href}
+                                href={href}
+                                onClick={() => {
+                                  setPlanFlyout(false);
+                                  onNavigate?.();
+                                }}
+                                className={cn(
+                                  "flex items-center gap-2.5 px-3 py-2 text-[12.5px] font-medium transition-colors",
+                                  childActive
+                                    ? "bg-forest-ink/[0.08] text-forest-ink"
+                                    : "text-slate hover:bg-veil",
+                                )}
+                              >
+                                <ChildIcon className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
+                                {label}
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                );
+              }
+
               return (
                 <div key={item.href}>
                   <button
                     type="button"
                     onClick={() => setPlanOpen((v) => !v)}
-                    className={cn(
-                      "group relative flex w-full items-center gap-3 rounded-[var(--radius-card)] px-3 py-2.5 text-[13px] font-medium transition-all duration-[var(--duration-fast)]",
-                      isPlanActionOpen
-                        ? "bg-forest-ink/[0.08] text-forest-ink"
-                        : "text-slate hover:bg-veil/80 hover:text-graphite",
-                    )}
+                    className={cn(navLinkClass(sectionActive), "w-full")}
                   >
-                    {isPlanActionOpen && (
+                    {sectionActive && (
                       <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-full bg-forest-ink" />
                     )}
                     <item.icon
                       className={cn(
                         "h-[18px] w-[18px] shrink-0 transition-colors",
-                        isPlanActionOpen ? "text-forest-ink" : "text-ash group-hover:text-slate",
+                        sectionActive ? "text-forest-ink" : "text-ash group-hover:text-slate",
                       )}
-                      strokeWidth={isPlanActionOpen ? 2.25 : 1.75}
+                      strokeWidth={sectionActive ? 2.25 : 1.75}
                     />
                     <span className="flex-1 text-left">{item.label}</span>
                     <ChevronDown
@@ -169,9 +299,7 @@ export function Sidebar({ mobileOpen = false, onNavigate }: SidebarProps) {
                             onClick={onNavigate}
                             className={cn(
                               "flex items-center gap-2.5 rounded-[var(--radius-card)] px-2.5 py-2 text-[12.5px] font-medium transition-all duration-[var(--duration-fast)]",
-                              childActive
-                                ? "text-forest-ink"
-                                : "text-ash hover:text-graphite",
+                              childActive ? "text-forest-ink" : "text-ash hover:text-graphite",
                             )}
                           >
                             <ChildIcon className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
@@ -191,12 +319,8 @@ export function Sidebar({ mobileOpen = false, onNavigate }: SidebarProps) {
                 key={item.href}
                 href={item.defaultChild ?? item.href}
                 onClick={onNavigate}
-                className={cn(
-                  "group relative flex items-center gap-3 rounded-[var(--radius-card)] px-3 py-2.5 text-[13px] font-medium transition-all duration-[var(--duration-fast)]",
-                  active
-                    ? "bg-forest-ink/[0.08] text-forest-ink shadow-sm"
-                    : "text-slate hover:bg-veil/80 hover:text-graphite",
-                )}
+                title={narrow ? item.label : undefined}
+                className={navLinkClass(active)}
               >
                 {active && (
                   <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-full bg-forest-ink" />
@@ -208,21 +332,36 @@ export function Sidebar({ mobileOpen = false, onNavigate }: SidebarProps) {
                   )}
                   strokeWidth={active ? 2.25 : 1.75}
                 />
-                {item.label}
+                {!narrow && item.label}
               </Link>
             );
           })}
       </nav>
 
-      {/* Déconnexion */}
-      <div className="border-t border-cloud/60 p-3">
+      {/* Pied */}
+      <div className={cn("border-t border-cloud/60 p-3", narrow && "px-2")}>
+        {narrow && onToggleCollapsed && (
+          <button
+            type="button"
+            onClick={onToggleCollapsed}
+            className="mb-2 flex w-full items-center justify-center rounded-[var(--radius-card)] p-2 text-ash transition-colors hover:bg-veil hover:text-graphite"
+            aria-label="Déplier le menu"
+            title="Déplier le menu"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        )}
         <Button
           variant="ghost"
-          className="w-full justify-start gap-2.5 text-[13px] text-ash hover:text-red-600"
+          className={cn(
+            "text-[13px] text-ash hover:text-red-600",
+            narrow ? "h-10 w-full justify-center px-0" : "w-full justify-start gap-2.5",
+          )}
           onClick={handleLogout}
+          title={narrow ? "Déconnexion" : undefined}
         >
-          <LogOut className="h-4 w-4" />
-          Déconnexion
+          <LogOut className="h-4 w-4 shrink-0" />
+          {!narrow && "Déconnexion"}
         </Button>
       </div>
     </aside>
