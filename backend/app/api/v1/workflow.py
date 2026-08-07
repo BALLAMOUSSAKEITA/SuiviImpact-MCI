@@ -1,6 +1,6 @@
 """Workflow API endpoints."""
 
-from fastapi import APIRouter, Depends, File, Form, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -20,6 +20,25 @@ async def list_workflows(
     db: AsyncSession = Depends(get_db),
 ) -> list[WorkflowRead]:
     return await service.list_workflows(db)
+
+
+@router.get("/workflows/fichiers/{action_id}/download")
+async def download_workflow_file(
+    action_id: int,
+    _: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> FileResponse:
+    from app.models.workflow import WorkflowAction
+
+    action = await db.get(WorkflowAction, action_id)
+    if action is None or not action.file_path:
+        raise HTTPException(status_code=404, detail="Fichier introuvable")
+    path = storage_service.resolve_path(action.file_path)
+    return FileResponse(
+        path=path,
+        filename=action.file_name or "document",
+        media_type="application/octet-stream",
+    )
 
 
 @router.get("/workflows/{workflow_id}", response_model=WorkflowRead)
@@ -54,22 +73,3 @@ async def perform_action(
 ) -> WorkflowRead:
     body = WorkflowActionCreate.model_validate_json(payload)
     return await service.perform_action(db, workflow_id, step_id, body, user, fichier)
-
-
-@router.get("/workflows/fichiers/{action_id}/download")
-async def download_workflow_file(
-    action_id: int,
-    _: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
-) -> FileResponse:
-    from app.models.workflow import WorkflowAction
-    action = await db.get(WorkflowAction, action_id)
-    if action is None or not action.file_path:
-        from fastapi import HTTPException
-        raise HTTPException(status_code=404, detail="Fichier introuvable")
-    path = storage_service.resolve_path(action.file_path)
-    return FileResponse(
-        path=path,
-        filename=action.file_name or "document",
-        media_type="application/octet-stream",
-    )
