@@ -17,17 +17,30 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
+def _create_enum_type(name: str, values: tuple[str, ...]) -> None:
+    """Create a PostgreSQL ENUM if missing (compatible with PG versions without IF NOT EXISTS)."""
+    labels = ", ".join(f"'{v}'" for v in values)
+    op.execute(
+        f"""
+        DO $$ BEGIN
+            CREATE TYPE {name} AS ENUM ({labels});
+        EXCEPTION
+            WHEN duplicate_object THEN NULL;
+        END $$;
+        """
+    )
+
+
 def upgrade() -> None:
     workflow_status = sa.Enum("en_cours", "termine", "rejete", name="workflow_status_enum", create_type=False)
     step_role = sa.Enum("directeur", "bsd", "sg", "ministre", "daf", name="workflow_step_role_enum", create_type=False)
     step_status = sa.Enum("waiting", "active", "done", "rejected", name="step_status_enum", create_type=False)
     action_type = sa.Enum("validate", "reject", "comment", "upload", name="action_type_enum", create_type=False)
 
-    # Create enum types first
-    op.execute("CREATE TYPE IF NOT EXISTS workflow_status_enum AS ENUM ('en_cours', 'termine', 'rejete')")
-    op.execute("CREATE TYPE IF NOT EXISTS workflow_step_role_enum AS ENUM ('directeur', 'bsd', 'sg', 'ministre', 'daf')")
-    op.execute("CREATE TYPE IF NOT EXISTS step_status_enum AS ENUM ('waiting', 'active', 'done', 'rejected')")
-    op.execute("CREATE TYPE IF NOT EXISTS action_type_enum AS ENUM ('validate', 'reject', 'comment', 'upload')")
+    _create_enum_type("workflow_status_enum", ("en_cours", "termine", "rejete"))
+    _create_enum_type("workflow_step_role_enum", ("directeur", "bsd", "sg", "ministre", "daf"))
+    _create_enum_type("step_status_enum", ("waiting", "active", "done", "rejected"))
+    _create_enum_type("action_type_enum", ("validate", "reject", "comment", "upload"))
 
     op.create_table(
         "workflows",
