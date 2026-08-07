@@ -29,10 +29,11 @@ const DEMO_WORKFLOWS: Workflow[] = [
     ref: "WF-001",
     type: "Budget",
     steps: [
-      { id: "1", role: "Directeur BSD", status: "done", date: "02 juil." },
-      { id: "2", role: "Directeur Général", status: "done", date: "05 juil." },
-      { id: "3", role: "Ministre", status: "active" },
-      { id: "4", role: "DAF", status: "waiting" },
+      { id: "1", role: "Directeur", status: "done", date: "02 juil." },
+      { id: "2", role: "BSD", status: "done", date: "04 juil." },
+      { id: "3", role: "SG", status: "done", date: "05 juil." },
+      { id: "4", role: "Ministre", status: "active" },
+      { id: "5", role: "DAF", status: "waiting" },
     ],
   },
   {
@@ -41,10 +42,11 @@ const DEMO_WORKFLOWS: Workflow[] = [
     ref: "WF-002",
     type: "Mission",
     steps: [
-      { id: "1", role: "Directeur BSD", status: "done", date: "10 juil." },
-      { id: "2", role: "Directeur Général", status: "active" },
-      { id: "3", role: "Ministre", status: "waiting" },
-      { id: "4", role: "DAF", status: "waiting" },
+      { id: "1", role: "Directeur", status: "done", date: "10 juil." },
+      { id: "2", role: "BSD", status: "done", date: "12 juil." },
+      { id: "3", role: "SG", status: "active" },
+      { id: "4", role: "Ministre", status: "waiting" },
+      { id: "5", role: "DAF", status: "waiting" },
     ],
   },
   {
@@ -53,10 +55,11 @@ const DEMO_WORKFLOWS: Workflow[] = [
     ref: "WF-003",
     type: "Marché",
     steps: [
-      { id: "1", role: "Directeur BSD", status: "done", date: "15 juin" },
-      { id: "2", role: "Directeur Général", status: "done", date: "18 juin" },
-      { id: "3", role: "Ministre", status: "done", date: "25 juin" },
-      { id: "4", role: "DAF", status: "done", date: "01 juil." },
+      { id: "1", role: "Directeur", status: "done", date: "15 juin" },
+      { id: "2", role: "BSD", status: "done", date: "17 juin" },
+      { id: "3", role: "SG", status: "done", date: "20 juin" },
+      { id: "4", role: "Ministre", status: "done", date: "25 juin" },
+      { id: "5", role: "DAF", status: "done", date: "01 juil." },
     ],
   },
 ];
@@ -224,7 +227,7 @@ export default function WorkflowPage() {
           </div>
           <div className="mt-3 flex items-center justify-between">
             <p className="text-[11px] text-ash">
-              BSD → Dir. Général → Ministre → DAF
+              Directeur → BSD → SG → Ministre → DAF
             </p>
             <div className="flex gap-2">
               <Button size="sm" variant="ghost" onClick={() => setShowNew(false)}>Annuler</Button>
