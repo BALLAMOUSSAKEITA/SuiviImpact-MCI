@@ -7,7 +7,6 @@ import { toast } from "sonner";
 
 import { useAuth } from "@/components/auth-provider";
 import { ConfirmDialog, FormDialog } from "@/components/confirm-dialog";
-import { ExecutionBadge } from "@/components/execution-badge";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { createProjet, deleteProjet, listProjets, updateProjet } from "@/lib/api";
@@ -152,27 +151,25 @@ function ProjetsContent() {
       )}
 
       <div className="table-shell">
-        <table className="table-grain min-w-[640px]">
+        <table className="table-grain">
           <thead>
             <tr>
-              <th>Identifiant</th>
+              <th className="w-[140px]">Identifiant</th>
               <th>Nom du projet</th>
-              <th>Financière</th>
-              <th>Physique</th>
-              {canWrite && <th className="text-right">Actions</th>}
+              {canWrite && <th className="w-[1%] text-right">Actions</th>}
             </tr>
           </thead>
           <tbody>
             {isLoading && (
               <tr>
-                <td colSpan={canWrite ? 5 : 4} className="py-8 text-center text-ash">
+                <td colSpan={canWrite ? 3 : 2} className="py-8 text-center text-ash">
                   Chargement…
                 </td>
               </tr>
             )}
             {!isLoading && items.length === 0 && (
               <tr>
-                <td colSpan={canWrite ? 5 : 4} className="py-8 text-center text-ash">
+                <td colSpan={canWrite ? 3 : 2} className="py-8 text-center text-ash">
                   Aucun projet enregistré.
                 </td>
               </tr>
@@ -185,12 +182,6 @@ function ProjetsContent() {
                   </span>
                 </td>
                 <td className="font-medium text-graphite">{item.description}</td>
-                <td>
-                  <ExecutionBadge value={item.execution_financiere} />
-                </td>
-                <td>
-                  <ExecutionBadge value={item.execution_physique} />
-                </td>
                 {canWrite && (
                   <td className="text-right">
                     <div className="flex flex-wrap justify-end gap-1 sm:gap-1.5">
