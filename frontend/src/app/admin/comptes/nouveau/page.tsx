@@ -15,7 +15,7 @@ import { createUser } from "@/lib/api";
 import { ROLE_LABELS } from "@/lib/roles";
 import type { UserRole } from "@/types";
 
-const ROLES = ["user", "admin", "directeur", "sg", "ministre"] as const satisfies readonly UserRole[];
+const ROLES = ["user", "admin", "directeur", "sg", "ministre", "daf"] as const satisfies readonly UserRole[];
 
 const schema = z.object({
   prenom: z.string().min(1, "Prénom requis"),

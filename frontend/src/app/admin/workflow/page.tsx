@@ -22,9 +22,11 @@ import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import {
   createWorkflow,
+  downloadWorkflowFile,
   listWorkflows,
   performWorkflowAction,
 } from "@/lib/api";
+import { canActOnWorkflowStep, canCreateWorkflow } from "@/lib/roles";
 import { cn } from "@/lib/utils";
 import {
   WORKFLOW_ROLE_LABELS,
@@ -38,11 +40,12 @@ import {
 const STEP_ROLES: WorkflowStepRole[] = ["directeur", "bsd", "sg", "ministre", "daf"];
 
 export default function WorkflowPage() {
-  const { canWrite } = useAuth();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const [showNew, setShowNew] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newType, setNewType] = useState("Budget");
+  const [newFile, setNewFile] = useState<File | null>(null);
   const [selected, setSelected] = useState<WorkflowItem | null>(null);
 
   const { data: workflows = [], isLoading } = useQuery({
@@ -51,15 +54,21 @@ export default function WorkflowPage() {
   });
 
   const createMutation = useMutation({
-    mutationFn: () => createWorkflow({ title: newTitle, type: newType }),
+    mutationFn: () => {
+      if (!newFile) throw new Error("Fichier requis");
+      return createWorkflow({ title: newTitle, type: newType }, newFile);
+    },
     onSuccess: () => {
-      toast.success("Workflow créé");
+      toast.success("Workflow déclenché — fichier transmis au circuit");
       setShowNew(false);
       setNewTitle("");
+      setNewFile(null);
       queryClient.invalidateQueries({ queryKey: ["workflows"] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  const mayCreate = canCreateWorkflow(user?.role);
 
   return (
     <>
@@ -68,10 +77,10 @@ export default function WorkflowPage() {
         title="Workflow"
         description="Circuit de validation des dossiers — Directeur → BSD → SG → Ministre → DAF"
         actions={
-          canWrite ? (
+          mayCreate ? (
             <Button onClick={() => setShowNew(!showNew)}>
               <Plus className="h-4 w-4" />
-              Nouveau
+              Déclencher un workflow
             </Button>
           ) : undefined
         }
@@ -108,6 +117,22 @@ export default function WorkflowPage() {
               <option>Note de service</option>
             </select>
           </div>
+          <div className="mt-3 grid gap-3">
+            <div>
+              <label className="mb-1 block text-sm text-slate">
+                Document initial (obligatoire)
+              </label>
+              <input
+                type="file"
+                required
+                className="w-full text-sm"
+                onChange={(e) => setNewFile(e.target.files?.[0] ?? null)}
+              />
+              <p className="mt-1 text-[11px] text-ash">
+                Ce fichier sera visible par tous les valideurs (BSD, SG, ministre, DAF).
+              </p>
+            </div>
+          </div>
           <div className="mt-3 flex items-center justify-between">
             <p className="text-[11px] text-ash">
               Directeur → BSD → SG → Ministre → DAF
@@ -121,7 +146,7 @@ export default function WorkflowPage() {
               >
                 Annuler
               </Button>
-              <Button type="submit" size="sm" disabled={createMutation.isPending}>
+              <Button type="submit" size="sm" disabled={createMutation.isPending || !newFile}>
                 <Play className="h-3.5 w-3.5" /> Démarrer
               </Button>
             </div>
@@ -315,6 +340,36 @@ function WorkflowCard({
 
 /* ─── Detail Panel ─── */
 
+function WorkflowFileButton({ actionId, fileName }: { actionId: number; fileName: string }) {
+  const [loading, setLoading] = useState(false);
+
+  const openFile = async () => {
+    setLoading(true);
+    try {
+      const blob = await downloadWorkflowFile(actionId);
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank", "noopener,noreferrer");
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Impossible d'ouvrir le fichier");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={() => void openFile()}
+      disabled={loading}
+      className="mt-0.5 flex items-center gap-1 text-[11px] font-medium text-forest-ink hover:underline"
+    >
+      <FileText className="h-3 w-3" />
+      {loading ? "Ouverture…" : fileName}
+    </button>
+  );
+}
+
 function WorkflowDetailPanel({
   workflow,
   onClose,
@@ -324,8 +379,11 @@ function WorkflowDetailPanel({
   onClose: () => void;
   onUpdate: (wf: WorkflowItem) => void;
 }) {
-  const { canWrite } = useAuth();
+  const { user } = useAuth();
   const activeStep = workflow.steps.find((s) => s.status === "active");
+  const canAct =
+    activeStep != null && canActOnWorkflowStep(user?.role, activeStep.role);
+  const stepHasFile = activeStep?.actions.some((a) => Boolean(a.file_name)) ?? false;
 
   const [actionMode, setActionMode] = useState<"validate" | "reject" | "comment" | null>(null);
   const [comment, setComment] = useState("");
@@ -451,11 +509,8 @@ function WorkflowDetailPanel({
                           « {action.comment} »
                         </p>
                       )}
-                      {action.file_name && (
-                        <p className="mt-0.5 flex items-center gap-1 text-[11px] text-forest-ink">
-                          <FileText className="h-3 w-3" />
-                          {action.file_name}
-                        </p>
+                      {action.file_name && action.id && (
+                        <WorkflowFileButton actionId={action.id} fileName={action.file_name} />
                       )}
                       <p className="text-[10px] text-ash">
                         {new Date(action.created_at).toLocaleString("fr-FR")}
@@ -470,7 +525,17 @@ function WorkflowDetailPanel({
       </div>
 
       {/* Actions pour l'étape active */}
-      {activeStep && canWrite && (
+      {activeStep && !canAct && (
+        <p className="mt-6 border-t border-cloud pt-5 text-sm text-slate">
+          En attente de{" "}
+          <span className="font-medium text-graphite">
+            {WORKFLOW_ROLE_LABELS[activeStep.role]}
+          </span>
+          . Vous pouvez consulter l&apos;historique et les fichiers, sans valider cette étape.
+        </p>
+      )}
+
+      {activeStep && canAct && (
         <div className="mt-6 border-t border-cloud pt-5">
           <p className="text-sm font-medium text-graphite mb-3">
             Actions — {WORKFLOW_ROLE_LABELS[activeStep.role]}
@@ -550,7 +615,11 @@ function WorkflowDetailPanel({
 
               <div>
                 <label className="mb-1 block text-sm text-slate">
-                  Joindre un fichier (optionnel)
+                  {actionMode === "validate"
+                    ? stepHasFile
+                      ? "Joindre une nouvelle version (optionnel)"
+                      : "Document à transmettre (obligatoire)"
+                    : "Joindre un fichier (optionnel)"}
                 </label>
                 <input
                   type="file"
@@ -566,7 +635,8 @@ function WorkflowDetailPanel({
                   disabled={
                     mutation.isPending ||
                     (actionMode === "reject" && !comment) ||
-                    (actionMode === "comment" && !comment)
+                    (actionMode === "comment" && !comment) ||
+                    (actionMode === "validate" && !stepHasFile && !fichier)
                   }
                 >
                   {mutation.isPending && (

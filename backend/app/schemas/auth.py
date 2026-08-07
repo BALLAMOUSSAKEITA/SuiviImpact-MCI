@@ -15,6 +15,7 @@ class UserRole(str, Enum):
     DIRECTEUR = "directeur"
     SG = "sg"
     MINISTRE = "ministre"
+    DAF = "daf"
 
 
 class LoginRequest(BaseModel):

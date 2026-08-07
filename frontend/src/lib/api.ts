@@ -1651,14 +1651,27 @@ export async function getWorkflow(id: number): Promise<WorkflowItem> {
   return apiFetch<WorkflowItem>(`/api/v1/workflows/${id}`);
 }
 
-export async function createWorkflow(data: {
-  title: string;
-  type: string;
-}): Promise<WorkflowItem> {
-  return apiFetch<WorkflowItem>("/api/v1/workflows", {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
+export async function createWorkflow(
+  data: { title: string; type: string },
+  fichier: File,
+): Promise<WorkflowItem> {
+  const formData = new FormData();
+  formData.append("payload", JSON.stringify(data));
+  formData.append("fichier", fichier);
+  return apiFetchFormData<WorkflowItem>("/api/v1/workflows", formData, "POST");
+}
+
+export async function downloadWorkflowFile(actionId: number): Promise<Blob> {
+  const headers = buildAuthHeaders({});
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/workflows/fichiers/${actionId}/download`,
+    { headers },
+  );
+  if (!response.ok) {
+    const error = (await response.json().catch(() => ({}))) as Record<string, unknown>;
+    throw new Error(messageFromFailedResponse(error, response.status));
+  }
+  return response.blob();
 }
 
 export async function performWorkflowAction(

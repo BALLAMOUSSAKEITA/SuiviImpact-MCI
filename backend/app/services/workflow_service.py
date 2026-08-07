@@ -25,7 +25,29 @@ from app.schemas.workflow import (
     WorkflowRead,
     WorkflowStepRead,
 )
+from app.core.workflow_access import (
+    assert_can_act_on_step,
+    assert_can_create_workflow,
+    step_has_attached_file,
+)
 from app.services.storage_service import storage_service
+
+
+async def _attach_initial_file(
+    db: AsyncSession, step: WorkflowStep, user: User, file: UploadFile
+) -> None:
+    chemin, nom, _ = await storage_service.save_upload(file, "workflow")
+    db.add(
+        WorkflowAction(
+            step_id=step.id,
+            user_id=user.id,
+            action_type=ActionType.UPLOAD,
+            comment=None,
+            file_path=chemin,
+            file_name=nom,
+            target_role=None,
+        )
+    )
 
 
 async def _next_ref(db: AsyncSession) -> str:
@@ -107,8 +129,12 @@ async def list_workflows(db: AsyncSession) -> list[WorkflowRead]:
 
 
 async def create_workflow(
-    db: AsyncSession, body: WorkflowCreate, user: User
+    db: AsyncSession,
+    body: WorkflowCreate,
+    user: User,
+    initial_file: UploadFile | None = None,
 ) -> WorkflowRead:
+    assert_can_create_workflow(user)
     ref = await _next_ref(db)
     wf = Workflow(
         title=body.title,
@@ -128,6 +154,18 @@ async def create_workflow(
             status=StepStatus.ACTIVE if i == 0 else StepStatus.WAITING,
         )
         db.add(step)
+
+    await db.flush()
+
+    step_result = await db.execute(
+        select(WorkflowStep).where(
+            WorkflowStep.workflow_id == wf.id,
+            WorkflowStep.role == WorkflowStepRole.DIRECTEUR,
+        )
+    )
+    directeur_step = step_result.scalar_one()
+    if initial_file is not None and initial_file.filename:
+        await _attach_initial_file(db, directeur_step, user, initial_file)
 
     await db.commit()
     return _workflow_to_read(await _load_workflow(db, wf.id))
@@ -152,6 +190,16 @@ async def perform_action(
             status_code=400,
             detail="Cette étape n'est pas active actuellement",
         )
+
+    assert_can_act_on_step(user, WorkflowStepRole(step.role))
+
+    if body.action_type == ActionType.VALIDATE:
+        incoming_file = file is not None and bool(file.filename)
+        if not incoming_file and not step_has_attached_file(step):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Un fichier est requis pour valider et transmettre au prochain niveau",
+            )
 
     file_path = None
     file_name = None

@@ -3,7 +3,7 @@
 from app.models.user import AccessType, User, UserRole
 
 READ_ONLY_ROLES = frozenset(
-    {UserRole.DIRECTEUR, UserRole.SG, UserRole.MINISTRE},
+    {UserRole.DIRECTEUR, UserRole.SG, UserRole.MINISTRE, UserRole.DAF},
 )
 
 

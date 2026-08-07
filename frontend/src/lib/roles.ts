@@ -1,4 +1,4 @@
-import type { UserRole } from "@/types";
+import type { UserRole, WorkflowStepRole } from "@/types";
 
 export const ROLE_LABELS: Record<UserRole, string> = {
   admin: "Super administrateur",
@@ -6,9 +6,10 @@ export const ROLE_LABELS: Record<UserRole, string> = {
   directeur: "Directeur",
   sg: "Secrétaire général",
   ministre: "Ministre",
+  daf: "DAF",
 };
 
-const INSTITUTION_ROLES: UserRole[] = ["directeur", "sg", "ministre"];
+const INSTITUTION_ROLES: UserRole[] = ["directeur", "sg", "ministre", "daf"];
 
 export function isInstitutionRole(role: UserRole | undefined): boolean {
   return role != null && INSTITUTION_ROLES.includes(role);
@@ -38,7 +39,7 @@ export function isPathAllowed(role: UserRole | undefined, pathname: string): boo
     return matchesAllowed(path, allowed);
   }
 
-  if (role === "sg" || role === "ministre") {
+  if (role === "sg" || role === "ministre" || role === "daf") {
     const allowed = ["/admin", "/admin/workflow", "/admin/archive", "/admin/stats"];
     return matchesAllowed(path, allowed);
   }
@@ -77,7 +78,7 @@ export function canSeeNavHref(role: UserRole | undefined, href: string, adminOnl
     return isPathAllowed(role, href);
   }
 
-  if (role === "sg" || role === "ministre") {
+  if (role === "sg" || role === "ministre" || role === "daf") {
     if (href.startsWith("/admin/planification")) return false;
     return isPathAllowed(role, href);
   }
@@ -97,4 +98,28 @@ export function canSeeNavGroup(
 
 export function defaultHomeForRole(role: UserRole | undefined): string {
   return "/admin";
+}
+
+export function userWorkflowStepRole(role: UserRole | undefined): WorkflowStepRole | null {
+  if (!role) return null;
+  const map: Record<UserRole, WorkflowStepRole | null> = {
+    admin: null,
+    user: "bsd",
+    directeur: "directeur",
+    sg: "sg",
+    ministre: "ministre",
+    daf: "daf",
+  };
+  return map[role] ?? null;
+}
+
+export function canCreateWorkflow(role: UserRole | undefined): boolean {
+  return role === "directeur";
+}
+
+export function canActOnWorkflowStep(
+  userRole: UserRole | undefined,
+  stepRole: WorkflowStepRole,
+): boolean {
+  return userWorkflowStepRole(userRole) === stepRole;
 }

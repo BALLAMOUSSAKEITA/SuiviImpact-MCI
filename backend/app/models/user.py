@@ -18,6 +18,7 @@ class UserRole(str, enum.Enum):
     DIRECTEUR = "directeur"
     SG = "sg"
     MINISTRE = "ministre"
+    DAF = "daf"
 
 
 class User(Base):

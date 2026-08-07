@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_current_user, require_write_access
+from app.api.deps import get_current_user
 from app.core.database import get_db
 from app.models.user import User
 from app.schemas.workflow import WorkflowActionCreate, WorkflowCreate, WorkflowRead
@@ -52,11 +52,21 @@ async def get_workflow(
 
 @router.post("/workflows", response_model=WorkflowRead, status_code=201)
 async def create_workflow(
-    body: WorkflowCreate,
-    user: User = Depends(require_write_access),
+    payload: str = Form(...),
+    fichier: UploadFile | None = File(default=None),
+    user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> WorkflowRead:
-    return await service.create_workflow(db, body, user)
+    try:
+        body = WorkflowCreate.model_validate_json(payload)
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail=f"Données invalides : {exc}") from exc
+    if fichier is None or not fichier.filename:
+        raise HTTPException(
+            status_code=400,
+            detail="Le directeur doit joindre un fichier pour déclencher le workflow",
+        )
+    return await service.create_workflow(db, body, user, fichier)
 
 
 @router.post(
@@ -68,7 +78,7 @@ async def perform_action(
     step_id: int,
     payload: str = Form(...),
     fichier: UploadFile | None = File(default=None),
-    user: User = Depends(require_write_access),
+    user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> WorkflowRead:
     body = WorkflowActionCreate.model_validate_json(payload)

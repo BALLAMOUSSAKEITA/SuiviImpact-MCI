@@ -46,6 +46,7 @@ async def client(db_session: AsyncSession):
         username="editeur",
         password_hash=hash_password("editeur123"),
         prenom="Editeur",
+        nom="",
         role=UserRole.USER,
         type_acces=AccessType.ECRITURE,
         etat=True,
@@ -72,11 +73,35 @@ async def auth_headers(client: AsyncClient) -> dict[str, str]:
 
 
 @pytest.fixture
+async def directeur_headers(client: AsyncClient, db_session: AsyncSession) -> dict[str, str]:
+    directeur = User(
+        username="directeur_test",
+        password_hash=hash_password("directeur123"),
+        prenom="Dir",
+        nom="Test",
+        role=UserRole.DIRECTEUR,
+        type_acces=AccessType.LECTURE,
+        etat=True,
+    )
+    db_session.add(directeur)
+    await db_session.commit()
+
+    login = await client.post(
+        "/api/v1/auth/login",
+        json={"username": "directeur_test", "password": "directeur123"},
+    )
+    assert login.status_code == 200
+    token = login.json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}
+
+
+@pytest.fixture
 async def admin_headers(client: AsyncClient, db_session: AsyncSession) -> dict[str, str]:
     admin = User(
         username="admin_test",
         password_hash=hash_password("admin_test123"),
         prenom="Admin Test",
+        nom="",
         role=UserRole.ADMIN,
         type_acces=AccessType.ECRITURE,
         etat=True,
