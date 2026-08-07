@@ -18,7 +18,7 @@ export default function PlanActionTachesPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Plan d'action"
+        eyebrow="Paramétrage"
         title="Tâches"
         description="Référentiel des tâches du plan d'action (code et description)"
       />

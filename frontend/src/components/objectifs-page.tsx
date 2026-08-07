@@ -18,7 +18,7 @@ export function ObjectifsPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Plan d'action"
+        eyebrow="Paramétrage"
         title="Objectifs"
         description="Définir les objectifs du plan d'action et leurs activités associées"
       />

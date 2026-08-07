@@ -96,7 +96,7 @@ function ProjetsContent() {
   return (
     <>
       <PageHeader
-        eyebrow="Plan d'action"
+        eyebrow="Paramétrage"
         title="Projets"
         description="Référentiel des projets — identifiant généré automatiquement à la création."
         actions={
