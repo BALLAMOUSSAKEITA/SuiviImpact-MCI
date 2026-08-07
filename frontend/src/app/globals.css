@@ -191,6 +191,15 @@ body {
   background-color: color-mix(in srgb, var(--color-forest-ink) 3%, var(--color-paper));
 }
 
+.table-grain tbody tr:hover .table-row-actions {
+  border-color: var(--color-mist);
+  box-shadow: var(--shadow-elevated);
+}
+
+.table-row-actions {
+  transition: border-color var(--duration-fast), box-shadow var(--duration-fast);
+}
+
 .table-grain td {
   padding: 0.75rem 1rem;
   color: var(--color-slate);

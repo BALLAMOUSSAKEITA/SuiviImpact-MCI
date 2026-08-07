@@ -1,12 +1,12 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/components/auth-provider";
 import { ConfirmDialog, FormDialog } from "@/components/confirm-dialog";
+import { TableRowActions } from "@/components/table-row-actions";
 import { Button } from "@/components/ui/button";
 import { deleteTachePlan, updateTachePlan } from "@/lib/api";
 import type { TachePlan } from "@/types";
@@ -77,7 +77,7 @@ export function TachePlanTable({ taches, queryKey }: TachePlanTableProps) {
             <tr>
               <th>Code</th>
               <th>Tâches</th>
-              {canWrite && <th className="text-right">Actions</th>}
+              {canWrite && <th className="w-[1%] text-right">Actions</th>}
             </tr>
           </thead>
           <tbody>
@@ -98,21 +98,10 @@ export function TachePlanTable({ taches, queryKey }: TachePlanTableProps) {
                 <td className="text-slate">{tache.description}</td>
                 {canWrite && (
                   <td className="text-right">
-                    <div className="flex flex-wrap justify-end gap-1 sm:gap-1.5">
-                      <Button variant="outline" size="sm" onClick={() => openEdit(tache)}>
-                        <Pencil className="h-3.5 w-3.5" />
-                        Modifier
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-red-600 hover:bg-red-50 hover:text-red-700"
-                        onClick={() => setDeleteTarget(tache)}
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                        Supprimer
-                      </Button>
-                    </div>
+                    <TableRowActions
+                      onEdit={() => openEdit(tache)}
+                      onDelete={() => setDeleteTarget(tache)}
+                    />
                   </td>
                 )}
               </tr>

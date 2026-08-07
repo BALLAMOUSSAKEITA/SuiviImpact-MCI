@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/components/auth-provider";
 import { ConfirmDialog, FormDialog } from "@/components/confirm-dialog";
 import { PageHeader } from "@/components/page-header";
+import { TableRowActions } from "@/components/table-row-actions";
 import { Button } from "@/components/ui/button";
 import { createProjet, deleteProjet, listProjets, updateProjet } from "@/lib/api";
 import type { Projet } from "@/types";
@@ -184,19 +185,10 @@ function ProjetsContent() {
                 <td className="font-medium text-graphite">{item.description}</td>
                 {canWrite && (
                   <td className="text-right">
-                    <div className="flex flex-wrap justify-end gap-1 sm:gap-1.5">
-                      <Button variant="outline" size="sm" onClick={() => openEdit(item)}>
-                        Modifier
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-red-600 hover:bg-red-50 hover:text-red-700"
-                        onClick={() => setDeleteTarget(item)}
-                      >
-                        Supprimer
-                      </Button>
-                    </div>
+                    <TableRowActions
+                      onEdit={() => openEdit(item)}
+                      onDelete={() => setDeleteTarget(item)}
+                    />
                   </td>
                 )}
               </tr>
