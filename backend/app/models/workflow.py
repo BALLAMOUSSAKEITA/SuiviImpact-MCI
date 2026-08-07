@@ -5,13 +5,13 @@ from datetime import datetime
 
 from sqlalchemy import (
     DateTime,
-    Enum,
     ForeignKey,
     Integer,
     String,
     Text,
     func,
 )
+from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
@@ -54,11 +54,11 @@ class ActionType(str, enum.Enum):
     UPLOAD = "upload"
 
 
-# Reusable enum types — create_type=False to let Alembic manage creation
-_workflow_status_enum = Enum(WorkflowStatus, name="workflow_status_enum", create_type=False)
-_step_role_enum = Enum(WorkflowStepRole, name="workflow_step_role_enum", create_type=False)
-_step_status_enum = Enum(StepStatus, name="step_status_enum", create_type=False)
-_action_type_enum = Enum(ActionType, name="action_type_enum", create_type=False)
+# Types ENUM gérés par Alembic (create_type=False évite une recréation au runtime)
+_workflow_status_enum = ENUM(WorkflowStatus, name="workflow_status_enum", create_type=False)
+_step_role_enum = ENUM(WorkflowStepRole, name="workflow_step_role_enum", create_type=False)
+_step_status_enum = ENUM(StepStatus, name="step_status_enum", create_type=False)
+_action_type_enum = ENUM(ActionType, name="action_type_enum", create_type=False)
 
 
 class Workflow(Base):

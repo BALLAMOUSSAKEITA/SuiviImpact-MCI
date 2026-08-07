@@ -10,6 +10,9 @@ from typing import Sequence, Union
 
 import sqlalchemy as sa
 from alembic import op
+from sqlalchemy.dialects import postgresql
+
+from app.db.migration_helpers import drop_enum, ensure_enum
 
 revision: str = "012"
 down_revision: Union[str, None] = "011"
@@ -17,30 +20,24 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
-def _create_enum_type(name: str, values: tuple[str, ...]) -> None:
-    """Create a PostgreSQL ENUM if missing (compatible with PG versions without IF NOT EXISTS)."""
-    labels = ", ".join(f"'{v}'" for v in values)
-    op.execute(
-        f"""
-        DO $$ BEGIN
-            CREATE TYPE {name} AS ENUM ({labels});
-        EXCEPTION
-            WHEN duplicate_object THEN NULL;
-        END $$;
-        """
-    )
-
-
 def upgrade() -> None:
-    workflow_status = sa.Enum("en_cours", "termine", "rejete", name="workflow_status_enum", create_type=False)
-    step_role = sa.Enum("directeur", "bsd", "sg", "ministre", "daf", name="workflow_step_role_enum", create_type=False)
-    step_status = sa.Enum("waiting", "active", "done", "rejected", name="step_status_enum", create_type=False)
-    action_type = sa.Enum("validate", "reject", "comment", "upload", name="action_type_enum", create_type=False)
+    ensure_enum("workflow_status_enum", "en_cours", "termine", "rejete")
+    ensure_enum("workflow_step_role_enum", "directeur", "bsd", "sg", "ministre", "daf")
+    ensure_enum("step_status_enum", "waiting", "active", "done", "rejected")
+    ensure_enum("action_type_enum", "validate", "reject", "comment", "upload")
 
-    _create_enum_type("workflow_status_enum", ("en_cours", "termine", "rejete"))
-    _create_enum_type("workflow_step_role_enum", ("directeur", "bsd", "sg", "ministre", "daf"))
-    _create_enum_type("step_status_enum", ("waiting", "active", "done", "rejected"))
-    _create_enum_type("action_type_enum", ("validate", "reject", "comment", "upload"))
+    workflow_status = postgresql.ENUM(
+        "en_cours", "termine", "rejete", name="workflow_status_enum", create_type=False
+    )
+    step_role = postgresql.ENUM(
+        "directeur", "bsd", "sg", "ministre", "daf", name="workflow_step_role_enum", create_type=False
+    )
+    step_status = postgresql.ENUM(
+        "waiting", "active", "done", "rejected", name="step_status_enum", create_type=False
+    )
+    action_type = postgresql.ENUM(
+        "validate", "reject", "comment", "upload", name="action_type_enum", create_type=False
+    )
 
     op.create_table(
         "workflows",
@@ -53,6 +50,7 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
         sa.PrimaryKeyConstraint("id"),
+        if_not_exists=True,
     )
 
     op.create_table(
@@ -65,8 +63,14 @@ def upgrade() -> None:
         sa.Column("assigned_user_id", sa.Integer(), sa.ForeignKey("users.id"), nullable=True),
         sa.Column("validated_at", sa.DateTime(timezone=True), nullable=True),
         sa.PrimaryKeyConstraint("id"),
+        if_not_exists=True,
     )
-    op.create_index("ix_workflow_steps_workflow_id", "workflow_steps", ["workflow_id"])
+    op.create_index(
+        "ix_workflow_steps_workflow_id",
+        "workflow_steps",
+        ["workflow_id"],
+        if_not_exists=True,
+    )
 
     op.create_table(
         "workflow_actions",
@@ -80,15 +84,23 @@ def upgrade() -> None:
         sa.Column("target_role", step_role, nullable=True),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
         sa.PrimaryKeyConstraint("id"),
+        if_not_exists=True,
     )
-    op.create_index("ix_workflow_actions_step_id", "workflow_actions", ["step_id"])
+    op.create_index(
+        "ix_workflow_actions_step_id",
+        "workflow_actions",
+        ["step_id"],
+        if_not_exists=True,
+    )
 
 
 def downgrade() -> None:
-    op.drop_table("workflow_actions")
-    op.drop_table("workflow_steps")
-    op.drop_table("workflows")
-    op.execute("DROP TYPE IF EXISTS action_type_enum")
-    op.execute("DROP TYPE IF EXISTS step_status_enum")
-    op.execute("DROP TYPE IF EXISTS workflow_step_role_enum")
-    op.execute("DROP TYPE IF EXISTS workflow_status_enum")
+    op.drop_index("ix_workflow_actions_step_id", table_name="workflow_actions", if_exists=True)
+    op.drop_table("workflow_actions", if_exists=True)
+    op.drop_index("ix_workflow_steps_workflow_id", table_name="workflow_steps", if_exists=True)
+    op.drop_table("workflow_steps", if_exists=True)
+    op.drop_table("workflows", if_exists=True)
+    drop_enum("action_type_enum")
+    drop_enum("step_status_enum")
+    drop_enum("workflow_step_role_enum")
+    drop_enum("workflow_status_enum")
