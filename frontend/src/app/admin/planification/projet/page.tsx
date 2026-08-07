@@ -28,9 +28,6 @@ import type {
   TypeBudgetProjet,
 } from "@/types";
 
-const MAX_COMPOSANTES = 2;
-const MAX_ACTIVITES = 5;
-
 type ActiviteRow = { key: number; dbId?: number; titre: string };
 
 type ComposanteBlock = {
@@ -165,7 +162,6 @@ function PlanificationProjetContent() {
   };
 
   const addComposante = () => {
-    if (composantes.length >= MAX_COMPOSANTES) return;
     setKeySeq((k) => {
       const next = k + 1;
       setComposantes((prev) => [...prev, emptyComposante(next)]);
@@ -188,7 +184,7 @@ function PlanificationProjetContent() {
       const next = k + 1;
       setComposantes((prev) =>
         prev.map((c) => {
-          if (c.key !== compKey || c.activites.length >= MAX_ACTIVITES) return c;
+          if (c.key !== compKey) return c;
           return {
             ...c,
             activites: [...c.activites, emptyActivite(next)],
@@ -412,21 +408,17 @@ function PlanificationProjetContent() {
 
             <div>
               <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                <p className="text-sm font-semibold text-graphite">
-                  Composantes (max. {MAX_COMPOSANTES})
-                </p>
-                {composantes.length < MAX_COMPOSANTES && (
-                  <Button type="button" variant="outline" size="sm" onClick={addComposante}>
-                    <Plus className="h-3.5 w-3.5" />
-                    Ajouter une composante
-                  </Button>
-                )}
+                <p className="text-sm font-semibold text-graphite">Composantes</p>
+                <Button type="button" variant="outline" size="sm" onClick={addComposante}>
+                  <Plus className="h-3.5 w-3.5" />
+                  Ajouter une composante
+                </Button>
               </div>
 
               {composantes.length === 0 && (
                 <p className="text-sm text-ash">
-                  Aucune composante. Vous pouvez en ajouter jusqu&apos;à {MAX_COMPOSANTES},
-                  avec jusqu&apos;à {MAX_ACTIVITES} activités chacune.
+                  Aucune composante. Ajoutez autant de composantes et d&apos;activités que
+                  nécessaire.
                 </p>
               )}
 
@@ -467,19 +459,17 @@ function PlanificationProjetContent() {
                     <div className="space-y-2">
                       <div className="flex items-center justify-between gap-2">
                         <p className="text-xs font-medium uppercase tracking-wide text-fog">
-                          Activités (max. {MAX_ACTIVITES})
+                          Activités
                         </p>
-                        {comp.activites.length < MAX_ACTIVITES && (
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => addActivite(comp.key)}
-                          >
-                            <Plus className="h-3.5 w-3.5" />
-                            Activité
-                          </Button>
-                        )}
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => addActivite(comp.key)}
+                        >
+                          <Plus className="h-3.5 w-3.5" />
+                          Activité
+                        </Button>
                       </div>
 
                       {comp.activites.length === 0 && (

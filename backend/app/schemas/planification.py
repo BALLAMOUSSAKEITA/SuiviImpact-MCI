@@ -152,17 +152,13 @@ class PlanificationProjetActiviteCreate(BaseModel):
 class PlanificationProjetComposanteCreate(BaseModel):
     id: int | None = None
     libelle: str | None = Field(default=None, max_length=255)
-    activites: list[PlanificationProjetActiviteCreate] = Field(
-        default_factory=list, max_length=5
-    )
+    activites: list[PlanificationProjetActiviteCreate] = Field(default_factory=list)
 
 
 class PlanificationProjetCreate(BaseModel):
     projet_id: int
     type_budget: TypeBudgetProjet
-    composantes: list[PlanificationProjetComposanteCreate] = Field(
-        default_factory=list, max_length=2
-    )
+    composantes: list[PlanificationProjetComposanteCreate] = Field(default_factory=list)
     montant: Decimal = Field(ge=0)
     lieu: str = Field(min_length=1, max_length=255)
     date_debut: date

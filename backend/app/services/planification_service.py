@@ -782,26 +782,10 @@ def _planif_projet_to_read(
     )
 
 
-def _validate_projet_planification(data: PlanificationProjetCreate) -> None:
-    if len(data.composantes) > 2:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Maximum 2 composantes par planification",
-        )
-    for comp in data.composantes:
-        if len(comp.activites) > 5:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Maximum 5 activités par composante",
-            )
-
-
 async def create_planification_projet(
     db: AsyncSession,
     data: PlanificationProjetCreate,
 ) -> PlanificationProjetRead:
-    _validate_projet_planification(data)
-
     projet = await db.get(Projet, data.projet_id)
     if projet is None:
         raise HTTPException(status_code=404, detail="Projet introuvable")
@@ -862,8 +846,6 @@ async def update_planification_projet(
     planif_id: int,
     data: PlanificationProjetUpdate,
 ) -> PlanificationProjetRead:
-    _validate_projet_planification(data)
-
     result = await db.execute(
         select(PlanificationProjet)
         .where(PlanificationProjet.id == planif_id)
