@@ -581,3 +581,54 @@ export const PPM_STATUT_LABELS: Record<PpmStatut, string> = {
 };
 
 export type { HealthResponse } from "@/lib/api";
+
+/* ─── Workflow ─── */
+
+export type WorkflowStepRole = "directeur" | "bsd" | "sg" | "ministre" | "daf";
+export type WorkflowStatus = "en_cours" | "termine" | "rejete";
+export type StepStatus = "waiting" | "active" | "done" | "rejected";
+export type ActionType = "validate" | "reject" | "comment" | "upload";
+
+export const WORKFLOW_ROLE_LABELS: Record<WorkflowStepRole, string> = {
+  directeur: "Directeur",
+  bsd: "BSD",
+  sg: "SG",
+  ministre: "Ministre",
+  daf: "DAF",
+};
+
+export interface WorkflowAction {
+  id: number;
+  action_type: ActionType;
+  comment: string | null;
+  file_name: string | null;
+  file_path: string | null;
+  target_role: WorkflowStepRole | null;
+  user_id: number;
+  user_prenom: string;
+  created_at: string;
+}
+
+export interface WorkflowStep {
+  id: number;
+  role: WorkflowStepRole;
+  ordre: number;
+  status: StepStatus;
+  assigned_user_id: number | null;
+  assigned_user_prenom: string | null;
+  validated_at: string | null;
+  actions: WorkflowAction[];
+}
+
+export interface WorkflowItem {
+  id: number;
+  title: string;
+  ref: string;
+  type: string;
+  status: WorkflowStatus;
+  created_by: number;
+  creator_prenom: string;
+  steps: WorkflowStep[];
+  created_at: string;
+  updated_at: string;
+}

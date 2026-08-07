@@ -15,6 +15,7 @@ from app.api.v1 import (
     stats,
     suivi,
     users,
+    workflow,
 )
 
 api_router = APIRouter()
@@ -32,3 +33,4 @@ api_router.include_router(indicateurs.router, tags=["indicateurs"])
 api_router.include_router(stats.router, tags=["stats"])
 api_router.include_router(exports.router, tags=["exports"])
 api_router.include_router(archive.router, tags=["archive"])
+api_router.include_router(workflow.router, tags=["workflow"])

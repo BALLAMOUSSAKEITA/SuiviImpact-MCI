@@ -1524,3 +1524,42 @@ export async function deleteArchiveFile(fichierId: number): Promise<void> {
 export { API_BASE_URL };
 
 
+/* ─── Workflow ─── */
+
+import type { WorkflowItem } from "@/types";
+
+export async function listWorkflows(): Promise<WorkflowItem[]> {
+  return apiFetch<WorkflowItem[]>("/api/v1/workflows");
+}
+
+export async function getWorkflow(id: number): Promise<WorkflowItem> {
+  return apiFetch<WorkflowItem>(`/api/v1/workflows/${id}`);
+}
+
+export async function createWorkflow(data: {
+  title: string;
+  type: string;
+}): Promise<WorkflowItem> {
+  return apiFetch<WorkflowItem>("/api/v1/workflows", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function performWorkflowAction(
+  workflowId: number,
+  stepId: number,
+  data: { action_type: string; comment?: string; target_role?: string },
+  fichier?: File | null,
+): Promise<WorkflowItem> {
+  const formData = new FormData();
+  formData.append("payload", JSON.stringify(data));
+  if (fichier) {
+    formData.append("fichier", fichier);
+  }
+  return apiFetchFormData<WorkflowItem>(
+    `/api/v1/workflows/${workflowId}/steps/${stepId}/action`,
+    formData,
+  );
+}
+
