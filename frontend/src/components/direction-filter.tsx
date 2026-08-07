@@ -18,7 +18,7 @@ export function DirectionFilter({
 }: DirectionFilterProps) {
   const { data: directions = [] } = useQuery({
     queryKey: ["directions"],
-    queryFn: listDirections,
+    queryFn: () => listDirections(),
   });
 
   return (

@@ -1,5 +1,6 @@
 from datetime import datetime
 from decimal import Decimal
+from enum import Enum
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -49,6 +50,12 @@ class TachePlanRead(BaseModel):
     updated_at: datetime
 
 
+class DirectionCategorie(str, Enum):
+    MINISTERE = "ministere"
+    POUVOIR_SUPREME = "pouvoir_supreme"
+    POUVOIR_INDIRECT = "pouvoir_indirect"
+
+
 class DirectionRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -57,6 +64,7 @@ class DirectionRead(BaseModel):
     libelle: str
     directeur_nom: str | None = None
     email_directeur: str | None = None
+    categorie: DirectionCategorie
 
 
 class DirectionCreate(BaseModel):
@@ -64,6 +72,7 @@ class DirectionCreate(BaseModel):
     libelle: str = Field(min_length=1, max_length=100)
     directeur_nom: str = Field(min_length=1, max_length=150)
     email_directeur: str = Field(min_length=3, max_length=255)
+    categorie: DirectionCategorie = DirectionCategorie.MINISTERE
 
 
 class DirectionUpdate(BaseModel):
@@ -71,6 +80,7 @@ class DirectionUpdate(BaseModel):
     libelle: str | None = Field(default=None, min_length=1, max_length=100)
     directeur_nom: str | None = Field(default=None, min_length=1, max_length=150)
     email_directeur: str | None = Field(default=None, min_length=3, max_length=255)
+    categorie: DirectionCategorie | None = None
 
 
 class ActiviteCreate(BaseModel):

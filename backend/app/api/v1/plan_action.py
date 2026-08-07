@@ -11,6 +11,7 @@ from app.schemas.plan_action import (
     ActiviteCreate,
     ActiviteRead,
     ActiviteUpdate,
+    DirectionCategorie,
     DirectionCreate,
     DirectionRead,
     DirectionUpdate,
@@ -29,10 +30,14 @@ router = APIRouter()
 
 @router.get("/directions", response_model=list[DirectionRead])
 async def list_directions(
+    categorie: DirectionCategorie | None = Query(default=None),
     _: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> list[Direction]:
-    result = await db.execute(select(Direction).order_by(Direction.code))
+    query = select(Direction).order_by(Direction.code)
+    if categorie is not None:
+        query = query.where(Direction.categorie == categorie.value)
+    result = await db.execute(query)
     return list(result.scalars().all())
 
 
@@ -51,6 +56,7 @@ async def create_direction(
         libelle=body.libelle.strip(),
         directeur_nom=body.directeur_nom.strip(),
         email_directeur=body.email_directeur.strip(),
+        categorie=body.categorie.value,
     )
     db.add(direction)
     try:
@@ -83,6 +89,8 @@ async def update_direction(
         direction.directeur_nom = body.directeur_nom.strip()
     if body.email_directeur is not None:
         direction.email_directeur = body.email_directeur.strip()
+    if body.categorie is not None:
+        direction.categorie = body.categorie.value
     try:
         await db.commit()
     except IntegrityError as exc:
@@ -93,6 +101,26 @@ async def update_direction(
         ) from exc
     await db.refresh(direction)
     return direction
+
+
+@router.delete("/directions/{direction_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_direction(
+    direction_id: int,
+    _: User = Depends(require_write_access),
+    db: AsyncSession = Depends(get_db),
+) -> None:
+    direction = await db.get(Direction, direction_id)
+    if direction is None:
+        raise HTTPException(status_code=404, detail="Direction introuvable")
+    try:
+        await db.delete(direction)
+        await db.commit()
+    except IntegrityError as exc:
+        await db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cette direction est utilisée dans le plan d'action ou une planification et ne peut pas être supprimée",
+        ) from exc
 
 
 @router.get("/objectifs", response_model=list[ObjectifRead])

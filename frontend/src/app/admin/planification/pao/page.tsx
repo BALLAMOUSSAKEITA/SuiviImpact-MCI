@@ -65,7 +65,7 @@ function PlanificationPaoContent() {
 
   const { data: directions = [] } = useQuery({
     queryKey: ["directions"],
-    queryFn: listDirections,
+    queryFn: () => listDirections(),
   });
 
   const [showForm, setShowForm] = useState(false);

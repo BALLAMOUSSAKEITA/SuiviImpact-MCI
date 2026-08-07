@@ -39,12 +39,24 @@ export interface Objectif {
   updated_at: string;
 }
 
+export type DirectionCategorie =
+  | "ministere"
+  | "pouvoir_supreme"
+  | "pouvoir_indirect";
+
+export const DIRECTION_CATEGORIE_LABELS: Record<DirectionCategorie, string> = {
+  ministere: "Directions du ministère",
+  pouvoir_supreme: "Pouvoirs suprêmes",
+  pouvoir_indirect: "Pouvoirs indirects",
+};
+
 export interface Direction {
   id: number;
   code: string;
   libelle: string;
   directeur_nom: string | null;
   email_directeur: string | null;
+  categorie: DirectionCategorie;
 }
 
 export interface DirectionCreate {
@@ -52,6 +64,7 @@ export interface DirectionCreate {
   libelle: string;
   directeur_nom: string;
   email_directeur: string;
+  categorie: DirectionCategorie;
 }
 
 export interface DirectionUpdate {
@@ -59,6 +72,20 @@ export interface DirectionUpdate {
   libelle?: string;
   directeur_nom?: string;
   email_directeur?: string;
+  categorie?: DirectionCategorie;
+}
+
+export interface MinistreParametrage {
+  prenom: string;
+  nom: string;
+  email: string | null;
+  updated_at?: string;
+}
+
+export interface MinistreParametrageUpdate {
+  prenom: string;
+  nom: string;
+  email: string;
 }
 
 export interface TrimestrePlan {

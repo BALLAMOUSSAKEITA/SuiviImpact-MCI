@@ -19,7 +19,7 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "Connexion — SuiviImpact | MCI Guinée",
   description:
-    "Plateforme de suivi d'impact du Ministère du Commerce et de l'Industrie — Bureau de Stratégie et de Développement (BSD).",
+    "Plateforme de suivi d'impact du Ministère de l'Industrie et du Commerce — Bureau de Stratégie et de Développement (BSD).",
 };
 
 export default function RootLayout({

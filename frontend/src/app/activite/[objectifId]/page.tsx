@@ -45,7 +45,7 @@ function ActivitesContent() {
 
   const { data: directions = [] } = useQuery({
     queryKey: ["directions"],
-    queryFn: listDirections,
+    queryFn: () => listDirections(),
   });
 
   const [open, setOpen] = useState(false);

@@ -48,6 +48,12 @@ import type {
 
   DirectionUpdate,
 
+  DirectionCategorie,
+
+  MinistreParametrage,
+
+  MinistreParametrageUpdate,
+
   PlanificationActivite,
 
   PlanificationPaoActivite,
@@ -558,10 +564,9 @@ export async function deleteUser(id: number): Promise<void> {
 
 
 
-export async function listDirections(): Promise<Direction[]> {
-
-  return apiFetch<Direction[]>("/api/v1/directions");
-
+export async function listDirections(categorie?: DirectionCategorie): Promise<Direction[]> {
+  const query = categorie ? `?categorie=${categorie}` : "";
+  return apiFetch<Direction[]>(`/api/v1/directions${query}`);
 }
 
 export async function createDirection(data: DirectionCreate): Promise<Direction> {
@@ -576,6 +581,23 @@ export async function updateDirection(
   data: DirectionUpdate,
 ): Promise<Direction> {
   return apiFetch<Direction>(`/api/v1/directions/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteDirection(id: number): Promise<void> {
+  return apiFetch<void>(`/api/v1/directions/${id}`, { method: "DELETE" });
+}
+
+export async function getMinistreParametrage(): Promise<MinistreParametrage> {
+  return apiFetch<MinistreParametrage>("/api/v1/parametrage/ministre");
+}
+
+export async function updateMinistreParametrage(
+  data: MinistreParametrageUpdate,
+): Promise<MinistreParametrage> {
+  return apiFetch<MinistreParametrage>("/api/v1/parametrage/ministre", {
     method: "PUT",
     body: JSON.stringify(data),
   });

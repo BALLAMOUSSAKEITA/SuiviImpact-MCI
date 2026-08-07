@@ -7,6 +7,7 @@ from app.api.v1 import (
     health,
     indicateurs,
     missions,
+    parametrage,
     plan_action,
     planification,
     ppm,
@@ -23,6 +24,7 @@ api_router.include_router(health.router, tags=["health"])
 api_router.include_router(auth.router, tags=["auth"])
 api_router.include_router(users.router, tags=["users"])
 api_router.include_router(plan_action.router, tags=["plan-action"])
+api_router.include_router(parametrage.router, tags=["parametrage"])
 api_router.include_router(planification.router, tags=["planification"])
 api_router.include_router(suivi.router, tags=["suivi"])
 api_router.include_router(recommandations.router, tags=["recommandations"])

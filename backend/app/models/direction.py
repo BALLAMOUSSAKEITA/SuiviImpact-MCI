@@ -1,7 +1,15 @@
+import enum
+
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base
+
+
+class DirectionCategorie(str, enum.Enum):
+    MINISTERE = "ministere"
+    POUVOIR_SUPREME = "pouvoir_supreme"
+    POUVOIR_INDIRECT = "pouvoir_indirect"
 
 
 class Direction(Base):
@@ -12,3 +20,6 @@ class Direction(Base):
     libelle: Mapped[str] = mapped_column(String(100), nullable=False)
     directeur_nom: Mapped[str | None] = mapped_column(String(150), nullable=True)
     email_directeur: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    categorie: Mapped[str] = mapped_column(
+        String(30), default=DirectionCategorie.MINISTERE.value, nullable=False
+    )

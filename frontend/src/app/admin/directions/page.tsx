@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/components/auth-provider";
@@ -10,8 +10,23 @@ import { ConfirmDialog, FormDialog } from "@/components/confirm-dialog";
 import { PageHeader } from "@/components/page-header";
 import { TableRowActions } from "@/components/table-row-actions";
 import { Button } from "@/components/ui/button";
-import { createDirection, listDirections, updateDirection } from "@/lib/api";
-import type { Direction } from "@/types";
+import {
+  createDirection,
+  deleteDirection,
+  getMinistreParametrage,
+  listDirections,
+  updateDirection,
+  updateMinistreParametrage,
+} from "@/lib/api";
+import { cn } from "@/lib/utils";
+import type { Direction, DirectionCategorie } from "@/types";
+import { DIRECTION_CATEGORIE_LABELS } from "@/types";
+
+const CATEGORIES: DirectionCategorie[] = [
+  "ministere",
+  "pouvoir_supreme",
+  "pouvoir_indirect",
+];
 
 export default function DirectionsPage() {
   return <DirectionsContent />;
@@ -20,11 +35,12 @@ export default function DirectionsPage() {
 function DirectionsContent() {
   const { canWrite } = useAuth();
   const queryClient = useQueryClient();
-  const queryKey = ["directions"];
+  const [activeCategorie, setActiveCategorie] = useState<DirectionCategorie>("ministere");
+  const queryKey = ["directions", activeCategorie];
 
   const { data: directions = [], isLoading } = useQuery({
     queryKey,
-    queryFn: listDirections,
+    queryFn: () => listDirections(activeCategorie),
   });
 
   const [showCreate, setShowCreate] = useState(false);
@@ -38,9 +54,30 @@ function DirectionsContent() {
   const [editLibelle, setEditLibelle] = useState("");
   const [editDirecteurNom, setEditDirecteurNom] = useState("");
   const [editEmailDirecteur, setEditEmailDirecteur] = useState("");
+  const [editCategorie, setEditCategorie] = useState<DirectionCategorie>("ministere");
   const [confirmUpdate, setConfirmUpdate] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<Direction | null>(null);
 
-  const invalidate = () => queryClient.invalidateQueries({ queryKey });
+  const ministreQueryKey = ["ministre-parametrage"];
+  const { data: ministre, isLoading: loadingMinistre } = useQuery({
+    queryKey: ministreQueryKey,
+    queryFn: getMinistreParametrage,
+  });
+  const [ministrePrenom, setMinistrePrenom] = useState("");
+  const [ministreNom, setMinistreNom] = useState("");
+  const [ministreEmail, setMinistreEmail] = useState("");
+
+  useEffect(() => {
+    if (ministre) {
+      setMinistrePrenom(ministre.prenom ?? "");
+      setMinistreNom(ministre.nom ?? "");
+      setMinistreEmail(ministre.email ?? "");
+    }
+  }, [ministre]);
+
+  const invalidate = () => {
+    queryClient.invalidateQueries({ queryKey: ["directions"] });
+  };
 
   const resetCreateForm = () => {
     setCode("");
@@ -56,12 +93,37 @@ function DirectionsContent() {
         libelle: libelle.trim(),
         directeur_nom: directeurNom.trim(),
         email_directeur: emailDirecteur.trim(),
+        categorie: activeCategorie,
       }),
     onSuccess: (d) => {
       toast.success(`Direction créée — ${d.code}`);
       resetCreateForm();
       setShowCreate(false);
       invalidate();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteDirection,
+    onSuccess: () => {
+      toast.success("Direction supprimée");
+      setDeleteTarget(null);
+      invalidate();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const ministreMutation = useMutation({
+    mutationFn: () =>
+      updateMinistreParametrage({
+        prenom: ministrePrenom.trim(),
+        nom: ministreNom.trim(),
+        email: ministreEmail.trim(),
+      }),
+    onSuccess: () => {
+      toast.success("Fiche ministre enregistrée");
+      queryClient.invalidateQueries({ queryKey: ministreQueryKey });
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -73,6 +135,7 @@ function DirectionsContent() {
         libelle: editLibelle.trim(),
         directeur_nom: editDirecteurNom.trim(),
         email_directeur: editEmailDirecteur.trim(),
+        categorie: editCategorie,
       }),
     onSuccess: () => {
       toast.success("Direction mise à jour");
@@ -89,6 +152,7 @@ function DirectionsContent() {
     setEditLibelle(item.libelle);
     setEditDirecteurNom(item.directeur_nom ?? "");
     setEditEmailDirecteur(item.email_directeur ?? "");
+    setEditCategorie(item.categorie);
     setConfirmUpdate(false);
   };
 
@@ -116,7 +180,7 @@ function DirectionsContent() {
       <PageHeader
         eyebrow="Paramétrage"
         title="Directions"
-        description="Référentiel des directions : acronyme, libellé, directeur et adresse e-mail."
+        description="Ministre, directions du ministère, pouvoirs suprêmes et pouvoirs indirects."
         actions={
           canWrite && !showCreate ? (
             <Button onClick={() => setShowCreate(true)}>
@@ -127,9 +191,90 @@ function DirectionsContent() {
         }
       />
 
+      <div className="panel-grain mb-6">
+        <h3 className="mb-4 text-base font-semibold text-graphite">Ministre</h3>
+        {loadingMinistre ? (
+          <p className="text-sm text-ash">Chargement…</p>
+        ) : (
+          <form
+            className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:items-end"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!canWrite) return;
+              ministreMutation.mutate();
+            }}
+          >
+            <div>
+              <label className="label-grain">Prénom</label>
+              <input
+                required
+                value={ministrePrenom}
+                onChange={(e) => setMinistrePrenom(e.target.value)}
+                className="input-grain"
+                disabled={!canWrite}
+                placeholder="Prénom"
+              />
+            </div>
+            <div>
+              <label className="label-grain">Nom</label>
+              <input
+                required
+                value={ministreNom}
+                onChange={(e) => setMinistreNom(e.target.value)}
+                className="input-grain"
+                disabled={!canWrite}
+                placeholder="Nom"
+              />
+            </div>
+            <div>
+              <label className="label-grain">E-mail du ministre</label>
+              <input
+                required
+                type="email"
+                value={ministreEmail}
+                onChange={(e) => setMinistreEmail(e.target.value)}
+                className="input-grain"
+                disabled={!canWrite}
+                placeholder="ministre@mci.gov.gn"
+              />
+            </div>
+            {canWrite && (
+              <div>
+                <Button type="submit" disabled={ministreMutation.isPending} className="w-full sm:w-auto">
+                  Enregistrer le ministre
+                </Button>
+              </div>
+            )}
+          </form>
+        )}
+      </div>
+
+      <div className="mb-6 flex flex-wrap gap-2">
+        {CATEGORIES.map((cat) => (
+          <button
+            key={cat}
+            type="button"
+            onClick={() => {
+              setActiveCategorie(cat);
+              setShowCreate(false);
+              resetCreateForm();
+            }}
+            className={cn(
+              "rounded-[var(--radius-pill)] px-4 py-2 text-sm font-medium transition-colors",
+              activeCategorie === cat
+                ? "bg-forest-ink text-white shadow-[var(--shadow-soft)]"
+                : "bg-white/80 text-slate hover:bg-veil",
+            )}
+          >
+            {DIRECTION_CATEGORIE_LABELS[cat]}
+          </button>
+        ))}
+      </div>
+
       {showCreate && canWrite && (
         <div className="panel-grain mb-6">
-          <h3 className="mb-4 text-base font-semibold text-graphite">Nouvelle direction</h3>
+          <h3 className="mb-1 text-base font-semibold text-graphite">Nouvelle direction</h3>
+          <p className="mb-4 text-sm text-ash">{DIRECTION_CATEGORIE_LABELS[activeCategorie]}</p>
           <form
             className="grid gap-4 sm:grid-cols-2"
             onSubmit={(e) => {
@@ -219,7 +364,7 @@ function DirectionsContent() {
             {!isLoading && directions.length === 0 && (
               <tr>
                 <td colSpan={canWrite ? 5 : 4} className="py-8 text-center text-ash">
-                  Aucune direction enregistrée
+                  Aucune direction dans cette catégorie
                 </td>
               </tr>
             )}
@@ -235,7 +380,10 @@ function DirectionsContent() {
                 <td className="text-sm text-slate">{d.email_directeur?.trim() || "—"}</td>
                 {canWrite && (
                   <td className="text-right">
-                    <TableRowActions onEdit={() => openEdit(d)} />
+                    <TableRowActions
+                      onEdit={() => openEdit(d)}
+                      onDelete={() => setDeleteTarget(d)}
+                    />
                   </td>
                 )}
               </tr>
@@ -250,6 +398,20 @@ function DirectionsContent() {
         onClose={closeEdit}
       >
         <form onSubmit={requestSave} className="space-y-4">
+          <div>
+            <label className="label-grain">Catégorie</label>
+            <select
+              value={editCategorie}
+              onChange={(e) => setEditCategorie(e.target.value as DirectionCategorie)}
+              className="input-grain"
+            >
+              {CATEGORIES.map((cat) => (
+                <option key={cat} value={cat}>
+                  {DIRECTION_CATEGORIE_LABELS[cat]}
+                </option>
+              ))}
+            </select>
+          </div>
           <div>
             <label className="label-grain">Acronyme</label>
             <input
@@ -304,6 +466,21 @@ function DirectionsContent() {
         loading={updateMutation.isPending}
         onCancel={() => setConfirmUpdate(false)}
         onConfirm={() => updateMutation.mutate()}
+      />
+
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        title="Supprimer la direction"
+        description={
+          deleteTarget
+            ? `Supprimer la direction « ${deleteTarget.code} » ? Cette action est irréversible.`
+            : ""
+        }
+        confirmLabel="Supprimer"
+        variant="destructive"
+        loading={deleteMutation.isPending}
+        onCancel={() => setDeleteTarget(null)}
+        onConfirm={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}
       />
     </>
   );
