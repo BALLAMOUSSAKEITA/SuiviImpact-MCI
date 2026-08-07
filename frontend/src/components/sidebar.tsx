@@ -59,7 +59,15 @@ const navItems: NavItem[] = [
       { href: "/admin/planification/projet", label: "Projet", icon: FolderKanban },
     ],
   },
-  { href: "/admin/suivi", label: "Suivi", icon: ClipboardList, defaultChild: "/admin/suivi/1" },
+  {
+    href: "/admin/suivi",
+    label: "Suivi",
+    icon: ClipboardList,
+    children: [
+      { href: "/admin/suivi/pao", label: "PAO", icon: ClipboardList },
+      { href: "/admin/suivi/projet", label: "Projet", icon: FolderKanban },
+    ],
+  },
   { href: "/admin/recommandation", label: "RCC", icon: Briefcase, defaultChild: "/admin/recommandation/1" },
   { href: "/admin/mission", label: "Missions", icon: MapPin, defaultChild: "/admin/mission/1" },
   { href: "/admin/ppm", label: "PPM", icon: ShoppingCart },

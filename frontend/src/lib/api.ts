@@ -743,6 +743,22 @@ export async function createPlanificationProjet(
 
 
 
+export async function toggleSuiviProjetActivite(
+  activiteId: number,
+  rapport?: File | null,
+): Promise<{ id: number; terminee: boolean; rapport_nom_original: string | null }> {
+  const formData = new FormData();
+  if (rapport) {
+    formData.append("rapport", rapport);
+  }
+  return apiFetchFormData<{ id: number; terminee: boolean; rapport_nom_original: string | null }>(
+    `/api/v1/suivi/projet/activite/${activiteId}/toggle`,
+    formData,
+  );
+}
+
+
+
 export async function getPlanification(
 
   annee: number,

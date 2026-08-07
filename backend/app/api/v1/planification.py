@@ -91,6 +91,16 @@ async def create_planification_projet(
     return await service.create_planification_projet(db, body)
 
 
+@router.post("/suivi/projet/activite/{activite_id}/toggle")
+async def toggle_suivi_projet_activite(
+    activite_id: int,
+    rapport: UploadFile | None = File(default=None),
+    _: User = Depends(require_write_access),
+    db: AsyncSession = Depends(get_db),
+):
+    return await service.toggle_projet_activite(db, activite_id, rapport)
+
+
 @router.get(
     "/planification/{annee}/{trimestre}",
     response_model=list[PlanificationActiviteRead],

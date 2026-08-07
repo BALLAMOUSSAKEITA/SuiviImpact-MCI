@@ -2,6 +2,7 @@ from datetime import date, datetime
 from decimal import Decimal
 
 from sqlalchemy import (
+    Boolean,
     CheckConstraint,
     Date,
     DateTime,
@@ -84,6 +85,9 @@ class PlanificationProjetActivite(Base):
     )
     ordre: Mapped[int] = mapped_column(Integer, nullable=False)
     titre: Mapped[str] = mapped_column(Text, nullable=False)
+    terminee: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    rapport_chemin: Mapped[str | None] = mapped_column(String(500))
+    rapport_nom_original: Mapped[str | None] = mapped_column(String(255))
 
     composante: Mapped["PlanificationProjetComposante"] = relationship(
         back_populates="activites"

@@ -170,6 +170,8 @@ class PlanificationProjetActiviteRead(BaseModel):
     id: int
     ordre: int
     titre: str
+    terminee: bool = False
+    rapport_nom_original: str | None = None
 
 
 class PlanificationProjetComposanteRead(BaseModel):

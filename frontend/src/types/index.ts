@@ -257,6 +257,8 @@ export interface PlanificationProjetActiviteRead {
   id: number;
   ordre: number;
   titre: string;
+  terminee: boolean;
+  rapport_nom_original: string | null;
 }
 
 export interface PlanificationProjetComposanteRead {

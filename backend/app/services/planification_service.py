@@ -607,6 +607,8 @@ def _planif_projet_to_read(
                         id=a.id,
                         ordre=a.ordre,
                         titre=a.titre,
+                        terminee=a.terminee,
+                        rapport_nom_original=a.rapport_nom_original,
                     )
                     for a in c.activites
                 ],
@@ -725,3 +727,28 @@ async def list_planifications_projet(
             continue
         out.append(_planif_projet_to_read(planif, projet, direction))
     return out
+
+
+async def toggle_projet_activite(
+    db: AsyncSession,
+    activite_id: int,
+    rapport_file: UploadFile | None = None,
+) -> dict:
+    activite = await db.get(PlanificationProjetActivite, activite_id)
+    if activite is None:
+        raise HTTPException(status_code=404, detail="Activité projet introuvable")
+
+    activite.terminee = not activite.terminee
+
+    if rapport_file is not None and rapport_file.filename:
+        chemin, nom, _ = await storage_service.save_upload(rapport_file, "rapports")
+        activite.rapport_chemin = chemin
+        activite.rapport_nom_original = nom
+
+    await db.commit()
+    await db.refresh(activite)
+    return {
+        "id": activite.id,
+        "terminee": activite.terminee,
+        "rapport_nom_original": activite.rapport_nom_original,
+    }
