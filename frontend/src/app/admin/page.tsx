@@ -41,14 +41,14 @@ export default function AdminDashboardPage() {
       />
 
       {/* Sélecteur de vue */}
-      <div className="flex flex-wrap gap-1.5 rounded-[var(--radius-card)] border border-cloud bg-paper p-1.5">
+      <div className="flex flex-wrap gap-1.5 rounded-[var(--radius-pill)] border border-cloud bg-paper p-1.5">
         {views.map((view) => (
           <button
             key={view.id}
             type="button"
             onClick={() => setCurrentView(view.id)}
             className={cn(
-              "rounded-[var(--radius-card)] px-4 py-2 text-[13px] font-medium transition-all duration-[var(--duration-fast)]",
+              "rounded-[var(--radius-pill)] px-4 py-2 text-[13px] font-medium transition-all duration-[var(--duration-fast)]",
               currentView === view.id
                 ? "bg-forest-ink text-white shadow-sm"
                 : "text-slate hover:bg-veil hover:text-graphite",

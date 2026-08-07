@@ -1,56 +1,61 @@
 @import "tailwindcss";
 
 @theme {
-  /* Grain — Colors */
+  /* ─── Brand Colors ─── */
   --color-forest-ink: #009959;
   --color-vine: #00b96c;
   --color-neon-sprout: #00ff95;
   --color-ice-blue: #3de1ff;
+
+  /* ─── Neutrals ─── */
   --color-obsidian: #000000;
-  --color-graphite: #141414;
-  --color-carbon: #313232;
-  --color-slate: #545454;
-  --color-fog: #707070;
-  --color-ash: #949494;
-  --color-mist: #d6d6d6;
-  --color-cloud: #e6e6e6;
-  --color-veil: #f0f0f0;
-  --color-paper: #fafafa;
+  --color-graphite: #1a1a2e;
+  --color-carbon: #2d2d3a;
+  --color-slate: #535768;
+  --color-fog: #707080;
+  --color-ash: #9a9ab0;
+  --color-mist: #d0d4e4;
+  --color-cloud: #e8eaf0;
+  --color-veil: #f0f2f7;
+  --color-paper: #f8f9fc;
   --color-white: #ffffff;
 
-  /* Typography */
+  /* ─── Pastel Accents ─── */
+  --color-mint: #e0fce8;
+  --color-sky: #ddf4ff;
+  --color-peach: #fff0e8;
+  --color-lavender: #f0eaff;
+  --color-periwinkle: #e7ecff;
+
+  /* ─── Typography ─── */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
 
-  /* Border radius — Grain */
-  --radius-sm: 6px;
-  --radius-card: 12px;
-  --radius-lg: 16px;
-  --radius-image: 14px;
+  /* ─── Border Radius ─── */
+  --radius-sm: 8px;
+  --radius-card: 16px;
+  --radius-lg: 24px;
+  --radius-image: 16px;
+  --radius-pill: 100px;
   --radius-full: 9999px;
 
-  /* Letter spacing tokens */
-  --tracking-body-sm: -0.42px;
-  --tracking-heading-sm: -0.4px;
+  /* ─── Shadows ─── */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 16px rgba(100, 110, 140, 0.06);
+  --shadow-elevated: 0 4px 12px rgba(100, 110, 140, 0.08), 0 12px 40px rgba(100, 110, 140, 0.06);
+  --shadow-soft: 0 2px 48px rgba(100, 120, 160, 0.1);
+  --shadow-inset: rgba(0, 0, 0, 0.03) 0px 0px 12px 0px inset;
+  --shadow-glow: 0 0 24px rgba(0, 153, 89, 0.15);
 
-  /* Shadows — Grain */
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.03);
-  --shadow-elevated: 0 4px 6px rgba(0, 0, 0, 0.04), 0 10px 24px rgba(0, 0, 0, 0.06);
-  --shadow-inset: rgba(0, 0, 0, 0.05) 0px 0px 12px 0px inset;
-  --shadow-glow: 0 0 20px rgba(0, 153, 89, 0.12);
-
-  /* Animation durations */
+  /* ─── Animation ─── */
   --duration-fast: 150ms;
   --duration-normal: 250ms;
   --duration-slow: 400ms;
-
-  /* Easing */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 :root {
-  --background: #f8faf9;
-  --foreground: #141414;
+  --background: #f8f9fc;
+  --foreground: #1a1a2e;
 }
 
 body {
@@ -61,7 +66,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Animations globales */
+/* ─── Animations ─── */
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
@@ -106,17 +111,17 @@ body {
 .grain-gradient {
   background: linear-gradient(
     135deg,
-    rgba(0, 153, 89, 0.06) 0%,
-    rgba(0, 185, 108, 0.03) 50%,
-    rgba(61, 225, 255, 0.02) 100%
+    rgba(0, 153, 89, 0.04) 0%,
+    rgba(0, 185, 108, 0.02) 50%,
+    rgba(61, 225, 255, 0.01) 100%
   );
 }
 
 .grain-mesh {
   background-image:
-    radial-gradient(at 20% 80%, rgba(0, 153, 89, 0.05) 0%, transparent 50%),
-    radial-gradient(at 80% 20%, rgba(0, 185, 108, 0.04) 0%, transparent 50%),
-    radial-gradient(at 50% 50%, rgba(61, 225, 255, 0.02) 0%, transparent 50%);
+    radial-gradient(at 20% 80%, rgba(0, 153, 89, 0.03) 0%, transparent 50%),
+    radial-gradient(at 80% 20%, rgba(0, 185, 108, 0.02) 0%, transparent 50%),
+    radial-gradient(at 50% 50%, rgba(61, 225, 255, 0.01) 0%, transparent 50%);
 }
 
 .font-display {
@@ -125,17 +130,16 @@ body {
   letter-spacing: -0.02em;
 }
 
-/* ─── Inputs ────────────────────────────────────────────── */
+/* ─── Inputs ─── */
 .input-grain {
   width: 100%;
-  border-radius: var(--radius-card);
+  border-radius: var(--radius-sm);
   border: 1.5px solid var(--color-cloud);
   background-color: var(--color-white);
-  padding: 0.5rem 0.875rem;
+  padding: 0.625rem 1rem;
   font-size: 0.875rem;
-  line-height: 1.25rem;
+  line-height: 1.4;
   color: var(--color-graphite);
-  letter-spacing: -0.42px;
   outline: none;
   transition: border-color var(--duration-fast), box-shadow var(--duration-fast), background-color var(--duration-fast);
 }
@@ -147,7 +151,7 @@ body {
 
 .input-grain:focus {
   border-color: var(--color-forest-ink);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-forest-ink) 12%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-forest-ink) 10%, transparent);
   background-color: var(--color-white);
 }
 
@@ -157,38 +161,30 @@ body {
   font-size: 0.8125rem;
   font-weight: 600;
   color: var(--color-slate);
-  letter-spacing: -0.3px;
 }
 
-/* ─── Tables ────────────────────────────────────────────── */
+/* ─── Tables ─── */
 .table-grain {
   width: 100%;
   min-width: 480px;
   font-size: 0.875rem;
-  letter-spacing: -0.42px;
   border-collapse: separate;
   border-spacing: 0;
 }
 
 .table-grain thead {
-  background: linear-gradient(180deg, var(--color-veil) 0%, color-mix(in srgb, var(--color-veil) 60%, var(--color-paper)) 100%);
+  background: var(--color-paper);
 }
 
 .table-grain th {
-  padding: 0.75rem 1rem;
+  padding: 0.875rem 1.25rem;
   text-align: left;
   font-weight: 600;
   font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: var(--color-fog);
+  letter-spacing: 0.04em;
+  color: var(--color-ash);
   white-space: nowrap;
-}
-
-@media (min-width: 640px) {
-  .table-grain th {
-    padding: 0.875rem 1.25rem;
-  }
 }
 
 .table-grain tbody tr {
@@ -197,27 +193,12 @@ body {
 }
 
 .table-grain tbody tr:hover {
-  background-color: color-mix(in srgb, var(--color-forest-ink) 3%, var(--color-paper));
-}
-
-.table-grain tbody tr:hover .table-row-actions {
-  border-color: var(--color-mist);
-  box-shadow: var(--shadow-elevated);
-}
-
-.table-row-actions {
-  transition: border-color var(--duration-fast), box-shadow var(--duration-fast);
+  background-color: var(--color-veil);
 }
 
 .table-grain td {
-  padding: 0.75rem 1rem;
+  padding: 0.875rem 1.25rem;
   color: var(--color-slate);
-}
-
-@media (min-width: 640px) {
-  .table-grain td {
-    padding: 0.875rem 1.25rem;
-  }
 }
 
 .table-shell {
@@ -234,12 +215,12 @@ body {
   box-shadow: var(--shadow-elevated);
 }
 
-/* ─── Panels ────────────────────────────────────────────── */
+/* ─── Panels ─── */
 .panel-grain {
   border-radius: var(--radius-card);
   border: 1px solid var(--color-cloud);
   background-color: var(--color-white);
-  padding: 1.25rem;
+  padding: 1.5rem;
   box-shadow: var(--shadow-card);
   transition: box-shadow var(--duration-normal), border-color var(--duration-normal);
 }
@@ -251,22 +232,21 @@ body {
 
 @media (min-width: 640px) {
   .panel-grain {
-    padding: 1.75rem;
+    padding: 2rem;
   }
 }
 
-/* ─── Badges ────────────────────────────────────────────── */
+/* ─── Badges ─── */
 .badge-grain {
   display: inline-flex;
   align-items: center;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-pill);
   border: 1px solid var(--color-cloud);
   background-color: var(--color-white);
   padding: 0.375rem 0.875rem;
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--color-slate);
-  letter-spacing: -0.3px;
   transition: all var(--duration-fast);
 }
 
@@ -275,32 +255,32 @@ body {
   box-shadow: var(--shadow-card);
 }
 
-/* ─── Login ─────────────────────────────────────────────── */
+/* ─── Login ─── */
 .login-shell {
-  background: linear-gradient(160deg, #f0f5f2 0%, #f0f2f5 50%, #eef3f7 100%);
+  background: linear-gradient(160deg, #f0f5f2 0%, #f2f4f8 50%, #eef3f7 100%);
 }
 
 .login-card {
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-cloud);
   background-color: var(--color-white);
-  padding: 2rem;
+  padding: 2.5rem;
   box-shadow: var(--shadow-elevated);
   transition: box-shadow var(--duration-slow);
 }
 
 .login-card:hover {
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-soft);
 }
 
 .login-input {
   width: 100%;
-  border-radius: var(--radius-card);
+  border-radius: var(--radius-sm);
   border: 1.5px solid var(--color-cloud);
   background-color: var(--color-white);
   padding: 0.875rem 1rem;
   font-size: 1rem;
-  line-height: 1.25rem;
+  line-height: 1.4;
   color: var(--color-graphite);
   outline: none;
   transition: border-color var(--duration-fast), box-shadow var(--duration-fast), transform var(--duration-fast);
@@ -316,11 +296,11 @@ body {
 
 .login-input:focus {
   border-color: var(--color-forest-ink);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-forest-ink) 12%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-forest-ink) 10%, transparent);
   transform: translateY(-1px);
 }
 
-/* ─── Scrollbar (WebKit) ────────────────────────────────── */
+/* ─── Scrollbar ─── */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -339,7 +319,7 @@ body {
   background: var(--color-ash);
 }
 
-/* ─── Skeleton loading ──────────────────────────────────── */
+/* ─── Skeleton loading ─── */
 .skeleton {
   background: linear-gradient(90deg, var(--color-veil) 25%, var(--color-cloud) 50%, var(--color-veil) 75%);
   background-size: 200% 100%;

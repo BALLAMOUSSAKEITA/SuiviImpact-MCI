@@ -129,11 +129,11 @@ export function Sidebar({
 
   const navLinkClass = (active: boolean) =>
     cn(
-      "group relative flex items-center rounded-[var(--radius-card)] text-[13px] font-medium transition-all duration-[var(--duration-fast)]",
+      "group relative flex items-center rounded-[var(--radius-sm)] text-[13px] font-medium transition-all duration-[var(--duration-fast)]",
       narrow ? "justify-center px-2 py-2.5" : "gap-3 px-3 py-2.5",
       active
-        ? "bg-forest-ink/[0.08] text-forest-ink shadow-sm"
-        : "text-slate hover:bg-veil/80 hover:text-graphite",
+        ? "bg-forest-ink/[0.07] text-forest-ink"
+        : "text-slate hover:bg-veil hover:text-graphite",
     );
 
   return (

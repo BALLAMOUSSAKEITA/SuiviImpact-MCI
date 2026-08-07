@@ -35,8 +35,8 @@ export function PageHeader({
           className={cn(
             "text-graphite tracking-tight",
             display
-              ? "font-display text-2xl leading-tight sm:text-[32px] lg:text-[38px] lg:leading-[1.2]"
-              : "text-xl font-bold sm:text-2xl",
+              ? "font-display text-2xl leading-tight sm:text-[32px] lg:text-[38px] lg:leading-[1.15]"
+              : "font-display text-xl sm:text-2xl",
           )}
         >
           {title}
