@@ -129,7 +129,7 @@ function ProjetsContent() {
                 placeholder="Ex. Appui aux MPME de Kindia"
               />
               <p className="mt-1.5 text-[11px] text-ash">
-                L&apos;identifiant (ex. PRJ-A1B2C3D4) sera généré automatiquement.
+                L&apos;identifiant (ex. A1B2C3D4) sera généré automatiquement.
               </p>
             </div>
             <div className="flex gap-2">

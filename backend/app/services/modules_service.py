@@ -247,7 +247,7 @@ async def get_projet(db: AsyncSession, item_id: int) -> Projet | None:
 
 async def _generate_projet_code(db: AsyncSession) -> str:
     for _ in range(20):
-        code = f"PRJ-{secrets.token_hex(4).upper()}"
+        code = secrets.token_hex(4).upper()
         result = await db.execute(select(Projet.id).where(Projet.code == code).limit(1))
         if result.scalar_one_or_none() is None:
             return code
