@@ -54,6 +54,13 @@ class ActionType(str, enum.Enum):
     UPLOAD = "upload"
 
 
+# Reusable enum types — create_type=False to let Alembic manage creation
+_workflow_status_enum = Enum(WorkflowStatus, name="workflow_status_enum", create_type=False)
+_step_role_enum = Enum(WorkflowStepRole, name="workflow_step_role_enum", create_type=False)
+_step_status_enum = Enum(StepStatus, name="step_status_enum", create_type=False)
+_action_type_enum = Enum(ActionType, name="action_type_enum", create_type=False)
+
+
 class Workflow(Base):
     __tablename__ = "workflows"
 
@@ -62,7 +69,7 @@ class Workflow(Base):
     ref: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     type: Mapped[str] = mapped_column(String(100), nullable=False)
     status: Mapped[WorkflowStatus] = mapped_column(
-        Enum(WorkflowStatus, name="workflow_status_enum"),
+        _workflow_status_enum,
         default=WorkflowStatus.EN_COURS,
         nullable=False,
     )
@@ -92,11 +99,11 @@ class WorkflowStep(Base):
         ForeignKey("workflows.id", ondelete="CASCADE"), nullable=False
     )
     role: Mapped[WorkflowStepRole] = mapped_column(
-        Enum(WorkflowStepRole, name="workflow_step_role_enum"), nullable=False
+        _step_role_enum, nullable=False
     )
     ordre: Mapped[int] = mapped_column(Integer, nullable=False)
     status: Mapped[StepStatus] = mapped_column(
-        Enum(StepStatus, name="step_status_enum"),
+        _step_status_enum,
         default=StepStatus.WAITING,
         nullable=False,
     )
@@ -126,14 +133,13 @@ class WorkflowAction(Base):
         ForeignKey("users.id"), nullable=False
     )
     action_type: Mapped[ActionType] = mapped_column(
-        Enum(ActionType, name="action_type_enum"), nullable=False
+        _action_type_enum, nullable=False
     )
     comment: Mapped[str | None] = mapped_column(Text, nullable=True)
     file_path: Mapped[str | None] = mapped_column(String(500), nullable=True)
     file_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
     target_role: Mapped[WorkflowStepRole | None] = mapped_column(
-        Enum(WorkflowStepRole, name="workflow_step_role_enum", create_type=False),
-        nullable=True,
+        _step_role_enum, nullable=True
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()

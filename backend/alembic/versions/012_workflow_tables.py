@@ -18,17 +18,16 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    workflow_status = sa.Enum("en_cours", "termine", "rejete", name="workflow_status_enum")
-    workflow_status.create(op.get_bind(), checkfirst=True)
+    workflow_status = sa.Enum("en_cours", "termine", "rejete", name="workflow_status_enum", create_type=False)
+    step_role = sa.Enum("directeur", "bsd", "sg", "ministre", "daf", name="workflow_step_role_enum", create_type=False)
+    step_status = sa.Enum("waiting", "active", "done", "rejected", name="step_status_enum", create_type=False)
+    action_type = sa.Enum("validate", "reject", "comment", "upload", name="action_type_enum", create_type=False)
 
-    step_role = sa.Enum("directeur", "bsd", "sg", "ministre", "daf", name="workflow_step_role_enum")
-    step_role.create(op.get_bind(), checkfirst=True)
-
-    step_status = sa.Enum("waiting", "active", "done", "rejected", name="step_status_enum")
-    step_status.create(op.get_bind(), checkfirst=True)
-
-    action_type = sa.Enum("validate", "reject", "comment", "upload", name="action_type_enum")
-    action_type.create(op.get_bind(), checkfirst=True)
+    # Create enum types first
+    op.execute("CREATE TYPE IF NOT EXISTS workflow_status_enum AS ENUM ('en_cours', 'termine', 'rejete')")
+    op.execute("CREATE TYPE IF NOT EXISTS workflow_step_role_enum AS ENUM ('directeur', 'bsd', 'sg', 'ministre', 'daf')")
+    op.execute("CREATE TYPE IF NOT EXISTS step_status_enum AS ENUM ('waiting', 'active', 'done', 'rejected')")
+    op.execute("CREATE TYPE IF NOT EXISTS action_type_enum AS ENUM ('validate', 'reject', 'comment', 'upload')")
 
     op.create_table(
         "workflows",
@@ -76,7 +75,7 @@ def downgrade() -> None:
     op.drop_table("workflow_actions")
     op.drop_table("workflow_steps")
     op.drop_table("workflows")
-    sa.Enum(name="action_type_enum").drop(op.get_bind(), checkfirst=True)
-    sa.Enum(name="step_status_enum").drop(op.get_bind(), checkfirst=True)
-    sa.Enum(name="workflow_step_role_enum").drop(op.get_bind(), checkfirst=True)
-    sa.Enum(name="workflow_status_enum").drop(op.get_bind(), checkfirst=True)
+    op.execute("DROP TYPE IF EXISTS action_type_enum")
+    op.execute("DROP TYPE IF EXISTS step_status_enum")
+    op.execute("DROP TYPE IF EXISTS workflow_step_role_enum")
+    op.execute("DROP TYPE IF EXISTS workflow_status_enum")
