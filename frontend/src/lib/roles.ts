@@ -17,7 +17,7 @@ export function isInstitutionRole(role: UserRole | undefined): boolean {
 
 export function canWritePlatform(role: UserRole | undefined, typeAcces: string | undefined): boolean {
   if (!role) return false;
-  if isInstitutionRole(role)) return false;
+  if (isInstitutionRole(role)) return false;
   return typeAcces === "ecriture";
 }
 
