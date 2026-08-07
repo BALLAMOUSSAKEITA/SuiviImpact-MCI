@@ -26,8 +26,10 @@ import {
 import { useEffect, useState } from "react";
 
 import { useAuth } from "@/components/auth-provider";
+import { UserAvatar } from "@/components/user-avatar";
 import { Button } from "@/components/ui/button";
 import { BRAND } from "@/lib/brand";
+import { canSeeNavGroup, canSeeNavHref, ROLE_LABELS } from "@/lib/roles";
 import { cn } from "@/lib/utils";
 
 interface NavItem {
@@ -95,7 +97,7 @@ export function Sidebar({
   onNavigate,
 }: SidebarProps) {
   const pathname = usePathname();
-  const { user, isAdmin, logout } = useAuth();
+  const { user, logout } = useAuth();
 
   const isActive = (href: string) => {
     if (href === "/admin") return pathname === "/admin";
@@ -191,36 +193,55 @@ export function Sidebar({
           )}
         </div>
 
-        <div
+        <Link
+          href="/admin/profil"
+          onClick={onNavigate}
           className={cn(
-            "mt-4 flex items-center border-t border-cloud/60 pt-4",
+            "mt-4 flex items-center border-t border-cloud/60 pt-4 transition-opacity hover:opacity-90",
             narrow ? "justify-center" : "gap-3",
           )}
         >
-          <div
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-forest-ink/10 text-forest-ink"
-            title={user?.prenom ?? "Utilisateur"}
-          >
-            <span className="text-sm font-bold">{user?.prenom?.charAt(0) ?? "U"}</span>
-          </div>
+          <UserAvatar
+            prenom={user?.prenom ?? ""}
+            nom={user?.nom}
+            hasAvatar={user?.has_avatar}
+            size="sm"
+          />
           {!narrow && (
             <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-graphite">{user?.prenom}</p>
+              <p className="truncate text-sm font-semibold text-graphite">
+                {[user?.prenom, user?.nom].filter(Boolean).join(" ") || "Profil"}
+              </p>
               <p className="text-[11px] text-ash">
-                {user?.type_acces === "ecriture" ? "Accès édition" : "Accès lecture"}
+                {user ? ROLE_LABELS[user.role] : "Mon profil"}
               </p>
             </div>
           )}
-        </div>
+        </Link>
       </div>
 
       {/* Navigation */}
       <nav className={cn("flex-1 space-y-0.5 overflow-y-auto py-4", narrow ? "px-2" : "px-3")}>
         {navItems
-          .filter((item) => !item.adminOnly || isAdmin)
-          .map((item) => {
+          .filter((item) => {
+            if (item.adminOnly && user?.role !== "admin") return false;
             if (item.children) {
-              const sectionActive = isGroupActive(item);
+              const childHrefs = item.children.map((c) => c.href);
+              return canSeeNavGroup(user?.role, item.href, childHrefs, item.adminOnly);
+            }
+            return canSeeNavHref(user?.role, item.href, item.adminOnly);
+          })
+          .map((item) => {
+            const visibleChildren = item.children?.filter((c) =>
+              canSeeNavHref(user?.role, c.href, false),
+            );
+            if (item.children && (!visibleChildren || visibleChildren.length === 0)) {
+              return null;
+            }
+            const children = visibleChildren ?? item.children;
+
+            if (children?.length) {
+              const sectionActive = children.some((c) => isActive(c.href));
               const isOpen = expanded[item.href] ?? sectionActive;
 
               if (narrow) {
@@ -258,7 +279,7 @@ export function Sidebar({
                           <p className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-fog">
                             {item.label}
                           </p>
-                          {item.children.map(({ href, label, icon: ChildIcon }) => {
+                          {children.map(({ href, label, icon: ChildIcon }) => {
                             const childActive = isActive(href);
                             return (
                               <Link
@@ -320,7 +341,7 @@ export function Sidebar({
 
                   {isOpen && (
                     <div className="ml-5 mt-0.5 space-y-0.5 border-l border-cloud/80 pl-3">
-                      {item.children.map(({ href, label, icon: ChildIcon }) => {
+                      {children.map(({ href, label, icon: ChildIcon }) => {
                         const childActive = isActive(href);
                         return (
                           <Link

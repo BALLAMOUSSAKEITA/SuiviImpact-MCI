@@ -1,6 +1,7 @@
 from datetime import UTC, datetime
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
+from fastapi.responses import FileResponse
 from jose import JWTError
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -18,10 +19,13 @@ from app.core.security import (
 from app.models.user import RefreshToken, User
 from app.schemas.auth import (
     LoginRequest,
+    ProfileUpdate,
     RefreshRequest,
     TokenResponse,
     UserMe,
+    user_to_read,
 )
+from app.services.storage_service import storage_service
 
 router = APIRouter(prefix="/auth")
 
@@ -120,5 +124,41 @@ async def logout(
 
 
 @router.get("/me", response_model=UserMe)
-async def me(user: User = Depends(get_current_user)) -> User:
-    return user
+async def me(user: User = Depends(get_current_user)) -> UserMe:
+    return user_to_read(user)
+
+
+@router.patch("/me", response_model=UserMe)
+async def update_me(
+    body: ProfileUpdate,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> UserMe:
+    user.prenom = body.prenom.strip()
+    user.nom = body.nom.strip()
+    await db.commit()
+    await db.refresh(user)
+    return user_to_read(user)
+
+
+@router.post("/me/avatar", response_model=UserMe)
+async def upload_avatar(
+    file: UploadFile = File(...),
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> UserMe:
+    if user.avatar_path:
+        storage_service.delete_file(user.avatar_path)
+    chemin, _, _ = await storage_service.save_upload(file, "avatars")
+    user.avatar_path = chemin
+    await db.commit()
+    await db.refresh(user)
+    return user_to_read(user)
+
+
+@router.get("/me/avatar")
+async def get_my_avatar(user: User = Depends(get_current_user)) -> FileResponse:
+    if not user.avatar_path:
+        raise HTTPException(status_code=404, detail="Aucune photo de profil")
+    path = storage_service.resolve_path(user.avatar_path)
+    return FileResponse(path=path, media_type="image/jpeg", filename="avatar")

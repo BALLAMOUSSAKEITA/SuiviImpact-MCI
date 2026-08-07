@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.security import TokenType, decode_token
+from app.core.roles import effective_can_write
 from app.models.user import AccessType, User, UserRole
 
 security_scheme = HTTPBearer(auto_error=False)
@@ -59,7 +60,7 @@ async def require_admin(user: User = Depends(get_current_user)) -> User:
 
 
 async def require_write_access(user: User = Depends(get_current_user)) -> User:
-    if user.type_acces != AccessType.ECRITURE:
+    if not effective_can_write(user):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Accès en écriture requis",

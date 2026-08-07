@@ -12,6 +12,7 @@ import {
   deleteUser,
   listUsers,
 } from "@/lib/api";
+import { ROLE_LABELS } from "@/lib/roles";
 
 export default function ComptesPage() {
   return (
@@ -82,6 +83,7 @@ function ComptesContent() {
             <thead className="bg-paper">
               <tr>
                 <th className="px-4 py-3 text-left font-medium text-slate">N°</th>
+                <th className="px-4 py-3 text-left font-medium text-slate">Nom</th>
                 <th className="px-4 py-3 text-left font-medium text-slate">Prénom</th>
                 <th className="px-4 py-3 text-left font-medium text-slate">Username</th>
                 <th className="px-4 py-3 text-left font-medium text-slate">Rôle</th>
@@ -93,7 +95,7 @@ function ComptesContent() {
             <tbody className="divide-y divide-cloud/60">
               {isLoading && (
                 <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-ash">
+                  <td colSpan={8} className="px-4 py-8 text-center text-ash">
                     Chargement…
                   </td>
                 </tr>
@@ -101,9 +103,10 @@ function ComptesContent() {
               {users?.map((user) => (
                 <tr key={user.id} className="hover:bg-paper">
                   <td className="px-4 py-3">{user.id}</td>
+                  <td className="px-4 py-3">{user.nom || "—"}</td>
                   <td className="px-4 py-3 font-medium">{user.prenom}</td>
                   <td className="px-4 py-3">{user.username}</td>
-                  <td className="px-4 py-3 capitalize">{user.role}</td>
+                  <td className="px-4 py-3">{ROLE_LABELS[user.role]}</td>
                   <td className="px-4 py-3 capitalize">{user.type_acces}</td>
                   <td className="px-4 py-3">
                     <span

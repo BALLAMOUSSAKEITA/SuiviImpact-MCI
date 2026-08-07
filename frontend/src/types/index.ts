@@ -1,13 +1,15 @@
 export type AccessType = "lecture" | "ecriture";
-export type UserRole = "user" | "admin";
+export type UserRole = "user" | "admin" | "directeur" | "sg" | "ministre";
 
 export interface User {
   id: number;
   username: string;
   prenom: string;
+  nom: string;
   role: UserRole;
   type_acces: AccessType;
   etat: boolean;
+  has_avatar?: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -27,8 +29,14 @@ export interface UserCreate {
   username: string;
   password: string;
   prenom: string;
+  nom?: string;
   type_acces: AccessType;
   role?: UserRole;
+}
+
+export interface ProfileUpdate {
+  prenom: string;
+  nom: string;
 }
 
 export interface Objectif {

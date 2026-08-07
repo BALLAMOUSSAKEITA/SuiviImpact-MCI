@@ -6,7 +6,8 @@ from app.api.deps import require_admin
 from app.core.database import get_db
 from app.core.security import hash_password
 from app.models.user import User
-from app.schemas.auth import UserCreate, UserRead
+from app.core.roles import normalize_role_for_create
+from app.schemas.auth import UserCreate, UserRead, user_to_read
 
 router = APIRouter(prefix="/users")
 
@@ -15,9 +16,9 @@ router = APIRouter(prefix="/users")
 async def list_users(
     _: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db),
-) -> list[User]:
+) -> list[UserRead]:
     result = await db.execute(select(User).order_by(User.id))
-    return list(result.scalars().all())
+    return [user_to_read(u) for u in result.scalars().all()]
 
 
 @router.post("", response_model=UserRead, status_code=status.HTTP_201_CREATED)
@@ -25,23 +26,26 @@ async def create_user(
     body: UserCreate,
     _: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db),
-) -> User:
+) -> UserRead:
     existing = await db.execute(select(User).where(User.username == body.username))
     if existing.scalar_one_or_none():
         raise HTTPException(status_code=400, detail="Nom d'utilisateur déjà utilisé")
 
+    type_acces = normalize_role_for_create(body.role, body.type_acces)
+
     user = User(
         username=body.username,
         password_hash=hash_password(body.password),
-        prenom=body.prenom,
-        type_acces=body.type_acces,
+        prenom=body.prenom.strip(),
+        nom=body.nom.strip(),
+        type_acces=type_acces,
         role=body.role,
         etat=True,
     )
     db.add(user)
     await db.commit()
     await db.refresh(user)
-    return user
+    return user_to_read(user)
 
 
 @router.patch("/{user_id}/activate", response_model=UserRead)
@@ -49,12 +53,12 @@ async def activate_user(
     user_id: int,
     _: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db),
-) -> User:
+) -> UserRead:
     user = await _get_user_or_404(db, user_id)
     user.etat = True
     await db.commit()
     await db.refresh(user)
-    return user
+    return user_to_read(user)
 
 
 @router.patch("/{user_id}/deactivate", response_model=UserRead)
@@ -62,14 +66,14 @@ async def deactivate_user(
     user_id: int,
     admin: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db),
-) -> User:
+) -> UserRead:
     if user_id == admin.id:
         raise HTTPException(status_code=400, detail="Impossible de désactiver votre propre compte")
     user = await _get_user_or_404(db, user_id)
     user.etat = False
     await db.commit()
     await db.refresh(user)
-    return user
+    return user_to_read(user)
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)

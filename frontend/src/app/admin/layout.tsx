@@ -1,5 +1,6 @@
 import { AdminShell } from "@/components/admin-shell";
 import { ProtectedRoute } from "@/components/protected-route";
+import { RoleRouteGuard } from "@/components/role-route-guard";
 
 export default function AdminLayout({
   children,
@@ -8,7 +9,9 @@ export default function AdminLayout({
 }) {
   return (
     <ProtectedRoute>
-      <AdminShell>{children}</AdminShell>
+      <RoleRouteGuard>
+        <AdminShell>{children}</AdminShell>
+      </RoleRouteGuard>
     </ProtectedRoute>
   );
 }

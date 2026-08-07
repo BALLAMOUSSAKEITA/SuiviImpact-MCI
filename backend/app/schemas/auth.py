@@ -12,6 +12,9 @@ class AccessType(str, Enum):
 class UserRole(str, Enum):
     USER = "user"
     ADMIN = "admin"
+    DIRECTEUR = "directeur"
+    SG = "sg"
+    MINISTRE = "ministre"
 
 
 class LoginRequest(BaseModel):
@@ -33,6 +36,7 @@ class UserCreate(BaseModel):
     username: str = Field(min_length=3, max_length=50)
     password: str = Field(min_length=6)
     prenom: str = Field(min_length=1, max_length=100)
+    nom: str = Field(default="", max_length=100)
     type_acces: AccessType = AccessType.LECTURE
     role: UserRole = UserRole.USER
 
@@ -43,12 +47,34 @@ class UserRead(BaseModel):
     id: int
     username: str
     prenom: str
+    nom: str
     role: UserRole
     type_acces: AccessType
     etat: bool
+    has_avatar: bool = False
     created_at: datetime
     updated_at: datetime
 
 
 class UserMe(UserRead):
     pass
+
+
+class ProfileUpdate(BaseModel):
+    prenom: str = Field(min_length=1, max_length=100)
+    nom: str = Field(min_length=1, max_length=100)
+
+
+def user_to_read(user) -> UserRead:
+    return UserRead(
+        id=user.id,
+        username=user.username,
+        prenom=user.prenom,
+        nom=user.nom or "",
+        role=user.role,
+        type_acces=user.type_acces,
+        etat=user.etat,
+        has_avatar=bool(user.avatar_path),
+        created_at=user.created_at,
+        updated_at=user.updated_at,
+    )

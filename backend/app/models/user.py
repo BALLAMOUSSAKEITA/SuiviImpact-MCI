@@ -15,6 +15,9 @@ class AccessType(str, enum.Enum):
 class UserRole(str, enum.Enum):
     USER = "user"
     ADMIN = "admin"
+    DIRECTEUR = "directeur"
+    SG = "sg"
+    MINISTRE = "ministre"
 
 
 class User(Base):
@@ -24,6 +27,8 @@ class User(Base):
     username: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     prenom: Mapped[str] = mapped_column(String(100), nullable=False)
+    nom: Mapped[str] = mapped_column(String(100), nullable=False, default="")
+    avatar_path: Mapped[str | None] = mapped_column(String(512), nullable=True)
     role: Mapped[UserRole] = mapped_column(
         pg_enum(UserRole, "user_role"), default=UserRole.USER, nullable=False
     )

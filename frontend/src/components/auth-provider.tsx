@@ -17,6 +17,7 @@ import {
   login as apiLogin,
   logout as apiLogout,
 } from "@/lib/api";
+import { canWritePlatform } from "@/lib/roles";
 import type { LoginRequest, User } from "@/types";
 
 interface AuthContextValue {
@@ -110,7 +111,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isLoading,
       isAuthenticated: !!user,
       isAdmin: user?.role === "admin",
-      canWrite: user?.type_acces === "ecriture",
+      canWrite: canWritePlatform(user?.role, user?.type_acces),
       login,
       logout,
       refreshUser,

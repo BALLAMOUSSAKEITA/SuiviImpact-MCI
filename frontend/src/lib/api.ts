@@ -98,6 +98,8 @@ import type {
 
   User,
 
+  ProfileUpdate,
+
   UserCreate,
 
 } from "@/types";
@@ -513,6 +515,50 @@ export async function logout(): Promise<void> {
 export async function getMe(): Promise<User> {
 
   return apiFetch<User>("/api/v1/auth/me");
+
+}
+
+
+
+export async function updateProfile(data: ProfileUpdate): Promise<User> {
+
+  return apiFetch<User>("/api/v1/auth/me", {
+
+    method: "PATCH",
+
+    body: JSON.stringify(data),
+
+  });
+
+}
+
+
+
+export async function uploadProfileAvatar(file: File): Promise<User> {
+
+  const formData = new FormData();
+
+  formData.append("file", file);
+
+  return apiFetchFormData<User>("/api/v1/auth/me/avatar", formData, "POST");
+
+}
+
+
+
+export async function fetchMyAvatarBlob(): Promise<Blob> {
+
+  const headers = buildAuthHeaders({});
+
+  const response = await fetch(`${API_BASE_URL}/api/v1/auth/me/avatar`, { headers });
+
+  if (!response.ok) {
+
+    throw new Error("Photo introuvable");
+
+  }
+
+  return response.blob();
 
 }
 

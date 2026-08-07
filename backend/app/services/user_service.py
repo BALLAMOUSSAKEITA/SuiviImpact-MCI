@@ -17,6 +17,7 @@ async def seed_admin_user(db: AsyncSession) -> None:
         username=settings.ADMIN_USERNAME,
         password_hash=hash_password(settings.ADMIN_PASSWORD),
         prenom=settings.ADMIN_PRENOM,
+        nom="",
         role=UserRole.ADMIN,
         type_acces=AccessType.ECRITURE,
         etat=True,
