@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user, require_write_access
@@ -10,7 +11,9 @@ from app.schemas.plan_action import (
     ActiviteCreate,
     ActiviteRead,
     ActiviteUpdate,
+    DirectionCreate,
     DirectionRead,
+    DirectionUpdate,
     ObjectifCreate,
     ObjectifRead,
     ObjectifUpdate,
@@ -31,6 +34,65 @@ async def list_directions(
 ) -> list[Direction]:
     result = await db.execute(select(Direction).order_by(Direction.code))
     return list(result.scalars().all())
+
+
+@router.post(
+    "/directions",
+    response_model=DirectionRead,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_direction(
+    body: DirectionCreate,
+    _: User = Depends(require_write_access),
+    db: AsyncSession = Depends(get_db),
+) -> Direction:
+    direction = Direction(
+        code=body.code.strip().upper(),
+        libelle=body.libelle.strip(),
+        directeur_nom=body.directeur_nom.strip(),
+        email_directeur=body.email_directeur.strip(),
+    )
+    db.add(direction)
+    try:
+        await db.commit()
+    except IntegrityError as exc:
+        await db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Une direction avec cet acronyme existe déjà",
+        ) from exc
+    await db.refresh(direction)
+    return direction
+
+
+@router.put("/directions/{direction_id}", response_model=DirectionRead)
+async def update_direction(
+    direction_id: int,
+    body: DirectionUpdate,
+    _: User = Depends(require_write_access),
+    db: AsyncSession = Depends(get_db),
+) -> Direction:
+    direction = await db.get(Direction, direction_id)
+    if direction is None:
+        raise HTTPException(status_code=404, detail="Direction introuvable")
+    if body.code is not None:
+        direction.code = body.code.strip().upper()
+    if body.libelle is not None:
+        direction.libelle = body.libelle.strip()
+    if body.directeur_nom is not None:
+        direction.directeur_nom = body.directeur_nom.strip()
+    if body.email_directeur is not None:
+        direction.email_directeur = body.email_directeur.strip()
+    try:
+        await db.commit()
+    except IntegrityError as exc:
+        await db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Une direction avec cet acronyme existe déjà",
+        ) from exc
+    await db.refresh(direction)
+    return direction
 
 
 @router.get("/objectifs", response_model=list[ObjectifRead])

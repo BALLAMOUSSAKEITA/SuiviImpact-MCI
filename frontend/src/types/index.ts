@@ -43,6 +43,22 @@ export interface Direction {
   id: number;
   code: string;
   libelle: string;
+  directeur_nom: string | null;
+  email_directeur: string | null;
+}
+
+export interface DirectionCreate {
+  code: string;
+  libelle: string;
+  directeur_nom: string;
+  email_directeur: string;
+}
+
+export interface DirectionUpdate {
+  code?: string;
+  libelle?: string;
+  directeur_nom?: string;
+  email_directeur?: string;
 }
 
 export interface TrimestrePlan {
@@ -232,10 +248,12 @@ export interface PlanificationPaoActivite {
 export type TypeBudgetProjet = "BND" | "FINEX";
 
 export interface PlanificationProjetActiviteInput {
+  id?: number;
   titre: string;
 }
 
 export interface PlanificationProjetComposanteInput {
+  id?: number;
   libelle?: string | null;
   activites: PlanificationProjetActiviteInput[];
 }

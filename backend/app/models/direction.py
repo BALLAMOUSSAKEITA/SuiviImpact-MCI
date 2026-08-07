@@ -10,3 +10,5 @@ class Direction(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     code: Mapped[str] = mapped_column(String(20), unique=True, nullable=False)
     libelle: Mapped[str] = mapped_column(String(100), nullable=False)
+    directeur_nom: Mapped[str | None] = mapped_column(String(150), nullable=True)
+    email_directeur: Mapped[str | None] = mapped_column(String(255), nullable=True)

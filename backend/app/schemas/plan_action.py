@@ -55,6 +55,22 @@ class DirectionRead(BaseModel):
     id: int
     code: str
     libelle: str
+    directeur_nom: str | None = None
+    email_directeur: str | None = None
+
+
+class DirectionCreate(BaseModel):
+    code: str = Field(min_length=1, max_length=20)
+    libelle: str = Field(min_length=1, max_length=100)
+    directeur_nom: str = Field(min_length=1, max_length=150)
+    email_directeur: str = Field(min_length=3, max_length=255)
+
+
+class DirectionUpdate(BaseModel):
+    code: str | None = Field(default=None, min_length=1, max_length=20)
+    libelle: str | None = Field(default=None, min_length=1, max_length=100)
+    directeur_nom: str | None = Field(default=None, min_length=1, max_length=150)
+    email_directeur: str | None = Field(default=None, min_length=3, max_length=255)
 
 
 class ActiviteCreate(BaseModel):

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   BarChart3,
   Briefcase,
+  Building2,
   CalendarDays,
   ChevronDown,
   ChevronLeft,
@@ -42,9 +43,10 @@ const navItems: NavItem[] = [
   { href: "/admin", label: "Vue d'ensemble", icon: Home },
   {
     href: "/admin/plan-action",
-    label: "Plan d'Action",
+    label: "Paramétrage",
     icon: LayoutDashboard,
     children: [
+      { href: "/admin/directions", label: "Directions", icon: Building2 },
       { href: "/admin/objectifs", label: "Objectifs", icon: Target },
       { href: "/admin/taches", label: "Tâches", icon: ClipboardList },
       { href: "/admin/projets", label: "Projets", icon: FolderKanban },

@@ -3,7 +3,7 @@ from decimal import Decimal
 import secrets
 
 from fastapi import HTTPException, UploadFile, status
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -22,8 +22,10 @@ from app.schemas.planification import (
     PlanificationPaoCreate,
     PlanificationPaoRead,
     PlanificationPaoTacheRead,
+    PlanificationPaoUpdate,
     PlanificationProjetCreate,
     PlanificationProjetRead,
+    PlanificationProjetUpdate,
     PlanificationProjetComposanteRead,
     PlanificationProjetActiviteRead,
     SemaineRead,
@@ -375,6 +377,116 @@ def _validate_pao_taches(taches: list) -> None:
         )
 
 
+async def _load_tache_plans(db: AsyncSession, taches: list) -> dict[int, TachePlan]:
+    tache_plans: dict[int, TachePlan] = {}
+    for item in taches:
+        if item.tache_plan_id in tache_plans:
+            continue
+        tp = await db.get(TachePlan, item.tache_plan_id)
+        if tp is None:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Tâche plan {item.tache_plan_id} introuvable",
+            )
+        tache_plans[item.tache_plan_id] = tp
+    return tache_plans
+
+
+async def _get_pao_activite_or_404(db: AsyncSession, activite_id: int) -> Activite:
+    result = await db.execute(
+        select(Activite)
+        .where(Activite.id == activite_id, Activite.date_debut.isnot(None))
+        .options(selectinload(Activite.directions))
+    )
+    activite = result.scalar_one_or_none()
+    if activite is None:
+        raise HTTPException(status_code=404, detail="Activité planifiée introuvable")
+    return activite
+
+
+async def _load_pao_activite_read(
+    db: AsyncSession, activite_id: int
+) -> PlanificationPaoRead:
+    items = await list_pao_activites(db)
+    for item in items:
+        if item.id == activite_id:
+            return item
+    raise HTTPException(status_code=404, detail="Activité planifiée introuvable")
+
+
+async def _sync_activite_trimestres(
+    db: AsyncSession, activite_id: int, date_debut: date, date_fin: date
+) -> None:
+    await db.execute(
+        delete(ActiviteTrimestre).where(ActiviteTrimestre.activite_id == activite_id)
+    )
+    for an, tr in _trimestres_between(date_debut, date_fin):
+        db.add(
+            ActiviteTrimestre(
+                activite_id=activite_id,
+                annee=an,
+                trimestre=tr,
+                planifie=True,
+            )
+        )
+
+
+async def _sync_pao_plan_taches(
+    db: AsyncSession,
+    activite: Activite,
+    data: PlanificationPaoCreate,
+    direction: Direction,
+    tache_plans: dict[int, TachePlan],
+) -> None:
+    annee, trimestre = _trimestre_from_date(data.date_debut)
+    responsable_label = direction.libelle[:100]
+
+    result = await db.execute(
+        select(Tache).where(
+            Tache.activite_id == activite.id,
+            Tache.tache_plan_id.isnot(None),
+        )
+    )
+    existing = {t.tache_plan_id: t for t in result.scalars().all()}
+    new_ids = {item.tache_plan_id for item in data.taches}
+
+    for plan_id, tache in existing.items():
+        if plan_id not in new_ids:
+            if tache.statut == TacheStatut.TERMINEE:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Impossible de retirer une tâche déjà terminée au suivi",
+                )
+            await db.delete(tache)
+
+    for item in data.taches:
+        tp = tache_plans[item.tache_plan_id]
+        desc = f"{tp.code} — {tp.description}"
+        ponderation = Decimal(str(item.ponderation))
+        if item.tache_plan_id in existing:
+            tache = existing[item.tache_plan_id]
+            tache.description = desc
+            tache.responsable = responsable_label
+            tache.email_responsable = data.email_responsable
+            tache.ponderation = ponderation
+            tache.trimestre = trimestre
+            tache.annee = annee
+        else:
+            db.add(
+                Tache(
+                    activite_id=activite.id,
+                    tache_plan_id=tp.id,
+                    trimestre=trimestre,
+                    annee=annee,
+                    description=desc,
+                    responsable=responsable_label,
+                    email_responsable=data.email_responsable,
+                    ponderation=ponderation,
+                    statut=TacheStatut.EN_COURS,
+                )
+            )
+
+
 async def create_pao_activite(
     db: AsyncSession,
     data: PlanificationPaoCreate,
@@ -485,6 +597,57 @@ async def create_pao_activite(
         taches=taches_read,
         created_at=activite.created_at,
     )
+
+
+async def update_pao_activite(
+    db: AsyncSession,
+    activite_id: int,
+    data: PlanificationPaoUpdate,
+    tdr_file: UploadFile | None = None,
+) -> PlanificationPaoRead:
+    _validate_pao_taches(data.taches)
+
+    activite = await _get_pao_activite_or_404(db, activite_id)
+
+    objectif = await db.get(Objectif, data.objectif_id)
+    if objectif is None:
+        raise HTTPException(status_code=404, detail="Objectif introuvable")
+
+    direction = await db.get(Direction, data.direction_id)
+    if direction is None:
+        raise HTTPException(status_code=404, detail="Direction introuvable")
+
+    tache_plans = await _load_tache_plans(db, data.taches)
+
+    if tdr_file is not None and tdr_file.filename:
+        tdr_chemin, tdr_nom, _ = await storage_service.save_upload(tdr_file, "tdr")
+        activite.tdr_chemin = tdr_chemin
+        activite.tdr_nom_original = tdr_nom
+
+    activite.objectif_id = data.objectif_id
+    activite.description = data.description
+    activite.budget = data.budget
+    activite.date_debut = data.date_debut
+    activite.date_fin = data.date_fin
+    activite.email_responsable = data.email_responsable
+    activite.email_ministre = data.email_ministre
+
+    if activite.directions:
+        current_dir_id = activite.directions[0].direction_id
+        if current_dir_id != data.direction_id:
+            for link in list(activite.directions):
+                await db.delete(link)
+            db.add(
+                ActiviteDirection(activite_id=activite.id, direction_id=data.direction_id)
+            )
+    else:
+        db.add(ActiviteDirection(activite_id=activite.id, direction_id=data.direction_id))
+
+    await _sync_activite_trimestres(db, activite.id, data.date_debut, data.date_fin)
+    await _sync_pao_plan_taches(db, activite, data, direction, tache_plans)
+
+    await db.commit()
+    return await _load_pao_activite_read(db, activite_id)
 
 
 async def list_pao_activites(db: AsyncSession) -> list[PlanificationPaoRead]:
@@ -619,10 +782,7 @@ def _planif_projet_to_read(
     )
 
 
-async def create_planification_projet(
-    db: AsyncSession,
-    data: PlanificationProjetCreate,
-) -> PlanificationProjetRead:
+def _validate_projet_planification(data: PlanificationProjetCreate) -> None:
     if len(data.composantes) > 2:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -634,6 +794,13 @@ async def create_planification_projet(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Maximum 5 activités par composante",
             )
+
+
+async def create_planification_projet(
+    db: AsyncSession,
+    data: PlanificationProjetCreate,
+) -> PlanificationProjetRead:
+    _validate_projet_planification(data)
 
     projet = await db.get(Projet, data.projet_id)
     if projet is None:
@@ -674,6 +841,127 @@ async def create_planification_projet(
                     titre=act.titre.strip(),
                 )
             )
+
+    await db.commit()
+
+    loaded = await db.execute(
+        select(PlanificationProjet)
+        .where(PlanificationProjet.id == planif.id)
+        .options(
+            selectinload(PlanificationProjet.composantes).selectinload(
+                PlanificationProjetComposante.activites
+            ),
+        )
+    )
+    planif_loaded = loaded.scalar_one()
+    return _planif_projet_to_read(planif_loaded, projet, direction)
+
+
+async def update_planification_projet(
+    db: AsyncSession,
+    planif_id: int,
+    data: PlanificationProjetUpdate,
+) -> PlanificationProjetRead:
+    _validate_projet_planification(data)
+
+    result = await db.execute(
+        select(PlanificationProjet)
+        .where(PlanificationProjet.id == planif_id)
+        .options(
+            selectinload(PlanificationProjet.composantes).selectinload(
+                PlanificationProjetComposante.activites
+            ),
+        )
+    )
+    planif = result.scalar_one_or_none()
+    if planif is None:
+        raise HTTPException(status_code=404, detail="Planification projet introuvable")
+
+    projet = await db.get(Projet, data.projet_id)
+    if projet is None:
+        raise HTTPException(status_code=404, detail="Projet introuvable")
+
+    direction = await db.get(Direction, data.direction_id)
+    if direction is None:
+        raise HTTPException(status_code=404, detail="Direction introuvable")
+
+    planif.projet_id = data.projet_id
+    planif.type_budget = data.type_budget.value
+    planif.montant = data.montant
+    planif.lieu = data.lieu.strip()
+    planif.date_debut = data.date_debut
+    planif.date_fin = data.date_fin
+    planif.direction_id = data.direction_id
+    planif.email_responsable = data.email_responsable.strip()
+    planif.email_ministre = data.email_ministre.strip()
+
+    kept_comp_ids = {c.id for c in data.composantes if c.id is not None}
+    for composante in list(planif.composantes):
+        if composante.id not in kept_comp_ids:
+            if any(a.terminee for a in composante.activites):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=(
+                        "Impossible de supprimer une composante contenant "
+                        "une activité déjà terminée au suivi"
+                    ),
+                )
+            await db.delete(composante)
+
+    await db.flush()
+    comp_by_id = {c.id: c for c in planif.composantes}
+
+    for idx, comp_data in enumerate(data.composantes, start=1):
+        libelle = (comp_data.libelle or "").strip() or None
+        if comp_data.id is not None:
+            composante = comp_by_id.get(comp_data.id)
+            if composante is None or composante.planification_id != planif.id:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Composante invalide pour cette planification",
+                )
+            composante.ordre = idx
+            composante.libelle = libelle
+        else:
+            composante = PlanificationProjetComposante(
+                planification_id=planif.id,
+                ordre=idx,
+                libelle=libelle,
+            )
+            db.add(composante)
+            await db.flush()
+            comp_by_id[composante.id] = composante
+
+        kept_act_ids = {a.id for a in comp_data.activites if a.id is not None}
+        act_by_id = {a.id: a for a in composante.activites}
+        for activite in list(composante.activites):
+            if activite.id not in kept_act_ids:
+                if activite.terminee:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail="Impossible de supprimer une activité déjà terminée au suivi",
+                    )
+                await db.delete(activite)
+
+        for act_idx, act_data in enumerate(comp_data.activites, start=1):
+            titre = act_data.titre.strip()
+            if act_data.id is not None:
+                activite = act_by_id.get(act_data.id)
+                if activite is None or activite.composante_id != composante.id:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail="Activité invalide pour cette composante",
+                    )
+                activite.titre = titre
+                activite.ordre = act_idx
+            else:
+                db.add(
+                    PlanificationProjetActivite(
+                        composante_id=composante.id,
+                        ordre=act_idx,
+                        titre=titre,
+                    )
+                )
 
     await db.commit()
 

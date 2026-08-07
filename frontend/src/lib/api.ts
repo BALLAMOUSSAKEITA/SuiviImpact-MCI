@@ -44,6 +44,10 @@ import type {
 
   Direction,
 
+  DirectionCreate,
+
+  DirectionUpdate,
+
   PlanificationActivite,
 
   PlanificationPaoActivite,
@@ -560,6 +564,23 @@ export async function listDirections(): Promise<Direction[]> {
 
 }
 
+export async function createDirection(data: DirectionCreate): Promise<Direction> {
+  return apiFetch<Direction>("/api/v1/directions", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateDirection(
+  id: number,
+  data: DirectionUpdate,
+): Promise<Direction> {
+  return apiFetch<Direction>(`/api/v1/directions/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+}
+
 
 
 export async function listObjectifs(): Promise<Objectif[]> {
@@ -724,6 +745,23 @@ export async function createPlanificationPao(
   );
 }
 
+export async function updatePlanificationPao(
+  activiteId: number,
+  data: PlanificationPaoCreate,
+  tdr?: File | null,
+): Promise<PlanificationPaoActivite> {
+  const formData = new FormData();
+  formData.append("payload", JSON.stringify(data));
+  if (tdr) {
+    formData.append("tdr", tdr);
+  }
+  return apiFetchFormData<PlanificationPaoActivite>(
+    `/api/v1/planification/pao/${activiteId}`,
+    formData,
+    "PUT",
+  );
+}
+
 
 
 export async function listPlanificationProjet(): Promise<PlanificationProjetPlan[]> {
@@ -737,6 +775,16 @@ export async function createPlanificationProjet(
 ): Promise<PlanificationProjetPlan> {
   return apiFetch<PlanificationProjetPlan>("/api/v1/planification/projet", {
     method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updatePlanificationProjet(
+  planifId: number,
+  data: PlanificationProjetCreate,
+): Promise<PlanificationProjetPlan> {
+  return apiFetch<PlanificationProjetPlan>(`/api/v1/planification/projet/${planifId}`, {
+    method: "PUT",
     body: JSON.stringify(data),
   });
 }

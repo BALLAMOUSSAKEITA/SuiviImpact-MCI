@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -20,6 +20,7 @@ import {
   listObjectifs,
   listPlanificationPao,
   listTachesPlan,
+  updatePlanificationPao,
 } from "@/lib/api";
 import { fetchPlanificationPaoTdr } from "@/lib/stored-documents";
 import type { PlanificationPaoActivite, PlanificationPaoCreate, PlanificationPaoTacheItem } from "@/types";
@@ -80,8 +81,12 @@ function PlanificationPaoContent() {
   const [slots, setSlots] = useState<TacheSlot[]>([]);
   const [slotKey, setSlotKey] = useState(0);
   const [selected, setSelected] = useState<PlanificationPaoActivite | null>(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [existingTdrName, setExistingTdrName] = useState<string | null>(null);
 
   const resetForm = () => {
+    setEditingId(null);
+    setExistingTdrName(null);
     setDescription("");
     setObjectifId("");
     setBudget("");
@@ -110,6 +115,53 @@ function PlanificationPaoContent() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  const updateMutation = useMutation({
+    mutationFn: ({
+      id,
+      payload,
+    }: {
+      id: number;
+      payload: PlanificationPaoCreate;
+    }) => updatePlanificationPao(id, payload, tdrFile),
+    onSuccess: (a) => {
+      toast.success(`Activité mise à jour — ${a.code}`);
+      queryClient.invalidateQueries({ queryKey });
+      resetForm();
+      setShowForm(false);
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const isSaving = createMutation.isPending || updateMutation.isPending;
+
+  const populateFormFromActivite = (a: PlanificationPaoActivite) => {
+    setEditingId(a.id);
+    setDescription(a.description);
+    setObjectifId(String(a.objectif_id));
+    setBudget(String(a.budget));
+    setDateDebut(a.date_debut);
+    setDateFin(a.date_fin);
+    setDirectionId(String(a.direction_id));
+    setEmailResponsable(a.email_responsable);
+    setEmailMinistre(a.email_ministre);
+    setTdrFile(null);
+    setExistingTdrName(a.tdr_nom_original);
+    setSlots(
+      a.taches.map((t, index) => ({
+        key: t.tache_plan_id * 1000 + index,
+        tachePlanId: String(t.tache_plan_id),
+        ponderation: String(Number(t.ponderation)),
+      })),
+    );
+    setShowForm(true);
+    setSelected(null);
+  };
+
+  const startCreate = () => {
+    resetForm();
+    setShowForm(true);
+  };
 
   const addSlot = () => {
     if (slots.length >= MAX_TACHES) return;
@@ -151,7 +203,11 @@ function PlanificationPaoContent() {
       taches,
     };
 
-    createMutation.mutate(payload);
+    if (editingId) {
+      updateMutation.mutate({ id: editingId, payload });
+    } else {
+      createMutation.mutate(payload);
+    }
   };
 
   return (
@@ -162,7 +218,7 @@ function PlanificationPaoContent() {
         description="Planifier une activité du plan d'action annuel : objectif, tâches pondérées, calendrier, direction et TDR."
         actions={
           canWrite && !showForm ? (
-            <Button onClick={() => setShowForm(true)}>
+            <Button onClick={startCreate}>
               <Plus className="h-4 w-4" />
               Planifier une activité
             </Button>
@@ -172,6 +228,9 @@ function PlanificationPaoContent() {
 
       {showForm && canWrite && (
         <div className="panel-grain">
+          <h3 className="mb-4 text-base font-semibold text-graphite">
+            {editingId ? "Modifier l'activité planifiée" : "Nouvelle activité PAO"}
+          </h3>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
@@ -281,6 +340,11 @@ function PlanificationPaoContent() {
 
               <div className="sm:col-span-2">
                 <label className="label-grain">TDR (pièce jointe)</label>
+                {existingTdrName && !tdrFile && (
+                  <p className="mb-2 text-xs text-ash">
+                    Fichier actuel : {existingTdrName}. Choisissez un fichier pour le remplacer.
+                  </p>
+                )}
                 <input
                   type="file"
                   accept=".pdf,.doc,.docx,.xls,.xlsx"
@@ -370,8 +434,8 @@ function PlanificationPaoContent() {
             </div>
 
             <div className="flex flex-wrap gap-2 border-t border-cloud/60 pt-4">
-              <Button type="submit" disabled={createMutation.isPending}>
-                Enregistrer la planification
+              <Button type="submit" disabled={isSaving}>
+                {editingId ? "Enregistrer les modifications" : "Enregistrer la planification"}
               </Button>
               <Button
                 type="button"
@@ -521,6 +585,19 @@ function PlanificationPaoContent() {
                 <span className="text-ash">Non joint</span>
               )}
             </DetailRow>
+            {canWrite && (
+              <div className="pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => selected && populateFormFromActivite(selected)}
+                >
+                  <Pencil className="h-4 w-4" />
+                  Modifier cette activité
+                </Button>
+              </div>
+            )}
           </DetailDrawerRows>
         )}
       </DetailDrawer>

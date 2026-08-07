@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -18,6 +18,7 @@ import {
   listDirections,
   listPlanificationProjet,
   listProjets,
+  updatePlanificationProjet,
 } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import type {
@@ -30,10 +31,11 @@ import type {
 const MAX_COMPOSANTES = 2;
 const MAX_ACTIVITES = 5;
 
-type ActiviteRow = { key: number; titre: string };
+type ActiviteRow = { key: number; dbId?: number; titre: string };
 
 type ComposanteBlock = {
   key: number;
+  dbId?: number;
   libelle: string;
   activites: ActiviteRow[];
 };
@@ -83,8 +85,10 @@ function PlanificationProjetContent() {
   const [composantes, setComposantes] = useState<ComposanteBlock[]>([]);
   const [keySeq, setKeySeq] = useState(0);
   const [selected, setSelected] = useState<PlanificationProjetPlan | null>(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
 
   const resetForm = () => {
+    setEditingId(null);
     setProjetId("");
     setTypeBudget("BND");
     setMontant("");
@@ -108,6 +112,57 @@ function PlanificationProjetContent() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  const updateMutation = useMutation({
+    mutationFn: ({
+      id,
+      payload,
+    }: {
+      id: number;
+      payload: PlanificationProjetCreate;
+    }) => updatePlanificationProjet(id, payload),
+    onSuccess: (p) => {
+      toast.success(`Planification mise à jour — ${p.projet_code}`);
+      queryClient.invalidateQueries({ queryKey });
+      resetForm();
+      setShowForm(false);
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const isSaving = createMutation.isPending || updateMutation.isPending;
+
+  const populateFormFromPlan = (p: PlanificationProjetPlan) => {
+    setEditingId(p.id);
+    setProjetId(String(p.projet_id));
+    setTypeBudget(p.type_budget);
+    setMontant(String(p.montant));
+    setLieu(p.lieu);
+    setDateDebut(p.date_debut);
+    setDateFin(p.date_fin);
+    setDirectionId(String(p.direction_id));
+    setEmailResponsable(p.email_responsable);
+    setEmailMinistre(p.email_ministre);
+    setComposantes(
+      p.composantes.map((c) => ({
+        key: c.id,
+        dbId: c.id,
+        libelle: c.libelle ?? "",
+        activites: c.activites.map((a) => ({
+          key: a.id,
+          dbId: a.id,
+          titre: a.titre,
+        })),
+      })),
+    );
+    setShowForm(true);
+    setSelected(null);
+  };
+
+  const startCreate = () => {
+    resetForm();
+    setShowForm(true);
+  };
 
   const addComposante = () => {
     if (composantes.length >= MAX_COMPOSANTES) return;
@@ -175,11 +230,14 @@ function PlanificationProjetContent() {
 
     const composantesPayload: PlanificationProjetComposanteInput[] = composantes.map(
       (c) => ({
+        ...(c.dbId != null ? { id: c.dbId } : {}),
         libelle: c.libelle.trim() || null,
         activites: c.activites
-          .map((a) => a.titre.trim())
-          .filter(Boolean)
-          .map((titre) => ({ titre })),
+          .filter((a) => a.titre.trim())
+          .map((a) => ({
+            ...(a.dbId != null ? { id: a.dbId } : {}),
+            titre: a.titre.trim(),
+          })),
       }),
     );
 
@@ -196,7 +254,11 @@ function PlanificationProjetContent() {
       email_ministre: emailMinistre.trim(),
     };
 
-    createMutation.mutate(payload);
+    if (editingId) {
+      updateMutation.mutate({ id: editingId, payload });
+    } else {
+      createMutation.mutate(payload);
+    }
   };
 
   const budgetLabel = (b: TypeBudgetProjet) => (b === "FINEX" ? "FINEX" : "BND");
@@ -216,7 +278,7 @@ function PlanificationProjetContent() {
         description="Planifier un projet du plan d'action : budget BND ou FINEX, composantes et activités, calendrier et responsables."
         actions={
           canWrite && !showForm ? (
-            <Button onClick={() => setShowForm(true)}>
+            <Button onClick={startCreate}>
               <Plus className="h-4 w-4" />
               Planifier un projet
             </Button>
@@ -226,6 +288,9 @@ function PlanificationProjetContent() {
 
       {showForm && canWrite && (
         <div className="panel-grain">
+          <h3 className="mb-4 text-base font-semibold text-graphite">
+            {editingId ? "Modifier la planification projet" : "Nouvelle planification projet"}
+          </h3>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
@@ -456,8 +521,8 @@ function PlanificationProjetContent() {
             </div>
 
             <div className="flex flex-wrap gap-2 border-t border-cloud/60 pt-4">
-              <Button type="submit" disabled={createMutation.isPending}>
-                Enregistrer la planification
+              <Button type="submit" disabled={isSaving}>
+                {editingId ? "Enregistrer les modifications" : "Enregistrer la planification"}
               </Button>
               <Button
                 type="button"
@@ -475,9 +540,6 @@ function PlanificationProjetContent() {
       )}
 
       <div className="table-shell">
-        <p className="mb-3 text-xs text-ash">
-          Cliquez sur une ligne pour afficher le détail de la planification.
-        </p>
         <table className="table-grain">
           <thead>
             <tr>
@@ -612,6 +674,19 @@ function PlanificationProjetContent() {
                 </div>
               )}
             </DetailRow>
+            {canWrite && (
+              <div className="pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => selected && populateFormFromPlan(selected)}
+                >
+                  <Pencil className="h-4 w-4" />
+                  Modifier cette planification
+                </Button>
+              </div>
+            )}
           </DetailDrawerRows>
         )}
       </DetailDrawer>

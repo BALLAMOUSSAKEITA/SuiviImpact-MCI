@@ -101,6 +101,16 @@ class PlanificationPaoCreate(BaseModel):
     email_ministre: str = Field(min_length=3, max_length=255)
     taches: list[PlanificationPaoTacheItem] = Field(default_factory=list, max_length=5)
 
+    @model_validator(mode="after")
+    def validate_dates(self) -> "PlanificationPaoCreate":
+        if self.date_fin < self.date_debut:
+            raise ValueError("La date de fin doit être postérieure ou égale à la date de début")
+        return self
+
+
+class PlanificationPaoUpdate(PlanificationPaoCreate):
+    """Même structure que la création pour la mise à jour d'une activité PAO."""
+
 
 class PlanificationPaoTacheRead(BaseModel):
     tache_plan_id: int
@@ -135,10 +145,12 @@ class TypeBudgetProjet(str, Enum):
 
 
 class PlanificationProjetActiviteCreate(BaseModel):
+    id: int | None = None
     titre: str = Field(min_length=1)
 
 
 class PlanificationProjetComposanteCreate(BaseModel):
+    id: int | None = None
     libelle: str | None = Field(default=None, max_length=255)
     activites: list[PlanificationProjetActiviteCreate] = Field(
         default_factory=list, max_length=5
@@ -164,6 +176,10 @@ class PlanificationProjetCreate(BaseModel):
         if self.date_fin < self.date_debut:
             raise ValueError("La date de fin doit être postérieure ou égale à la date de début")
         return self
+
+
+class PlanificationProjetUpdate(PlanificationProjetCreate):
+    """Même structure que la création pour la mise à jour d'une planification projet."""
 
 
 class PlanificationProjetActiviteRead(BaseModel):

@@ -9,8 +9,10 @@ from app.schemas.planification import (
     PlanificationActiviteRead,
     PlanificationPaoCreate,
     PlanificationPaoRead,
+    PlanificationPaoUpdate,
     PlanificationProjetCreate,
     PlanificationProjetRead,
+    PlanificationProjetUpdate,
     TacheCreate,
     TacheRead,
     TacheUpdate,
@@ -48,6 +50,24 @@ async def create_pao_activite(
             detail=f"Données invalides : {exc}",
         ) from exc
     return await service.create_pao_activite(db, body, tdr)
+
+
+@router.put("/planification/pao/{activite_id}", response_model=PlanificationPaoRead)
+async def update_pao_activite(
+    activite_id: int,
+    payload: str = Form(...),
+    tdr: UploadFile | None = File(default=None),
+    _: User = Depends(require_write_access),
+    db: AsyncSession = Depends(get_db),
+) -> PlanificationPaoRead:
+    try:
+        body = PlanificationPaoUpdate.model_validate_json(payload)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Données invalides : {exc}",
+        ) from exc
+    return await service.update_pao_activite(db, activite_id, body, tdr)
 
 
 @router.get("/planification/pao/{activite_id}/tdr")
@@ -89,6 +109,19 @@ async def create_planification_projet(
     db: AsyncSession = Depends(get_db),
 ) -> PlanificationProjetRead:
     return await service.create_planification_projet(db, body)
+
+
+@router.put(
+    "/planification/projet/{planif_id}",
+    response_model=PlanificationProjetRead,
+)
+async def update_planification_projet(
+    planif_id: int,
+    body: PlanificationProjetUpdate,
+    _: User = Depends(require_write_access),
+    db: AsyncSession = Depends(get_db),
+) -> PlanificationProjetRead:
+    return await service.update_planification_projet(db, planif_id, body)
 
 
 @router.post("/suivi/projet/activite/{activite_id}/toggle")
