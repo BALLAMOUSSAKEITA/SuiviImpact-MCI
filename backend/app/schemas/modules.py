@@ -127,17 +127,7 @@ class PpmRead(BaseModel):
 
 
 class ProjetCreate(BaseModel):
-    description: str = Field(min_length=1)
-    abreviation: str | None = Field(default=None, max_length=20)
-    cout: Decimal | None = Field(default=None, ge=0)
-    bailleur: str | None = Field(default=None, max_length=50)
-    part_etat: Decimal | None = Field(default=None, ge=0, le=100)
-    part_bailleur: Decimal | None = Field(default=None, ge=0, le=100)
-    execution_financiere: Decimal = Field(default=Decimal("0"), ge=0, le=100)
-    execution_physique: Decimal = Field(default=Decimal("0"), ge=0, le=100)
-    date_debut: date | None = None
-    date_fin: date | None = None
-    observations: str | None = None
+    description: str = Field(min_length=1, description="Nom du projet")
 
 
 class ProjetUpdate(BaseModel):
@@ -158,6 +148,7 @@ class ProjetRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    code: str
     description: str
     abreviation: str | None
     cout: Decimal | None

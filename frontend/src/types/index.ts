@@ -314,6 +314,7 @@ export interface PpmUpdate {
 
 export interface Projet {
   id: number;
+  code: string;
   description: string;
   abreviation: string | null;
   cout: string | null;

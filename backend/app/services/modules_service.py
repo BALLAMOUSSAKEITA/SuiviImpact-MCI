@@ -1,4 +1,5 @@
 from decimal import Decimal
+import secrets
 from typing import Any, TypeVar
 
 from fastapi import HTTPException
@@ -244,8 +245,21 @@ async def get_projet(db: AsyncSession, item_id: int) -> Projet | None:
     return await db.get(Projet, item_id)
 
 
+async def _generate_projet_code(db: AsyncSession) -> str:
+    for _ in range(20):
+        code = f"PRJ-{secrets.token_hex(4).upper()}"
+        result = await db.execute(select(Projet.id).where(Projet.code == code).limit(1))
+        if result.scalar_one_or_none() is None:
+            return code
+    raise HTTPException(
+        status_code=500,
+        detail="Impossible de générer un identifiant projet unique",
+    )
+
+
 async def create_projet(db: AsyncSession, data: ProjetCreate) -> ProjetRead:
-    item = Projet(**data.model_dump())
+    code = await _generate_projet_code(db)
+    item = Projet(code=code, description=data.description.strip())
     db.add(item)
     await db.commit()
     await db.refresh(item)

@@ -100,6 +100,7 @@ class Projet(Base):
     __tablename__ = "projets"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    code: Mapped[str] = mapped_column(String(32), unique=True, nullable=False, index=True)
     description: Mapped[str] = mapped_column(Text, nullable=False)
     abreviation: Mapped[str | None] = mapped_column(String(20))
     cout: Mapped[Decimal | None] = mapped_column(Numeric(15, 2))

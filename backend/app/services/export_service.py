@@ -182,7 +182,8 @@ async def export_projets(db: AsyncSession) -> BytesIO:
     ws = wb.active
     ws.title = "Projets"
     headers = [
-        "Description",
+        "Identifiant",
+        "Nom du projet",
         "Abréviation",
         "Coût",
         "Bailleur",
@@ -197,22 +198,23 @@ async def export_projets(db: AsyncSession) -> BytesIO:
 
     result = await db.execute(select(Projet).order_by(Projet.id))
     for row_idx, item in enumerate(result.scalars().all(), start=2):
-        ws.cell(row=row_idx, column=1, value=item.description)
-        ws.cell(row=row_idx, column=2, value=item.abreviation or "")
-        ws.cell(row=row_idx, column=3, value=float(item.cout or 0))
-        ws.cell(row=row_idx, column=4, value=item.bailleur or "")
-        ws.cell(row=row_idx, column=5, value=float(item.part_etat or 0))
-        ws.cell(row=row_idx, column=6, value=float(item.part_bailleur or 0))
-        ws.cell(row=row_idx, column=7, value=float(item.execution_financiere))
-        ws.cell(row=row_idx, column=8, value=float(item.execution_physique))
+        ws.cell(row=row_idx, column=1, value=item.code)
+        ws.cell(row=row_idx, column=2, value=item.description)
+        ws.cell(row=row_idx, column=3, value=item.abreviation or "")
+        ws.cell(row=row_idx, column=4, value=float(item.cout or 0))
+        ws.cell(row=row_idx, column=5, value=item.bailleur or "")
+        ws.cell(row=row_idx, column=6, value=float(item.part_etat or 0))
+        ws.cell(row=row_idx, column=7, value=float(item.part_bailleur or 0))
+        ws.cell(row=row_idx, column=8, value=float(item.execution_financiere))
+        ws.cell(row=row_idx, column=9, value=float(item.execution_physique))
         ws.cell(
             row=row_idx,
-            column=9,
+            column=10,
             value=item.date_debut.isoformat() if item.date_debut else "",
         )
         ws.cell(
             row=row_idx,
-            column=10,
+            column=11,
             value=item.date_fin.isoformat() if item.date_fin else "",
         )
 
