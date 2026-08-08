@@ -51,6 +51,8 @@ class Settings(BaseSettings):
     SMTP_USER: str = ""
     SMTP_PASSWORD: str = ""
     SMTP_FROM: str = "noreply@suiviimpact.gov.gn"
+    # Adresses BSD en copie (CSV) pour les rappels d'activités en retard
+    SMTP_BSD_CC: str = ""
 
     DEFAULT_ANNEE: int = 2026
     PORT: int = 8000
@@ -72,6 +74,11 @@ class Settings(BaseSettings):
     def cors_origins(self) -> list[str]:
         origins = _split_csv(self.CORS_ORIGINS)
         return origins or ["http://localhost:3000"]
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def smtp_bsd_cc(self) -> list[str]:
+        return _split_csv(self.SMTP_BSD_CC)
 
 
 settings = Settings()

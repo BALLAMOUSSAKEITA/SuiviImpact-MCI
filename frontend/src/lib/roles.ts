@@ -71,6 +71,7 @@ export function canSeeNavHref(role: UserRole | undefined, href: string, adminOnl
   if (href === "/admin/planification" || href === "/admin/planification/projet") return false;
   if (href.startsWith("/admin/suivi")) return false;
   if (href.startsWith("/admin/export")) return false;
+  if (href.startsWith("/admin/notifications")) return false;
 
   if (role === "directeur") {
     if (href === "/admin/stats") return false;

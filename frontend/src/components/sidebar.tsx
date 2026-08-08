@@ -18,6 +18,7 @@ import {
   Home,
   LayoutDashboard,
   LogOut,
+  Mail,
   MapPin,
   ShoppingCart,
   Target,
@@ -43,6 +44,7 @@ interface NavItem {
   icon: typeof LayoutDashboard;
   defaultChild?: string;
   adminOnly?: boolean;
+  writeOnly?: boolean;
   children?: NavItem[];
 }
 
@@ -84,6 +86,12 @@ const navItems: NavItem[] = [
   { href: "/admin/stats", label: "Statistiques", icon: BarChart3 },
   { href: "/admin/workflow", label: "Workflow", icon: GitBranch },
   { href: "/admin/export", label: "Export", icon: Download },
+  {
+    href: "/admin/notifications",
+    label: "Notifications",
+    icon: Mail,
+    writeOnly: true,
+  },
   { href: "/admin/archive", label: "Archive", icon: FolderArchive },
   { href: "/admin/profil", label: "Mon profil", icon: UserCircle },
   { href: "/admin/comptes", label: "Comptes", icon: Users, adminOnly: true },
@@ -103,7 +111,7 @@ export function Sidebar({
   onNavigate,
 }: SidebarProps) {
   const pathname = usePathname();
-  const { user, logout } = useAuth();
+  const { user, logout, canWrite } = useAuth();
 
   const isActive = (href: string) => {
     if (href === "/admin") return pathname === "/admin";
@@ -246,6 +254,7 @@ export function Sidebar({
         {navItems
           .filter((item) => {
             if (item.adminOnly && user?.role !== "admin") return false;
+            if (item.writeOnly && !canWrite) return false;
             if (item.children) {
               const childHrefs = item.children.map((c) => c.href);
               return canSeeNavGroup(user?.role, item.href, childHrefs, item.adminOnly);

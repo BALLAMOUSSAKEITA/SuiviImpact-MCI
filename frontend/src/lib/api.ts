@@ -1738,3 +1738,24 @@ export async function performWorkflowAction(
   );
 }
 
+/* ─── Notifications e-mail ─── */
+
+import type { NotificationEmailItem, RappelActivitesStats } from "@/types";
+
+export async function listNotificationEmails(
+  limit = 100,
+): Promise<NotificationEmailItem[]> {
+  return apiFetch<NotificationEmailItem[]>(
+    `/api/v1/notifications?limit=${limit}`,
+  );
+}
+
+export async function triggerActiviteReminders(
+  force = false,
+): Promise<RappelActivitesStats> {
+  return apiFetch<RappelActivitesStats>(
+    `/api/v1/notifications/rappels-activites?force=${force ? "true" : "false"}`,
+    { method: "POST" },
+  );
+}
+

@@ -124,11 +124,15 @@ class NotificationEmail(Base):
     __tablename__ = "notifications_email"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    activite_id: Mapped[int | None] = mapped_column(
+        ForeignKey("activites.id", ondelete="SET NULL")
+    )
     tache_id: Mapped[int | None] = mapped_column(
         ForeignKey("taches.id", ondelete="SET NULL")
     )
     destinataire: Mapped[str] = mapped_column(String(255), nullable=False)
     sujet: Mapped[str | None] = mapped_column(String(255))
+    en_copie: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     envoye_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )

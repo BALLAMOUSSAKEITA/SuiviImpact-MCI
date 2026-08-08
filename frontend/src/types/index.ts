@@ -691,3 +691,28 @@ export interface WorkflowItem {
   created_at: string;
   updated_at: string;
 }
+
+export interface NotificationEmailItem {
+  id: number;
+  activite_id: number | null;
+  activite_code: string | null;
+  activite_description: string | null;
+  destinataire: string;
+  sujet: string | null;
+  en_copie: boolean;
+  envoye_at: string;
+  statut: string;
+}
+
+export interface RappelActivitesStats {
+  activites_notifiees: number;
+  emails_envoyes: number;
+  emails_simules: number;
+  emails_echec: number;
+}
+
+export const NOTIFICATION_STATUT_LABELS: Record<string, string> = {
+  envoye: "Envoyé",
+  simule: "Simulé",
+  echec: "Échec",
+};
