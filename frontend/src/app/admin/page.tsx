@@ -3,11 +3,14 @@
 import { useQueries, useQuery } from "@tanstack/react-query";
 import {
   Activity,
+  AlertTriangle,
   Briefcase,
   ClipboardList,
   FolderKanban,
   LayoutGrid,
   Scale,
+  Target,
+  TrendingUp,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -19,20 +22,22 @@ import {
   StatusDonutChart,
   StatusLegend,
 } from "@/components/charts/status-donut-chart";
+import {
+  StatusStackBar,
+  StatusStackLegend,
+} from "@/components/charts/status-stack-bar";
+import { DashboardToolbar } from "@/components/dashboard/dashboard-toolbar";
+import { KpiMetric, ModuleTile } from "@/components/dashboard/kpi-metric";
 import { DirectionFilter } from "@/components/direction-filter";
 import { ProgressBar } from "@/components/execution-badge";
 import { PageHeader } from "@/components/page-header";
-import { HeroStat, StatCard, StatGrid } from "@/components/stat-card";
+import { StatCard, StatGrid } from "@/components/stat-card";
 import { StatsQueryStatus } from "@/components/stats-query-status";
-import {
-  StatsPeriodFilter,
-  useStatsPeriodState,
-} from "@/components/stats-period-filter";
+import { useStatsPeriodState } from "@/components/stats-period-filter";
 import { BRAND } from "@/lib/brand";
 import {
   avgProgression,
   executionStatusSlices,
-  MODULE_ACCENTS,
   parseProgress,
   ppmFunnelSlices,
   ppmProgression,
@@ -46,7 +51,6 @@ import {
 } from "@/lib/api";
 import { PPM_STATUT_LABELS } from "@/types";
 import { TrimestreFilter } from "@/components/trimestre-tabs";
-import { cn } from "@/lib/utils";
 
 type StatsPeriodState = ReturnType<typeof useStatsPeriodState>;
 
@@ -61,64 +65,55 @@ const views = [
 
 type ViewId = (typeof views)[number]["id"];
 
-const PERIOD_HINTS: Record<ViewId, string> = {
-  synthese: "Vue consolidée sur l'ensemble des modules de suivi.",
-  activites: "Les activités PAO sont comptées selon leur date de début.",
-  rcc: "Filtrage sur la date de la recommandation RCC.",
-  missions: "Filtrage sur la date de la mission.",
-  ppm: "Filtrage sur la date du marché (PPM).",
-  projets: "Filtrage sur la date de début du projet.",
-};
-
 export default function AdminDashboardPage() {
   const [currentView, setCurrentView] = useState<ViewId>("synthese");
   const periodState = useStatsPeriodState();
 
+  const [direction, setDirection] = useState<string | null>(null);
+  const [trimestreRcc, setTrimestreRcc] = useState<number | undefined>();
+  const [trimestreMissions, setTrimestreMissions] = useState<number | undefined>();
+
+  const secondaryFilter =
+    currentView === "activites" ? (
+      <DirectionFilter
+        value={direction}
+        onChange={setDirection}
+        className="[&_select]:py-1.5 [&_select]:text-sm"
+        compact
+      />
+    ) : currentView === "rcc" ? (
+      <TrimestreFilter value={trimestreRcc} onChange={setTrimestreRcc} />
+    ) : currentView === "missions" ? (
+      <TrimestreFilter value={trimestreMissions} onChange={setTrimestreMissions} />
+    ) : null;
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <PageHeader
         eyebrow={`${BRAND.bureauShort} · ${BRAND.program}`}
         title="Tableau de bord"
-        description="Indicateurs consolidés et visualisations interactives du suivi d'exécution."
         display
       />
 
-      <div className="inline-flex flex-wrap gap-1 rounded-[var(--radius-sm)] bg-veil p-1">
-        {views.map((view) => {
-          const Icon = view.icon;
-          return (
-            <button
-              key={view.id}
-              type="button"
-              onClick={() => setCurrentView(view.id)}
-              className={cn(
-                "inline-flex items-center gap-2 rounded-[var(--radius-sm)] px-4 py-2 text-sm font-medium transition-colors duration-[var(--duration-fast)]",
-                currentView === view.id
-                  ? "bg-white text-graphite shadow-[var(--shadow-subtle)]"
-                  : "text-slate hover:text-graphite",
-              )}
-            >
-              <Icon className="size-4 shrink-0 opacity-70" />
-              {view.label}
-            </button>
-          );
-        })}
-      </div>
-
-      <StatsPeriodFilter
-        dateFieldHint={PERIOD_HINTS[currentView]}
-        state={periodState}
+      <DashboardToolbar
+        tabs={[...views]}
+        currentTab={currentView}
+        onTabChange={(id) => setCurrentView(id as ViewId)}
+        periodState={periodState}
+        secondaryFilter={secondaryFilter}
       />
 
       {currentView === "synthese" && (
         <SyntheseView periodState={periodState} onNavigate={setCurrentView} />
       )}
       {currentView === "activites" && (
-        <ActivitesView periodState={periodState} />
+        <ActivitesView periodState={periodState} direction={direction} />
       )}
-      {currentView === "rcc" && <RccView periodState={periodState} />}
+      {currentView === "rcc" && (
+        <RccView periodState={periodState} trimestre={trimestreRcc} />
+      )}
       {currentView === "missions" && (
-        <MissionsView periodState={periodState} />
+        <MissionsView periodState={periodState} trimestre={trimestreMissions} />
       )}
       {currentView === "ppm" && <PpmView periodState={periodState} />}
       {currentView === "projets" && (
@@ -189,182 +184,145 @@ function SyntheseView({
     projets?.execution_physique ?? 0,
   ]);
 
-  const retards = activites?.en_retard ?? 0;
-
   return (
     <StatsQueryStatus isLoading={isLoading} isError={isError} error={error}>
-      <div className="space-y-6 animate-fade-in">
-        {/* Hero */}
-        <section className="relative overflow-hidden rounded-[var(--radius-lg)] bg-gradient-to-br from-forest-ink via-[#00804a] to-[#006b3d] px-6 py-8 sm:px-10 sm:py-10">
-          <div
-            className="pointer-events-none absolute inset-0 opacity-[0.07]"
-            style={{
-              backgroundImage:
-                "radial-gradient(circle at 20% 50%, #00ff95 0%, transparent 50%), radial-gradient(circle at 80% 20%, #3de1ff 0%, transparent 40%)",
-            }}
+      <div className="space-y-5 animate-fade-in">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <KpiMetric
+            label="Éléments suivis"
+            value={totalItems}
+            hint="Tous modules"
+            icon={Target}
+            iconBgClassName="bg-mint"
+            iconClassName="text-forest-ink"
           />
-          <div className="relative grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            <HeroStat
-              label="Éléments suivis"
-              value={totalItems}
-              sublabel="Tous modules confondus"
-            />
-            <HeroStat
-              label="Progression moyenne"
-              value={`${avgExec} %`}
-              sublabel="Exécution globale"
-            />
-            <HeroStat
-              label="Activités en retard"
-              value={retards}
-              sublabel="PAO — tâches dépassées"
-            />
-            <HeroStat
-              label="Projets actifs"
-              value={projets?.total ?? 0}
-              sublabel="Suivi financier & physique"
-            />
-          </div>
-        </section>
+          <KpiMetric
+            label="Progression moyenne"
+            value={`${avgExec} %`}
+            hint="Exécution globale"
+            icon={TrendingUp}
+            iconBgClassName="bg-sky"
+            iconClassName="text-carbon"
+          />
+          <KpiMetric
+            label="Activités en retard"
+            value={activites?.en_retard ?? 0}
+            hint="Tâches PAO dépassées"
+            icon={AlertTriangle}
+            iconBgClassName="bg-peach"
+            iconClassName="text-[#c0392b]"
+          />
+          <KpiMetric
+            label="Projets actifs"
+            value={projets?.total ?? 0}
+            hint="Suivi financier & physique"
+            icon={FolderKanban}
+            iconBgClassName="bg-lavender"
+            iconClassName="text-carbon"
+          />
+        </div>
 
-        {/* Bento grid */}
-        <div className="grid gap-4 lg:grid-cols-12">
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {activites && (
-            <ModuleCard
-              className="lg:col-span-4"
+            <ModuleTile
               title="Activités PAO"
-              accent={MODULE_ACCENTS.activites}
-              total={activites.total}
+              subtitle={`${activites.total} activité${activites.total > 1 ? "s" : ""}`}
               progression={activites.progression}
-              slices={executionStatusSlices(activites, true)}
-              onDetail={() => onNavigate("activites")}
-            />
+              accentBar="bg-forest-ink"
+              accentText="text-forest-ink"
+              onClick={() => onNavigate("activites")}
+            >
+              <StatusStackBar
+                segments={executionStatusSlices(activites, true)}
+                height={8}
+              />
+              <StatusStackLegend
+                segments={executionStatusSlices(activites, true)}
+                compact
+                className="mt-3"
+              />
+            </ModuleTile>
           )}
           {rcc && (
-            <ModuleCard
-              className="lg:col-span-4"
+            <ModuleTile
               title="Recommandations RCC"
-              accent={MODULE_ACCENTS.rcc}
-              total={rcc.total}
+              subtitle={`${rcc.total} recommandation${rcc.total > 1 ? "s" : ""}`}
               progression={rcc.progression}
-              slices={executionStatusSlices(rcc)}
-              onDetail={() => onNavigate("rcc")}
-            />
+              accentBar="bg-ice-blue"
+              accentText="text-carbon"
+              onClick={() => onNavigate("rcc")}
+            >
+              <StatusStackBar segments={executionStatusSlices(rcc)} height={8} />
+              <StatusStackLegend
+                segments={executionStatusSlices(rcc)}
+                compact
+                className="mt-3"
+              />
+            </ModuleTile>
           )}
           {missions && (
-            <ModuleCard
-              className="lg:col-span-4"
+            <ModuleTile
               title="Missions"
-              accent={MODULE_ACCENTS.missions}
-              total={missions.total}
+              subtitle={`${missions.total} mission${missions.total > 1 ? "s" : ""}`}
               progression={missions.progression}
-              slices={executionStatusSlices(missions)}
-              onDetail={() => onNavigate("missions")}
-            />
+              accentBar="bg-periwinkle"
+              accentText="text-carbon"
+              onClick={() => onNavigate("missions")}
+            >
+              <StatusStackBar segments={executionStatusSlices(missions)} height={8} />
+              <StatusStackLegend
+                segments={executionStatusSlices(missions)}
+                compact
+                className="mt-3"
+              />
+            </ModuleTile>
           )}
+        </div>
+
+        <div className="grid gap-3 lg:grid-cols-2">
           {ppm && (
-            <div className="lg:col-span-6">
-              <ChartPanel
-                title="Pipeline PPM"
-                subtitle={`${ppm.total} marché${ppm.total > 1 ? "s" : ""} — avancement des statuts`}
-                action={
-                  <button
-                    type="button"
-                    onClick={() => onNavigate("ppm")}
-                    className="text-xs font-medium text-forest-ink hover:underline"
-                  >
-                    Détail →
-                  </button>
-                }
-              >
-                <FunnelBarChart data={ppmFunnelSlices(ppm)} height={200} />
-              </ChartPanel>
-            </div>
+            <ChartPanel
+              title="Pipeline PPM"
+              subtitle={`${ppm.total} marché${ppm.total > 1 ? "s" : ""}`}
+              className="border border-cloud/70 shadow-[var(--shadow-subtle)]"
+              action={
+                <button
+                  type="button"
+                  onClick={() => onNavigate("ppm")}
+                  className="text-xs font-medium text-forest-ink hover:underline"
+                >
+                  Détail
+                </button>
+              }
+            >
+              <FunnelBarChart data={ppmFunnelSlices(ppm)} height={220} />
+            </ChartPanel>
           )}
           {projets && (
-            <div className="lg:col-span-6">
-              <ChartPanel
-                title="Exécution projets"
-                subtitle={`${projets.total} projet${projets.total > 1 ? "s" : ""} — comparaison financier / physique`}
-                action={
-                  <button
-                    type="button"
-                    onClick={() => onNavigate("projets")}
-                    className="text-xs font-medium text-forest-ink hover:underline"
-                  >
-                    Détail →
-                  </button>
-                }
-              >
-                <ComparisonBarChart
-                  financier={projets.execution_financiere}
-                  physique={projets.execution_physique}
-                  height={200}
-                />
-              </ChartPanel>
-            </div>
+            <ChartPanel
+              title="Exécution projets"
+              subtitle="Financier vs physique"
+              className="border border-cloud/70 shadow-[var(--shadow-subtle)]"
+              action={
+                <button
+                  type="button"
+                  onClick={() => onNavigate("projets")}
+                  className="text-xs font-medium text-forest-ink hover:underline"
+                >
+                  Détail
+                </button>
+              }
+            >
+              <ComparisonBarChart
+                financier={projets.execution_financiere}
+                physique={projets.execution_physique}
+                height={220}
+              />
+            </ChartPanel>
           )}
         </div>
       </div>
     </StatsQueryStatus>
-  );
-}
-
-function ModuleCard({
-  title,
-  accent,
-  total,
-  progression,
-  slices,
-  onDetail,
-  className,
-}: {
-  title: string;
-  accent: (typeof MODULE_ACCENTS)[keyof typeof MODULE_ACCENTS];
-  total: number;
-  progression: number | string;
-  slices: ReturnType<typeof executionStatusSlices>;
-  onDetail: () => void;
-  className?: string;
-}) {
-  return (
-    <div
-      className={cn(
-        "panel-grain flex flex-col border",
-        accent.bg,
-        accent.border,
-        className,
-      )}
-    >
-      <div className="mb-3 flex items-start justify-between gap-3">
-        <div>
-          <h3 className={cn("text-sm font-semibold", accent.text)}>{title}</h3>
-          <p className="mt-0.5 text-xs text-slate">
-            {total} élément{total > 1 ? "s" : ""}
-          </p>
-        </div>
-        <ProgressionRing
-          value={progression}
-          size={56}
-          strokeWidth={5}
-          fillColor="#009959"
-        />
-      </div>
-      <StatusDonutChart
-        data={slices}
-        height={140}
-        innerRadius={42}
-        outerRadius={58}
-      />
-      <StatusLegend items={slices} className="mt-2 border-t border-cloud/60 pt-2" />
-      <button
-        type="button"
-        onClick={onDetail}
-        className="mt-3 text-left text-xs font-medium text-forest-ink hover:underline"
-      >
-        Voir le détail →
-      </button>
-    </div>
   );
 }
 
@@ -373,7 +331,6 @@ function ModuleCard({
 function ExecutionDashboard({
   stats,
   includeRetard,
-  progressionLabel,
 }: {
   stats: {
     total: number;
@@ -384,7 +341,6 @@ function ExecutionDashboard({
     progression: string;
   };
   includeRetard?: boolean;
-  progressionLabel?: string;
 }) {
   const slices = executionStatusSlices(
     stats as Parameters<typeof executionStatusSlices>[0],
@@ -392,60 +348,68 @@ function ExecutionDashboard({
   );
 
   return (
-    <>
-      <StatGrid>
-        <StatCard title="Total" value={stats.total} accent="forest" />
-        <StatCard
-          title="Non démarrées"
-          value={stats.non_demare}
-          accent="default"
-        />
+    <div className="space-y-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <StatCard title="Total" value={stats.total} accent="forest" className="lg:col-span-1" />
+        <StatCard title="Non démarrées" value={stats.non_demare} accent="default" />
         <StatCard title="En cours" value={stats.en_cours} accent="sky" />
         <StatCard title="Terminées" value={stats.termine} accent="mint" />
         {includeRetard && stats.en_retard != null && (
           <StatCard title="En retard" value={stats.en_retard} accent="alert" />
         )}
-      </StatGrid>
+      </div>
 
-      <div className="grid gap-4 lg:grid-cols-5">
+      <div className="grid gap-3 lg:grid-cols-12">
         <ChartPanel
-          title="Répartition par statut"
-          subtitle="Distribution des éléments sur la période"
-          className="lg:col-span-3"
+          title="Répartition"
+          subtitle="Distribution par statut d'exécution"
+          className="border border-cloud/70 shadow-[var(--shadow-subtle)] lg:col-span-8"
         >
+          <StatusStackBar segments={slices} height={10} className="mb-4" />
           <div className="grid gap-4 sm:grid-cols-[1fr_auto]">
             <StatusDonutChart
               data={slices}
               centerValue={stats.total}
               centerLabel="Total"
-              height={260}
+              height={240}
+              innerRadius={58}
+              outerRadius={82}
             />
-            <StatusLegend items={slices} className="sm:min-w-[160px] sm:pt-4" />
+            <StatusLegend items={slices} className="sm:min-w-[150px] sm:pt-6" />
           </div>
         </ChartPanel>
 
         <ChartPanel
-          title="Progression globale"
-          subtitle={progressionLabel ?? "Taux d'exécution moyen"}
-          className="lg:col-span-2 flex flex-col items-center justify-center"
+          title="Progression"
+          subtitle="Taux d'exécution"
+          className="border border-cloud/70 shadow-[var(--shadow-subtle)] lg:col-span-4"
         >
-          <ProgressionRing
-            value={stats.progression}
-            size={140}
-            strokeWidth={10}
-            label="Exécution"
-          />
-          <div className="mt-6 w-full">
-            <ProgressBar label="Avancement" value={stats.progression} />
+          <div className="flex flex-col items-center py-2">
+            <ProgressionRing
+              value={stats.progression}
+              size={128}
+              strokeWidth={9}
+              label="Exécution"
+            />
+            <ProgressBar
+              label="Avancement"
+              value={stats.progression}
+              className="mt-6 w-full"
+            />
           </div>
         </ChartPanel>
       </div>
-    </>
+    </div>
   );
 }
 
-function ActivitesView({ periodState }: { periodState: StatsPeriodState }) {
-  const [direction, setDirection] = useState<string | null>(null);
+function ActivitesView({
+  periodState,
+  direction,
+}: {
+  periodState: StatsPeriodState;
+  direction: string | null;
+}) {
   const { params: period } = periodState;
 
   const { data: stats, isLoading, isError, error } = useQuery({
@@ -454,23 +418,23 @@ function ActivitesView({ periodState }: { periodState: StatsPeriodState }) {
   });
 
   return (
-    <div className="space-y-4 animate-fade-in">
-      <DirectionFilter value={direction} onChange={setDirection} />
-      <StatsQueryStatus
-        isLoading={isLoading}
-        isError={isError}
-        error={error}
-      >
-        {stats ? (
-          <ExecutionDashboard stats={stats} includeRetard progressionLabel="Activités PAO" />
-        ) : null}
-      </StatsQueryStatus>
-    </div>
+    <StatsQueryStatus isLoading={isLoading} isError={isError} error={error}>
+      {stats ? (
+        <div className="animate-fade-in">
+          <ExecutionDashboard stats={stats} includeRetard />
+        </div>
+      ) : null}
+    </StatsQueryStatus>
   );
 }
 
-function RccView({ periodState }: { periodState: StatsPeriodState }) {
-  const [trimestre, setTrimestre] = useState<number | undefined>(undefined);
+function RccView({
+  periodState,
+  trimestre,
+}: {
+  periodState: StatsPeriodState;
+  trimestre?: number;
+}) {
   const { params: period } = periodState;
 
   const { data: stats, isLoading, isError, error } = useQuery({
@@ -479,19 +443,23 @@ function RccView({ periodState }: { periodState: StatsPeriodState }) {
   });
 
   return (
-    <div className="space-y-4 animate-fade-in">
-      <TrimestreFilter value={trimestre} onChange={setTrimestre} />
-      <StatsQueryStatus isLoading={isLoading} isError={isError} error={error}>
-        {stats ? (
-          <ExecutionDashboard stats={stats} progressionLabel="Recommandations RCC" />
-        ) : null}
-      </StatsQueryStatus>
-    </div>
+    <StatsQueryStatus isLoading={isLoading} isError={isError} error={error}>
+      {stats ? (
+        <div className="animate-fade-in">
+          <ExecutionDashboard stats={stats} />
+        </div>
+      ) : null}
+    </StatsQueryStatus>
   );
 }
 
-function MissionsView({ periodState }: { periodState: StatsPeriodState }) {
-  const [trimestre, setTrimestre] = useState<number | undefined>(undefined);
+function MissionsView({
+  periodState,
+  trimestre,
+}: {
+  periodState: StatsPeriodState;
+  trimestre?: number;
+}) {
   const { params: period } = periodState;
 
   const { data: stats, isLoading, isError, error } = useQuery({
@@ -500,14 +468,13 @@ function MissionsView({ periodState }: { periodState: StatsPeriodState }) {
   });
 
   return (
-    <div className="space-y-4 animate-fade-in">
-      <TrimestreFilter value={trimestre} onChange={setTrimestre} />
-      <StatsQueryStatus isLoading={isLoading} isError={isError} error={error}>
-        {stats ? (
-          <ExecutionDashboard stats={stats} progressionLabel="Missions" />
-        ) : null}
-      </StatsQueryStatus>
-    </div>
+    <StatsQueryStatus isLoading={isLoading} isError={isError} error={error}>
+      {stats ? (
+        <div className="animate-fade-in">
+          <ExecutionDashboard stats={stats} />
+        </div>
+      ) : null}
+    </StatsQueryStatus>
   );
 }
 
@@ -523,67 +490,50 @@ function PpmView({ periodState }: { periodState: StatsPeriodState }) {
   const funnel = stats ? ppmFunnelSlices(stats) : [];
 
   return (
-    <div className="space-y-4 animate-fade-in">
-      <StatsQueryStatus isLoading={isLoading} isError={isError} error={error}>
-        {stats ? (
-          <>
-            <StatGrid className="xl:grid-cols-5">
-              <StatCard title="Total marchés" value={stats.total} accent="forest" />
-              <StatCard
-                title={PPM_STATUT_LABELS.dao_elabore}
-                value={stats.dao_elabore}
-                accent="sky"
-              />
-              <StatCard
-                title={PPM_STATUT_LABELS.dao_publie}
-                value={stats.dao_publie}
-                accent="sky"
-              />
-              <StatCard
-                title={PPM_STATUT_LABELS.marche_attribue}
-                value={stats.marche_attribue}
-                accent="mint"
-              />
-              <StatCard
-                title={PPM_STATUT_LABELS.contrat_signe}
-                value={stats.contrat_signe}
-                accent="forest"
-              />
-            </StatGrid>
+    <StatsQueryStatus isLoading={isLoading} isError={isError} error={error}>
+      {stats ? (
+        <div className="space-y-4 animate-fade-in">
+          <StatGrid className="xl:grid-cols-5">
+            <StatCard title="Total marchés" value={stats.total} accent="forest" />
+            <StatCard title={PPM_STATUT_LABELS.dao_elabore} value={stats.dao_elabore} accent="sky" />
+            <StatCard title={PPM_STATUT_LABELS.dao_publie} value={stats.dao_publie} accent="sky" />
+            <StatCard title={PPM_STATUT_LABELS.marche_attribue} value={stats.marche_attribue} accent="mint" />
+            <StatCard title={PPM_STATUT_LABELS.contrat_signe} value={stats.contrat_signe} accent="forest" />
+          </StatGrid>
 
-            <div className="grid gap-4 lg:grid-cols-5">
-              <ChartPanel
-                title="Entonnoir des statuts"
-                subtitle="Progression du cycle de passation"
-                className="lg:col-span-3"
-              >
-                <FunnelBarChart data={funnel} height={280} />
-              </ChartPanel>
+          <div className="grid gap-3 lg:grid-cols-12">
+            <ChartPanel
+              title="Entonnoir des statuts"
+              subtitle="Cycle de passation des marchés"
+              className="border border-cloud/70 shadow-[var(--shadow-subtle)] lg:col-span-8"
+            >
+              <FunnelBarChart data={funnel} height={260} />
+            </ChartPanel>
 
-              <ChartPanel
-                title="Taux de contractualisation"
-                subtitle="Contrats signés / total marchés"
-                className="lg:col-span-2 flex flex-col items-center justify-center"
-              >
+            <ChartPanel
+              title="Contractualisation"
+              subtitle="Contrats signés / total"
+              className="border border-cloud/70 shadow-[var(--shadow-subtle)] lg:col-span-4"
+            >
+              <div className="flex flex-col items-center py-2">
                 <ProgressionRing
                   value={progression}
-                  size={140}
-                  strokeWidth={10}
+                  size={128}
+                  strokeWidth={9}
                   fillColor="#009959"
                   label="Signés"
                 />
-                <div className="mt-6 w-full">
-                  <ProgressBar
-                    label="Contrats signés / total"
-                    value={progression}
-                  />
-                </div>
-              </ChartPanel>
-            </div>
-          </>
-        ) : null}
-      </StatsQueryStatus>
-    </div>
+                <ProgressBar
+                  label="Contrats signés / total"
+                  value={progression}
+                  className="mt-6 w-full"
+                />
+              </div>
+            </ChartPanel>
+          </div>
+        </div>
+      ) : null}
+    </StatsQueryStatus>
   );
 }
 
@@ -600,73 +550,73 @@ function ProjetsView({ periodState }: { periodState: StatsPeriodState }) {
   const ecart = Math.abs(fin - phys);
 
   return (
-    <div className="space-y-4 animate-fade-in">
-      <StatsQueryStatus isLoading={isLoading} isError={isError} error={error}>
-        {stats ? (
-          <>
-            <StatGrid className="sm:grid-cols-3">
-              <StatCard title="Total projets" value={stats.total} accent="forest" />
-              <StatCard
-                title="Exécution financière"
-                value={`${fin.toFixed(0)} %`}
-                accent="mint"
-                showProgress
-                progressValue={stats.execution_financiere}
-              />
-              <StatCard
-                title="Exécution physique"
-                value={`${phys.toFixed(0)} %`}
-                accent="sky"
-                showProgress
-                progressValue={stats.execution_physique}
-              />
-            </StatGrid>
+    <StatsQueryStatus isLoading={isLoading} isError={isError} error={error}>
+      {stats ? (
+        <div className="space-y-4 animate-fade-in">
+          <div className="grid gap-3 sm:grid-cols-3">
+            <StatCard title="Total projets" value={stats.total} accent="forest" />
+            <StatCard
+              title="Exécution financière"
+              value={`${fin.toFixed(0)} %`}
+              accent="mint"
+              showProgress
+              progressValue={stats.execution_financiere}
+            />
+            <StatCard
+              title="Exécution physique"
+              value={`${phys.toFixed(0)} %`}
+              accent="sky"
+              showProgress
+              progressValue={stats.execution_physique}
+            />
+          </div>
 
-            <div className="grid gap-4 lg:grid-cols-5">
-              <ChartPanel
-                title="Comparaison des exécutions"
-                subtitle="Moyennes financière et physique"
-                className="lg:col-span-3"
-              >
-                <ComparisonBarChart
-                  financier={stats.execution_financiere}
-                  physique={stats.execution_physique}
-                  height={280}
-                />
-              </ChartPanel>
+          <div className="grid gap-3 lg:grid-cols-12">
+            <ChartPanel
+              title="Comparaison des exécutions"
+              subtitle="Moyennes financière et physique"
+              className="border border-cloud/70 shadow-[var(--shadow-subtle)] lg:col-span-8"
+            >
+              <ComparisonBarChart
+                financier={stats.execution_financiere}
+                physique={stats.execution_physique}
+                height={260}
+              />
+            </ChartPanel>
 
-              <ChartPanel
-                title="Écart d'exécution"
-                subtitle="Différence financier − physique"
-                className="lg:col-span-2"
-              >
-                <div className="flex h-[280px] flex-col items-center justify-center gap-6">
+            <ChartPanel
+              title="Écart d'exécution"
+              subtitle="Financier − physique"
+              className="border border-cloud/70 shadow-[var(--shadow-subtle)] lg:col-span-4"
+            >
+              <div className="flex h-[260px] flex-col items-center justify-center gap-4">
+                <div className="flex gap-6">
                   <ProgressionRing
                     value={fin}
-                    size={100}
-                    strokeWidth={8}
+                    size={88}
+                    strokeWidth={7}
                     fillColor="#009959"
                     label="Financier"
                   />
                   <ProgressionRing
                     value={phys}
-                    size={100}
-                    strokeWidth={8}
+                    size={88}
+                    strokeWidth={7}
                     fillColor="#3de1ff"
                     label="Physique"
                   />
-                  <p className="text-center text-sm text-slate">
-                    Écart de{" "}
-                    <span className="font-semibold text-graphite">
-                      {ecart.toFixed(0)} points
-                    </span>
-                  </p>
                 </div>
-              </ChartPanel>
-            </div>
-          </>
-        ) : null}
-      </StatsQueryStatus>
-    </div>
+                <p className="text-center text-sm text-slate">
+                  Écart de{" "}
+                  <span className="font-semibold text-graphite">
+                    {ecart.toFixed(0)} pts
+                  </span>
+                </p>
+              </div>
+            </ChartPanel>
+          </div>
+        </div>
+      ) : null}
+    </StatsQueryStatus>
   );
 }
