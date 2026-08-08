@@ -59,7 +59,7 @@ async def export_recommandations(
     db: AsyncSession = Depends(get_db),
 ) -> StreamingResponse:
     buffer = await service.export_recommandations(db)
-    return _excel_response(buffer, "Recommandations_RCC.xlsx")
+    return _excel_response(buffer, "recommandations.xlsx")
 
 
 @router.get("/exports/missions")
@@ -77,7 +77,7 @@ async def export_ppm(
     db: AsyncSession = Depends(get_db),
 ) -> StreamingResponse:
     buffer = await service.export_ppm(db)
-    return _excel_response(buffer, "marches_ppm.xlsx")
+    return _excel_response(buffer, "ppm.xlsx")
 
 
 @router.get("/exports/projets")

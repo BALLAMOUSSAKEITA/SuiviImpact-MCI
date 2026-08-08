@@ -229,7 +229,7 @@ async def export_pao(
     write_data_rows(ws_act, start_act, activite_rows)
     write_data_rows(ws_taches, start_taches, tache_rows)
 
-    filename = f"PAO_{period.filename_part}.xlsx"
+    filename = f"pao_{period.filename_part}.xlsx"
     return _save_workbook(wb), filename
 
 

@@ -377,6 +377,8 @@ async function apiFetchBlob(
 
   retry = true,
 
+  defaultFilename = "export.xlsx",
+
 ): Promise<{ blob: Blob; filename: string }> {
 
   const headers = buildAuthHeaders({});
@@ -415,9 +417,9 @@ async function apiFetchBlob(
 
   const disposition = response.headers.get("Content-Disposition") ?? "";
 
-  const match = disposition.match(/filename="?([^";\n]+)"?/);
+  const match = disposition.match(/filename\*?=(?:UTF-8''|")?([^";\n]+)"?/i);
 
-  const filename = match?.[1] ?? "export.xlsx";
+  const filename = match?.[1]?.trim() ?? defaultFilename;
 
   const blob = await response.blob();
 
@@ -1507,6 +1509,36 @@ export async function getStatsProjets(
 
 // --- Exports ---
 
+const EXPORT_DEFAULT_FILENAMES: Record<ExportType, string> = {
+  pao: "pao.xlsx",
+  recommandations: "recommandations.xlsx",
+  missions: "missions.xlsx",
+  ppm: "ppm.xlsx",
+  projets: "projets.xlsx",
+};
+
+function defaultExportFilename(
+  type: ExportType,
+  options?: { pao?: PaoExportOptions },
+): string {
+  if (type !== "pao") return EXPORT_DEFAULT_FILENAMES[type];
+
+  const p = options?.pao ?? { mode: "annee" as const, annee: DEFAULT_ANNEE };
+  if (p.mode === "annee") {
+    return `pao_${p.annee ?? DEFAULT_ANNEE}.xlsx`;
+  }
+  if (p.mode === "plage") {
+    const { du, au } = yearToDateRange(p.annee ?? DEFAULT_ANNEE);
+    const from = p.du?.trim() || du;
+    const to = p.au?.trim() || au;
+    return `pao_${from}_${to}.xlsx`;
+  }
+  if (p.mode === "mois" && p.mois) {
+    return `pao_${p.mois.replace(/,/g, "_")}.xlsx`;
+  }
+  return EXPORT_DEFAULT_FILENAMES.pao;
+}
+
 
 
 export async function downloadExport(
@@ -1530,7 +1562,8 @@ export async function downloadExport(
   } else {
     path = `/api/v1/exports/${type}`;
   }
-  const { blob, filename } = await apiFetchBlob(path);
+  const fallback = defaultExportFilename(type, options);
+  const { blob, filename } = await apiFetchBlob(path, true, fallback);
   triggerDownload(blob, filename);
 }
 

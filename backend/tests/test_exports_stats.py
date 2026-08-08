@@ -2,14 +2,6 @@ import pytest
 from httpx import AsyncClient
 
 
-EXPORT_PATHS = [
-    "/api/v1/exports/pao?mode=annee&annee=2026",
-    "/api/v1/exports/recommandations",
-    "/api/v1/exports/missions",
-    "/api/v1/exports/ppm",
-    "/api/v1/exports/projets",
-]
-
 STATS_PATHS = [
     "/api/v1/stats/activites",
     "/api/v1/stats/recommandations",
@@ -81,12 +73,28 @@ async def test_export_pao_with_activite(client: AsyncClient, auth_headers: dict[
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("path", EXPORT_PATHS)
-async def test_exports_return_excel(client: AsyncClient, auth_headers: dict[str, str], path: str):
+@pytest.mark.parametrize(
+    ("path", "expected_filename"),
+    [
+        ("/api/v1/exports/pao?mode=annee&annee=2026", "pao_2026.xlsx"),
+        ("/api/v1/exports/recommandations", "recommandations.xlsx"),
+        ("/api/v1/exports/missions", "missions.xlsx"),
+        ("/api/v1/exports/ppm", "ppm.xlsx"),
+        ("/api/v1/exports/projets", "projets.xlsx"),
+    ],
+)
+async def test_exports_return_excel(
+    client: AsyncClient,
+    auth_headers: dict[str, str],
+    path: str,
+    expected_filename: str,
+):
     response = await client.get(path, headers=auth_headers)
     assert response.status_code == 200
     assert "spreadsheet" in response.headers.get("content-type", "")
     assert len(response.content) > 100
+    disposition = response.headers.get("content-disposition", "")
+    assert expected_filename in disposition
 
 
 @pytest.mark.asyncio
