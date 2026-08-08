@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -96,14 +95,7 @@ export function ObjectifTable({ objectifs, queryKey }: ObjectifTableProps) {
                     {objectif.code}
                   </span>
                 </td>
-                <td>
-                  <Link
-                    href={`/activite/${objectif.id}`}
-                    className="text-graphite transition-colors hover:text-forest-ink"
-                  >
-                    {objectif.description}
-                  </Link>
-                </td>
+                <td className="font-medium text-graphite">{objectif.description}</td>
                 {canWrite && (
                   <td className="text-right">
                     <TableRowActions
@@ -157,6 +149,7 @@ export function ObjectifTable({ objectifs, queryKey }: ObjectifTableProps) {
         title="Confirmer la modification"
         description={`Enregistrer les modifications de l'objectif « ${editCode} » ?`}
         confirmLabel="Oui, enregistrer"
+        variant="info"
         loading={updateMutation.isPending}
         onCancel={() => setConfirmUpdate(false)}
         onConfirm={() => updateMutation.mutate()}

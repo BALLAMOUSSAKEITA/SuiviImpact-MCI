@@ -7,6 +7,8 @@ import { toast } from "sonner";
 import { Folder, File } from "lucide-react";
 
 import { useAuth } from "@/components/auth-provider";
+import { ConfirmDialog } from "@/components/confirm-dialog";
+import { FileUploadTrigger } from "@/components/file-upload-field";
 import { Button } from "@/components/ui/button";
 import {
   createDossier,
@@ -15,6 +17,11 @@ import {
   getArchiveRoot,
   uploadArchiveFile,
 } from "@/lib/api";
+
+type ArchiveDeleteTarget =
+  | { kind: "folder"; id: number; name: string }
+  | { kind: "file"; id: number }
+  | null;
 
 export default function ArchivePage() {
   return <ArchiveContent />;
@@ -25,6 +32,7 @@ function ArchiveContent() {
   const queryClient = useQueryClient();
   const [newFolderName, setNewFolderName] = useState("");
   const [showNewFolder, setShowNewFolder] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<ArchiveDeleteTarget>(null);
 
   const queryKey = ["archive-root"];
 
@@ -59,6 +67,7 @@ function ArchiveContent() {
     mutationFn: deleteDossier,
     onSuccess: () => {
       toast.success("Dossier supprimé");
+      setDeleteTarget(null);
       invalidate();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -68,6 +77,7 @@ function ArchiveContent() {
     mutationFn: deleteArchiveFile,
     onSuccess: () => {
       toast.success("Fichier supprimé");
+      setDeleteTarget(null);
       invalidate();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -93,20 +103,11 @@ function ArchiveContent() {
               <Button variant="outline" onClick={() => setShowNewFolder(true)}>
                 Nouveau dossier
               </Button>
-              <label className="cursor-pointer">
-                <span className="inline-flex h-10 items-center justify-center rounded-card border border-forest-ink px-4 text-sm font-medium text-forest-ink hover:bg-veil">
-                  Uploader un fichier
-                </span>
-                <input
-                  type="file"
-                  className="hidden"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) uploadMutation.mutate(file);
-                    e.target.value = "";
-                  }}
-                />
-              </label>
+              <FileUploadTrigger
+                label="Joindre un fichier"
+                loading={uploadMutation.isPending}
+                onFile={(file) => uploadMutation.mutate(file)}
+              />
             </div>
           )}
         </div>
@@ -167,11 +168,9 @@ function ArchiveContent() {
                   <Button
                     variant="ghost"
                     className="h-8 px-3 text-xs text-red-600"
-                    onClick={() => {
-                      if (window.confirm(`Supprimer le dossier « ${d.nom} » ?`)) {
-                        deleteFolderMutation.mutate(d.id);
-                      }
-                    }}
+                    onClick={() =>
+                      setDeleteTarget({ kind: "folder", id: d.id, name: d.nom })
+                    }
                   >
                     Supprimer
                   </Button>
@@ -194,11 +193,7 @@ function ArchiveContent() {
                   <Button
                     variant="ghost"
                     className="h-8 px-3 text-xs text-red-600"
-                    onClick={() => {
-                      if (window.confirm("Supprimer ce fichier ?")) {
-                        deleteFileMutation.mutate(f.id);
-                      }
-                    }}
+                    onClick={() => setDeleteTarget({ kind: "file", id: f.id })}
                   >
                     Supprimer
                   </Button>
@@ -214,6 +209,29 @@ function ArchiveContent() {
               )}
           </div>
         )}
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        title={
+          deleteTarget?.kind === "folder" ? "Supprimer le dossier" : "Supprimer le fichier"
+        }
+        description={
+          deleteTarget?.kind === "folder"
+            ? `Supprimer le dossier « ${deleteTarget.name} » et son contenu ?`
+            : "Ce fichier sera définitivement supprimé."
+        }
+        confirmLabel="Supprimer"
+        variant="destructive"
+        loading={deleteFolderMutation.isPending || deleteFileMutation.isPending}
+        onCancel={() => setDeleteTarget(null)}
+        onConfirm={() => {
+          if (!deleteTarget) return;
+          if (deleteTarget.kind === "folder") {
+            deleteFolderMutation.mutate(deleteTarget.id);
+          } else {
+            deleteFileMutation.mutate(deleteTarget.id);
+          }
+        }}
+      />
     </>
   );
 }

@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/components/auth-provider";
+import { FileUploadField } from "@/components/file-upload-field";
 import {
   DetailDrawer,
   DetailDrawerRows,
@@ -339,17 +340,13 @@ function PlanificationPaoContent() {
               </div>
 
               <div className="sm:col-span-2">
-                <label className="label-grain">TDR (pièce jointe)</label>
-                {existingTdrName && !tdrFile && (
-                  <p className="mb-2 text-xs text-ash">
-                    Fichier actuel : {existingTdrName}. Choisissez un fichier pour le remplacer.
-                  </p>
-                )}
-                <input
-                  type="file"
+                <FileUploadField
+                  label="TDR (pièce jointe)"
                   accept=".pdf,.doc,.docx,.xls,.xlsx"
-                  onChange={(e) => setTdrFile(e.target.files?.[0] ?? null)}
-                  className="block w-full text-sm text-slate file:mr-3 file:rounded-[var(--radius-card)] file:border-0 file:bg-forest-ink/10 file:px-3 file:py-2 file:text-sm file:font-medium file:text-forest-ink"
+                  file={tdrFile}
+                  onFileChange={setTdrFile}
+                  existingFileName={existingTdrName && !tdrFile ? existingTdrName : null}
+                  hint="PDF, Word ou Excel — laissez vide pour conserver le fichier actuel."
                 />
               </div>
             </div>

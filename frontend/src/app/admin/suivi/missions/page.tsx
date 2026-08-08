@@ -5,6 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/components/auth-provider";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { ExecutionBadge } from "@/components/execution-badge";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,7 @@ function SuiviMissionsContent() {
   const [statut, setStatut] = useState<ExecutionStatutFilter>(null);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Mission | null>(null);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
   const [form, setForm] = useState({
     date_mission: new Date().toISOString().slice(0, 10),
     description: "",
@@ -96,6 +98,7 @@ function SuiviMissionsContent() {
     mutationFn: deleteMission,
     onSuccess: () => {
       toast.success("Mission supprimée");
+      setDeleteId(null);
       invalidate();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -295,11 +298,7 @@ function SuiviMissionsContent() {
                       <Button
                         variant="ghost"
                         className="h-8 px-3 text-xs text-red-600"
-                        onClick={() => {
-                          if (window.confirm("Supprimer ?")) {
-                            deleteMutation.mutate(item.id);
-                          }
-                        }}
+                        onClick={() => setDeleteId(item.id)}
                       >
                         Supprimer
                       </Button>
@@ -311,6 +310,19 @@ function SuiviMissionsContent() {
           </tbody>
         </table>
       </div>
+
+      <ConfirmDialog
+        open={deleteId !== null}
+        title="Supprimer la mission"
+        description="Cette mission sera définitivement supprimée."
+        confirmLabel="Supprimer"
+        variant="destructive"
+        loading={deleteMutation.isPending}
+        onCancel={() => setDeleteId(null)}
+        onConfirm={() => {
+          if (deleteId !== null) deleteMutation.mutate(deleteId);
+        }}
+      />
     </>
   );
 }

@@ -6,6 +6,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/components/auth-provider";
+import { FileUploadField } from "@/components/file-upload-field";
 import {
   DetailDrawer,
   DetailDrawerRows,
@@ -250,13 +251,11 @@ function SuiviProjetDrawer({
               Vous pouvez joindre un rapport (optionnel).
             </p>
             <div className="mt-4">
-              <label className="mb-1 block text-sm text-slate">
-                Rapport / Pièce jointe
-              </label>
-              <input
-                type="file"
-                onChange={(e) => setRapportFile(e.target.files?.[0] ?? null)}
-                className="w-full text-sm"
+              <FileUploadField
+                label="Rapport / Pièce jointe"
+                file={rapportFile}
+                onFileChange={setRapportFile}
+                hint="Optionnel — rapport de clôture de l'activité."
               />
             </div>
             <div className="mt-6 flex justify-end gap-2">

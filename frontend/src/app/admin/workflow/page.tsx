@@ -18,6 +18,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/components/auth-provider";
+import { FileUploadField } from "@/components/file-upload-field";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import {
@@ -118,20 +119,12 @@ export default function WorkflowPage() {
             </select>
           </div>
           <div className="mt-3 grid gap-3">
-            <div>
-              <label className="mb-1 block text-sm text-slate">
-                Document initial (obligatoire)
-              </label>
-              <input
-                type="file"
-                required
-                className="w-full text-sm"
-                onChange={(e) => setNewFile(e.target.files?.[0] ?? null)}
-              />
-              <p className="mt-1 text-[11px] text-ash">
-                Ce fichier sera visible par tous les valideurs (BSD, SG, ministre, DAF).
-              </p>
-            </div>
+            <FileUploadField
+              label="Document initial (obligatoire)"
+              hint="Ce fichier sera visible par tous les valideurs (BSD, SG, ministre, DAF)."
+              file={newFile}
+              onFileChange={setNewFile}
+            />
           </div>
           <div className="mt-3 flex items-center justify-between">
             <p className="text-[11px] text-ash">
@@ -613,20 +606,17 @@ function WorkflowDetailPanel({
                 />
               </div>
 
-              <div>
-                <label className="mb-1 block text-sm text-slate">
-                  {actionMode === "validate"
+              <FileUploadField
+                label={
+                  actionMode === "validate"
                     ? stepHasFile
                       ? "Joindre une nouvelle version (optionnel)"
                       : "Document à transmettre (obligatoire)"
-                    : "Joindre un fichier (optionnel)"}
-                </label>
-                <input
-                  type="file"
-                  onChange={(e) => setFichier(e.target.files?.[0] ?? null)}
-                  className="w-full text-sm"
-                />
-              </div>
+                    : "Joindre un fichier (optionnel)"
+                }
+                file={fichier}
+                onFileChange={setFichier}
+              />
 
               <div className="flex gap-2 pt-1">
                 <Button

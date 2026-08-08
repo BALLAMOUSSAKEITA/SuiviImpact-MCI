@@ -1,10 +1,11 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/components/auth-provider";
+import { FileUploadTrigger } from "@/components/file-upload-field";
 import { PageHeader } from "@/components/page-header";
 import { UserAvatar } from "@/components/user-avatar";
 import { Button } from "@/components/ui/button";
@@ -17,7 +18,6 @@ export default function ProfilPage() {
 
 function ProfilContent() {
   const { user, refreshUser, canWrite } = useAuth();
-  const fileRef = useRef<HTMLInputElement>(null);
   const [prenom, setPrenom] = useState("");
   const [nom, setNom] = useState("");
   const [avatarKey, setAvatarKey] = useState(0);
@@ -77,27 +77,15 @@ function ProfilContent() {
             <p className="text-xl font-semibold text-graphite">{displayName || user.username}</p>
             <p className="text-sm text-slate">@{user.username}</p>
             <p className="mt-1 text-sm text-ash">{ROLE_LABELS[user.role]}</p>
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/png,image/jpeg,image/jpg,image/gif"
-              className="hidden"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) avatarMutation.mutate(file);
-                e.target.value = "";
-              }}
-            />
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="mt-3"
-              disabled={avatarMutation.isPending}
-              onClick={() => fileRef.current?.click()}
-            >
-              {avatarMutation.isPending ? "Envoi…" : "Changer la photo"}
-            </Button>
+            <div className="mt-3">
+              <FileUploadTrigger
+                label={avatarMutation.isPending ? "Envoi…" : "Changer la photo"}
+                accept="image/png,image/jpeg,image/jpg,image/gif"
+                disabled={!canWrite}
+                loading={avatarMutation.isPending}
+                onFile={(file) => avatarMutation.mutate(file)}
+              />
+            </div>
           </div>
         </div>
 

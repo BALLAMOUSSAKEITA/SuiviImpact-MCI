@@ -7,6 +7,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/components/auth-provider";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { TacheStatutBadge } from "@/components/execution-badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,6 +38,7 @@ function TachesContent() {
 
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Tache | null>(null);
+  const [deleteTacheId, setDeleteTacheId] = useState<number | null>(null);
   const [form, setForm] = useState({
     description: "",
     responsable: "",
@@ -94,6 +96,7 @@ function TachesContent() {
     mutationFn: deleteTache,
     onSuccess: () => {
       toast.success("Tâche supprimée");
+      setDeleteTacheId(null);
       invalidate();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -341,11 +344,7 @@ function TachesContent() {
                       <Button
                         variant="ghost"
                         className="h-8 px-3 text-xs text-red-600"
-                        onClick={() => {
-                          if (window.confirm("Supprimer cette tâche ?")) {
-                            deleteMutation.mutate(tache.id);
-                          }
-                        }}
+                        onClick={() => setDeleteTacheId(tache.id)}
                       >
                         Supprimer
                       </Button>
@@ -397,6 +396,18 @@ function TachesContent() {
             ))}
           </div>
         )}
+      <ConfirmDialog
+        open={deleteTacheId !== null}
+        title="Supprimer la tâche"
+        description="Cette tâche sera définitivement supprimée."
+        confirmLabel="Supprimer"
+        variant="destructive"
+        loading={deleteMutation.isPending}
+        onCancel={() => setDeleteTacheId(null)}
+        onConfirm={() => {
+          if (deleteTacheId !== null) deleteMutation.mutate(deleteTacheId);
+        }}
+      />
     </>
   );
 }

@@ -2,9 +2,11 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { ProtectedRoute } from "@/components/protected-route";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import {
   activateUser,
@@ -24,6 +26,10 @@ export default function ComptesPage() {
 
 function ComptesContent() {
   const queryClient = useQueryClient();
+  const [deleteTarget, setDeleteTarget] = useState<{
+    id: number;
+    prenom: string;
+  } | null>(null);
   const { data: users, isLoading } = useQuery({
     queryKey: ["users"],
     queryFn: listUsers,
@@ -53,15 +59,14 @@ function ComptesContent() {
     mutationFn: deleteUser,
     onSuccess: () => {
       toast.success("Compte supprimé");
+      setDeleteTarget(null);
       invalidate();
     },
     onError: (e: Error) => toast.error(e.message),
   });
 
   const handleDelete = (id: number, prenom: string) => {
-    if (window.confirm(`Supprimer le compte de ${prenom} ?`)) {
-      deleteMutation.mutate(id);
-    }
+    setDeleteTarget({ id, prenom });
   };
 
   return (
@@ -155,6 +160,23 @@ function ComptesContent() {
             </tbody>
           </table>
         </div>
+
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        title="Supprimer le compte"
+        description={
+          deleteTarget
+            ? `Supprimer définitivement le compte de ${deleteTarget.prenom} ?`
+            : ""
+        }
+        confirmLabel="Supprimer"
+        variant="destructive"
+        loading={deleteMutation.isPending}
+        onCancel={() => setDeleteTarget(null)}
+        onConfirm={() => {
+          if (deleteTarget) deleteMutation.mutate(deleteTarget.id);
+        }}
+      />
     </>
   );
 }

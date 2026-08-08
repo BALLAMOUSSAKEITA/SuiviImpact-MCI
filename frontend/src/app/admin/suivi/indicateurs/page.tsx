@@ -5,6 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/components/auth-provider";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { ProgressBar } from "@/components/execution-badge";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,7 @@ function SuiviIndicateursContent() {
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Indicateur | null>(null);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
   const [form, setForm] = useState({
     code: "",
     libelle: "",
@@ -80,6 +82,7 @@ function SuiviIndicateursContent() {
     mutationFn: deleteIndicateur,
     onSuccess: () => {
       toast.success("Indicateur supprimé");
+      setDeleteId(null);
       invalidate();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -234,11 +237,7 @@ function SuiviIndicateursContent() {
                       <Button
                         variant="ghost"
                         className="h-8 px-3 text-xs text-red-600"
-                        onClick={() => {
-                          if (window.confirm("Supprimer ?")) {
-                            deleteMutation.mutate(item.id);
-                          }
-                        }}
+                        onClick={() => setDeleteId(item.id)}
                       >
                         Supprimer
                       </Button>
@@ -250,6 +249,19 @@ function SuiviIndicateursContent() {
           </tbody>
         </table>
       </div>
+
+      <ConfirmDialog
+        open={deleteId !== null}
+        title="Supprimer l'indicateur"
+        description="Cet indicateur sera définitivement supprimé."
+        confirmLabel="Supprimer"
+        variant="destructive"
+        loading={deleteMutation.isPending}
+        onCancel={() => setDeleteId(null)}
+        onConfirm={() => {
+          if (deleteId !== null) deleteMutation.mutate(deleteId);
+        }}
+      />
     </>
   );
 }

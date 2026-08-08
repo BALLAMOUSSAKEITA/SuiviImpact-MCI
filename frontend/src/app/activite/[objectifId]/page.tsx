@@ -7,6 +7,7 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/components/auth-provider";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import {
   createActivite,
@@ -54,6 +55,7 @@ function ActivitesContent() {
   const [budget, setBudget] = useState("0");
   const [selectedDirections, setSelectedDirections] = useState<number[]>([]);
   const [selectedTrimestres, setSelectedTrimestres] = useState<TrimestrePlan[]>([]);
+  const [deleteActiviteId, setDeleteActiviteId] = useState<number | null>(null);
 
   const directionMap = useMemo(
     () => new Map(directions.map((d) => [d.id, d.code])),
@@ -80,6 +82,7 @@ function ActivitesContent() {
     mutationFn: deleteActivite,
     onSuccess: () => {
       toast.success("Activité supprimée");
+      setDeleteActiviteId(null);
       queryClient.invalidateQueries({ queryKey });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -279,11 +282,7 @@ function ActivitesContent() {
                       <Button
                         variant="ghost"
                         className="h-8 px-3 text-xs text-red-600"
-                        onClick={() => {
-                          if (window.confirm("Supprimer cette activité ?")) {
-                            deleteMutation.mutate(activite.id);
-                          }
-                        }}
+                        onClick={() => setDeleteActiviteId(activite.id)}
                       >
                         Supprimer
                       </Button>
@@ -294,6 +293,19 @@ function ActivitesContent() {
             </tbody>
           </table>
         </div>
+
+      <ConfirmDialog
+        open={deleteActiviteId !== null}
+        title="Supprimer l'activité"
+        description="Cette activité sera définitivement supprimée."
+        confirmLabel="Supprimer"
+        variant="destructive"
+        loading={deleteMutation.isPending}
+        onCancel={() => setDeleteActiviteId(null)}
+        onConfirm={() => {
+          if (deleteActiviteId !== null) deleteMutation.mutate(deleteActiviteId);
+        }}
+      />
     </>
   );
 }

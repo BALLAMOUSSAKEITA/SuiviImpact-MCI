@@ -20,7 +20,7 @@ export function ObjectifsPage() {
       <PageHeader
         eyebrow="Paramétrage"
         title="Objectifs"
-        description="Définir les objectifs du plan d'action et leurs activités associées"
+        description="Définir les objectifs du plan d'action (sans navigation vers les activités depuis ce tableau)."
       />
 
       <ObjectifForm queryKey={queryKey} />

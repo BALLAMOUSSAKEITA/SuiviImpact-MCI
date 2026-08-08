@@ -7,6 +7,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/components/auth-provider";
+import { FileUploadField } from "@/components/file-upload-field";
 import { TacheStatutBadge } from "@/components/execution-badge";
 import { Button } from "@/components/ui/button";
 import { finaliserTache, listTachesSuivi } from "@/lib/api";
@@ -143,16 +144,12 @@ function SuiviTachesContent() {
                     className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
                   />
                 </div>
-                <div>
-                  <label className="mb-1 block text-sm text-slate">
-                    Pièce jointe
-                  </label>
-                  <input
-                    type="file"
-                    onChange={(e) => setFichier(e.target.files?.[0] ?? null)}
-                    className="w-full text-sm"
-                  />
-                </div>
+                <FileUploadField
+                  label="Pièce jointe"
+                  file={fichier}
+                  onFileChange={setFichier}
+                  hint="Optionnel — document associé à la finalisation."
+                />
               </div>
 
               <div className="mt-6 flex justify-end gap-2">
