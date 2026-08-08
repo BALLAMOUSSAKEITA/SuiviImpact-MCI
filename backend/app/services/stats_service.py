@@ -1,3 +1,4 @@
+from datetime import date
 from decimal import Decimal
 
 from sqlalchemy import func, select
@@ -9,6 +10,7 @@ from app.models.modules import Mission, Ppm, PpmStatut, Projet, Recommandation
 from app.models.plan_action import Activite, ActiviteDirection
 from app.models.tache import Tache, TacheStatut
 from app.schemas.stats import ActiviteStats, ExecutionStats, PpmStats, ProjetStats
+from app.services.period_filter import PeriodMode, build_period_on_date
 
 
 def _execution_bucket(execution: Decimal) -> str:
@@ -20,10 +22,56 @@ def _execution_bucket(execution: Decimal) -> str:
     return "en_cours"
 
 
+def _aggregate_execution(items) -> ExecutionStats:
+    counts = {"non_demare": 0, "en_cours": 0, "termine": 0}
+    total_execution = Decimal("0")
+    for item in items:
+        bucket = _execution_bucket(item.execution)
+        counts[bucket] += 1
+        total_execution += item.execution
+
+    total = len(items)
+    progression = (
+        (total_execution / total).quantize(Decimal("0.1")) if total else Decimal("0")
+    )
+
+    return ExecutionStats(
+        total=total,
+        non_demare=counts["non_demare"],
+        en_cours=counts["en_cours"],
+        termine=counts["termine"],
+        progression=progression,
+    )
+
+
 async def stats_activites(
-    db: AsyncSession, direction_code: str | None = None
+    db: AsyncSession,
+    direction_code: str | None = None,
+    *,
+    mode: PeriodMode = "annee",
+    annee: int = 2026,
+    du: date | None = None,
+    au: date | None = None,
+    mois: str | None = None,
 ) -> ActiviteStats:
-    query = select(Activite).options(selectinload(Activite.directions))
+    date_cond, _ = build_period_on_date(
+        Activite.date_debut,
+        mode,
+        annee=annee,
+        du=du,
+        au=au,
+        mois_csv=mois,
+    )
+
+    query = (
+        select(Activite)
+        .where(
+            Activite.date_debut.isnot(None),
+            Activite.date_fin.isnot(None),
+            date_cond,
+        )
+        .options(selectinload(Activite.directions))
+    )
     if direction_code:
         query = (
             query.join(ActiviteDirection, Activite.id == ActiviteDirection.activite_id)
@@ -66,59 +114,81 @@ async def stats_activites(
     )
 
 
-async def _execution_module_stats(
-    db: AsyncSession,
-    model: type,
-    trimestre: int | None,
-    annee: int | None,
-) -> ExecutionStats:
-    query = select(model)
-    if trimestre is not None:
-        query = query.where(model.trimestre == trimestre)
-    if annee is not None:
-        query = query.where(model.annee == annee)
-    result = await db.execute(query)
-    items = list(result.scalars().all())
-
-    counts = {"non_demare": 0, "en_cours": 0, "termine": 0}
-    total_execution = Decimal("0")
-    for item in items:
-        bucket = _execution_bucket(item.execution)
-        counts[bucket] += 1
-        total_execution += item.execution
-
-    total = len(items)
-    progression = (
-        (total_execution / total).quantize(Decimal("0.1")) if total else Decimal("0")
-    )
-
-    return ExecutionStats(
-        total=total,
-        non_demare=counts["non_demare"],
-        en_cours=counts["en_cours"],
-        termine=counts["termine"],
-        progression=progression,
-    )
-
-
 async def stats_recommandations(
     db: AsyncSession,
     trimestre: int | None = None,
-    annee: int | None = None,
+    *,
+    mode: PeriodMode = "annee",
+    annee: int = 2026,
+    du: date | None = None,
+    au: date | None = None,
+    mois: str | None = None,
 ) -> ExecutionStats:
-    return await _execution_module_stats(db, Recommandation, trimestre, annee)
+    date_cond, _ = build_period_on_date(
+        Recommandation.date_recommandation,
+        mode,
+        annee=annee,
+        du=du,
+        au=au,
+        mois_csv=mois,
+        period_context="Date de la recommandation",
+    )
+    query = select(Recommandation).where(date_cond)
+    if trimestre is not None:
+        query = query.where(Recommandation.trimestre == trimestre)
+    result = await db.execute(query)
+    return _aggregate_execution(list(result.scalars().all()))
 
 
 async def stats_missions(
     db: AsyncSession,
     trimestre: int | None = None,
-    annee: int | None = None,
+    *,
+    mode: PeriodMode = "annee",
+    annee: int = 2026,
+    du: date | None = None,
+    au: date | None = None,
+    mois: str | None = None,
 ) -> ExecutionStats:
-    return await _execution_module_stats(db, Mission, trimestre, annee)
+    date_cond, _ = build_period_on_date(
+        Mission.date_mission,
+        mode,
+        annee=annee,
+        du=du,
+        au=au,
+        mois_csv=mois,
+        period_context="Date de la mission",
+    )
+    query = select(Mission).where(date_cond)
+    if trimestre is not None:
+        query = query.where(Mission.trimestre == trimestre)
+    result = await db.execute(query)
+    return _aggregate_execution(list(result.scalars().all()))
 
 
-async def stats_ppm(db: AsyncSession, type_marche: str | None = None) -> PpmStats:
-    query = select(Ppm.statut, func.count(Ppm.id))
+async def stats_ppm(
+    db: AsyncSession,
+    type_marche: str | None = None,
+    *,
+    mode: PeriodMode = "annee",
+    annee: int = 2026,
+    du: date | None = None,
+    au: date | None = None,
+    mois: str | None = None,
+) -> PpmStats:
+    date_cond, _ = build_period_on_date(
+        Ppm.date_marche,
+        mode,
+        annee=annee,
+        du=du,
+        au=au,
+        mois_csv=mois,
+        period_context="Date du marché",
+    )
+    query = select(Ppm.statut, func.count(Ppm.id)).where(
+        Ppm.date_marche.isnot(None),
+        date_cond,
+    )
     if type_marche:
         query = query.where(Ppm.type_marche == type_marche)
     query = query.group_by(Ppm.statut)
@@ -145,9 +215,25 @@ async def stats_ppm(db: AsyncSession, type_marche: str | None = None) -> PpmStat
 
 
 async def stats_projets(
-    db: AsyncSession, projet_id: int | None = None
+    db: AsyncSession,
+    projet_id: int | None = None,
+    *,
+    mode: PeriodMode = "annee",
+    annee: int = 2026,
+    du: date | None = None,
+    au: date | None = None,
+    mois: str | None = None,
 ) -> ProjetStats:
-    query = select(Projet)
+    date_cond, _ = build_period_on_date(
+        Projet.date_debut,
+        mode,
+        annee=annee,
+        du=du,
+        au=au,
+        mois_csv=mois,
+        period_context="Date de début du projet",
+    )
+    query = select(Projet).where(Projet.date_debut.isnot(None), date_cond)
     if projet_id is not None:
         query = query.where(Projet.id == projet_id)
     result = await db.execute(query)

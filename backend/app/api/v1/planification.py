@@ -3,7 +3,9 @@ from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user, require_write_access
+from app.core.config import settings
 from app.core.database import get_db
+from app.core.years import MAX_ANNEE, MIN_ANNEE
 from app.models.user import User
 from app.schemas.planification import (
     PlanificationActiviteRead,
@@ -155,7 +157,7 @@ async def list_planification(
 async def list_taches(
     activite_id: int,
     trimestre: int = Query(..., ge=1, le=4),
-    annee: int = Query(default=2025, ge=2025, le=2027),
+    annee: int = Query(default=settings.DEFAULT_ANNEE, ge=MIN_ANNEE, le=MAX_ANNEE),
     _: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> list[TacheRead]:

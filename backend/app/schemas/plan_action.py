@@ -3,9 +3,11 @@ from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.core.years import MAX_ANNEE, MIN_ANNEE
+
 
 class TrimestrePlan(BaseModel):
-    annee: int = Field(ge=2025, le=2027)
+    annee: int = Field(ge=MIN_ANNEE, le=MAX_ANNEE)
     trimestre: int = Field(ge=1, le=4)
 
 

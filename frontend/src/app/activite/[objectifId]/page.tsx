@@ -18,7 +18,7 @@ import {
 } from "@/lib/api";
 import type { TrimestrePlan } from "@/types";
 
-const YEARS = [2025, 2026, 2027];
+import { ANNEE_OPTIONS, DEFAULT_ANNEE } from "@/lib/years";
 const TRIMESTRES = [1, 2, 3, 4];
 
 export default function ActivitesPage() {
@@ -179,7 +179,7 @@ function ActivitesContent() {
                 <div>
                   <p className="mb-2 text-sm font-medium text-slate">Trimestres</p>
                   <div className="space-y-2">
-                    {YEARS.map((year) => (
+                    {ANNEE_OPTIONS.map((year) => (
                       <div key={year} className="flex flex-wrap items-center gap-2">
                         <span className="w-12 text-xs font-semibold text-fog">{year}</span>
                         {TRIMESTRES.map((t) => (
@@ -228,7 +228,7 @@ function ActivitesContent() {
                 <th className="px-3 py-3 text-left">Activité</th>
                 <th className="px-3 py-3 text-left">Directions</th>
                 <th className="px-3 py-3 text-left">Budget</th>
-                {YEARS.map((year) =>
+                {ANNEE_OPTIONS.map((year) =>
                   TRIMESTRES.map((t) => (
                     <th key={`${year}-T${t}`} className="px-2 py-3 text-center text-xs">
                       {year} T{t}
@@ -259,7 +259,7 @@ function ActivitesContent() {
                   <td className="px-3 py-3">
                     {Number(activite.budget).toLocaleString("fr-FN")}
                   </td>
-                  {YEARS.map((year) =>
+                  {ANNEE_OPTIONS.map((year) =>
                     TRIMESTRES.map((t) => {
                       const planned = activite.trimestres.some(
                         (tr) => tr.annee === year && tr.trimestre === t,

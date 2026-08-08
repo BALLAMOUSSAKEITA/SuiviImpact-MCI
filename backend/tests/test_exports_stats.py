@@ -3,7 +3,7 @@ from httpx import AsyncClient
 
 
 EXPORT_PATHS = [
-    "/api/v1/exports/pao?mode=annee&annee=2025",
+    "/api/v1/exports/pao?mode=annee&annee=2026",
     "/api/v1/exports/recommandations",
     "/api/v1/exports/missions",
     "/api/v1/exports/ppm",
@@ -44,7 +44,7 @@ async def test_export_pao_with_activite(client: AsyncClient, auth_headers: dict[
     assert create.status_code == 201
 
     response = await client.get(
-        "/api/v1/exports/pao?mode=annee&annee=2025",
+        "/api/v1/exports/pao?mode=annee&annee=2026",
         headers=auth_headers,
     )
     assert response.status_code == 200
@@ -61,9 +61,9 @@ async def test_export_pao_with_activite(client: AsyncClient, auth_headers: dict[
     assert wb["Activités"]["A1"].value == EXPORT_MINISTRY
     assert "Plan d" in str(wb["Activités"]["A3"].value or "")
 
-    # Filtre mois : date_debut 2025-01-15 → inclus pour janvier 2025 uniquement
+    # Filtre mois : date_debut 2026-01-15 → inclus pour janvier 2026 uniquement
     jan = await client.get(
-        "/api/v1/exports/pao?mode=mois&mois=2025-01",
+        "/api/v1/exports/pao?mode=mois&mois=2026-01",
         headers=auth_headers,
     )
     assert jan.status_code == 200
@@ -71,7 +71,7 @@ async def test_export_pao_with_activite(client: AsyncClient, auth_headers: dict[
     assert wb_jan["Activités"].max_row >= 6  # en-tête + au moins une ligne
 
     fev = await client.get(
-        "/api/v1/exports/pao?mode=mois&mois=2025-02",
+        "/api/v1/exports/pao?mode=mois&mois=2026-02",
         headers=auth_headers,
     )
     assert fev.status_code == 200

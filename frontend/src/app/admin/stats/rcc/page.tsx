@@ -6,8 +6,11 @@ import { useState } from "react";
 
 import { ProgressBar } from "@/components/execution-badge";
 import { StatCard, StatGrid } from "@/components/stat-card";
+import {
+  StatsPeriodFilter,
+  useStatsPeriodState,
+} from "@/components/stats-period-filter";
 import { getStatsRcc } from "@/lib/api";
-import { DEFAULT_ANNEE } from "@/types";
 
 export default function StatsRccPage() {
   return <StatsRccContent />;
@@ -15,10 +18,12 @@ export default function StatsRccPage() {
 
 function StatsRccContent() {
   const [trimestre, setTrimestre] = useState<number | undefined>(undefined);
+  const periodState = useStatsPeriodState();
+  const { params: period } = periodState;
 
   const { data: stats, isLoading } = useQuery({
-    queryKey: ["stats-rcc", trimestre, DEFAULT_ANNEE],
-    queryFn: () => getStatsRcc({ trimestre, annee: DEFAULT_ANNEE }),
+    queryKey: ["stats-rcc", trimestre, period],
+    queryFn: () => getStatsRcc({ trimestre, period }),
   });
 
   return (
@@ -32,6 +37,11 @@ function StatsRccContent() {
         </h1>
       </div>
 
+      <StatsPeriodFilter
+        dateFieldHint="Filtrage sur la date de la recommandation RCC."
+        state={periodState}
+      />
+
       <div className="flex flex-wrap gap-2">
         <button
           type="button"
@@ -42,7 +52,7 @@ function StatsRccContent() {
               : "bg-paper ring-1 ring-cloud"
           }`}
         >
-          Année
+          Tous trimestres
         </button>
         {[1, 2, 3, 4].map((t) => (
           <button

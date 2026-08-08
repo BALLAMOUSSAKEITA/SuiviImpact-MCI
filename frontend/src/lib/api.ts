@@ -104,7 +104,8 @@ import type {
 
 } from "@/types";
 
-import { DEFAULT_ANNEE, type PaoExportOptions } from "@/types";
+import { appendStatsPeriodToSearch } from "@/components/stats-period-filter";
+import { DEFAULT_ANNEE, type PaoExportOptions, type StatsPeriodParams } from "@/types";
 
 import { messageFromFailedResponse } from "./api-errors";
 
@@ -908,7 +909,7 @@ export async function listTaches(
 
   trimestre: number,
 
-  annee = 2025,
+  annee = DEFAULT_ANNEE,
 
 ): Promise<Tache[]> {
 
@@ -1425,87 +1426,68 @@ export async function deleteIndicateur(id: number): Promise<void> {
 
 
 export async function getStatsActivites(
-
   direction?: string,
-
+  period?: StatsPeriodParams,
 ): Promise<ActiviteStats> {
-
-  const query = direction ? `?direction=${direction}` : "";
-
+  const search = new URLSearchParams();
+  if (direction) search.set("direction", direction);
+  if (period) appendStatsPeriodToSearch(search, period);
+  const query = search.toString() ? `?${search.toString()}` : "";
   return apiFetch<ActiviteStats>(`/api/v1/stats/activites${query}`);
-
 }
 
 
 
 export async function getStatsRcc(params?: {
-
   trimestre?: number;
-
-  annee?: number;
-
+  period?: StatsPeriodParams;
 }): Promise<ExecutionStats> {
-
   const search = new URLSearchParams();
-
   if (params?.trimestre) search.set("trimestre", String(params.trimestre));
-
-  if (params?.annee) search.set("annee", String(params.annee));
-
+  if (params?.period) appendStatsPeriodToSearch(search, params.period);
   const query = search.toString() ? `?${search.toString()}` : "";
-
   return apiFetch<ExecutionStats>(
-
     `/api/v1/stats/recommandations${query}`,
-
   );
-
 }
 
 
 
 export async function getStatsMissions(params?: {
-
   trimestre?: number;
-
-  annee?: number;
-
+  period?: StatsPeriodParams;
 }): Promise<ExecutionStats> {
-
   const search = new URLSearchParams();
-
   if (params?.trimestre) search.set("trimestre", String(params.trimestre));
-
-  if (params?.annee) search.set("annee", String(params.annee));
-
+  if (params?.period) appendStatsPeriodToSearch(search, params.period);
   const query = search.toString() ? `?${search.toString()}` : "";
-
   return apiFetch<ExecutionStats>(`/api/v1/stats/missions${query}`);
-
 }
 
 
 
-export async function getStatsPpm(type?: string): Promise<PpmStats> {
-
-  const query = type ? `?type=${type}` : "";
-
+export async function getStatsPpm(
+  type?: string,
+  period?: StatsPeriodParams,
+): Promise<PpmStats> {
+  const search = new URLSearchParams();
+  if (type) search.set("type", type);
+  if (period) appendStatsPeriodToSearch(search, period);
+  const query = search.toString() ? `?${search.toString()}` : "";
   return apiFetch<PpmStats>(`/api/v1/stats/ppm${query}`);
-
 }
 
 
 
 export async function getStatsProjets(
-
   projetId?: number,
-
+  period?: StatsPeriodParams,
 ): Promise<ProjetStats> {
-
-  const query = projetId ? `?projet_id=${projetId}` : "";
-
+  const search = new URLSearchParams();
+  if (projetId) search.set("projet_id", String(projetId));
+  if (period) appendStatsPeriodToSearch(search, period);
+  const query = search.toString() ? `?${search.toString()}` : "";
   return apiFetch<ProjetStats>(`/api/v1/stats/projets${query}`);
-
 }
 
 

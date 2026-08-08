@@ -3,8 +3,8 @@ from httpx import AsyncClient
 
 RCC_BASE = {
     "trimestre": 1,
-    "annee": 2025,
-    "date_recommandation": "2025-02-10",
+    "annee": 2026,
+    "date_recommandation": "2026-02-10",
     "description": "Recommandation test",
     "responsable": "M. RCC",
     "execution": 0,
@@ -24,7 +24,7 @@ async def test_recommandations_crud_and_finaliser(
     item_id = create.json()["id"]
 
     listing = await client.get(
-        "/api/v1/recommandations?trimestre=1&annee=2025",
+        "/api/v1/recommandations?trimestre=1&annee=2026",
         headers=auth_headers,
     )
     assert listing.status_code == 200
@@ -52,8 +52,8 @@ async def test_recommandations_crud_and_finaliser(
 async def test_missions_crud_and_finaliser(client: AsyncClient, auth_headers: dict[str, str]):
     payload = {
         "trimestre": 2,
-        "annee": 2025,
-        "date_mission": "2025-05-01",
+        "annee": 2026,
+        "date_mission": "2026-05-01",
         "description": "Mission test",
         "responsable": "M. Mission",
         "execution": 25,

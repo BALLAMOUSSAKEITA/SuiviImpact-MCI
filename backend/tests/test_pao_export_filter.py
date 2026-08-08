@@ -4,7 +4,7 @@ from app.services.pao_export_filter import parse_mois_param
 
 
 def test_parse_mois_param():
-    assert parse_mois_param("2025-01,2025-06") == [(2025, 1), (2025, 6)]
+    assert parse_mois_param("2026-01,2026-06") == [(2026, 1), (2026, 6)]
 
 
 def test_parse_mois_param_invalid():
@@ -12,4 +12,4 @@ def test_parse_mois_param_invalid():
         parse_mois_param("")
 
     with pytest.raises(ValueError):
-        parse_mois_param("2025-13")
+        parse_mois_param("2026-13")

@@ -7,6 +7,10 @@ import { DirectionFilter } from "@/components/direction-filter";
 import { ProgressBar } from "@/components/execution-badge";
 import { PageHeader } from "@/components/page-header";
 import { StatCard, StatGrid } from "@/components/stat-card";
+import {
+  StatsPeriodFilter,
+  useStatsPeriodState,
+} from "@/components/stats-period-filter";
 import { BRAND } from "@/lib/brand";
 import {
   getStatsActivites,
@@ -15,8 +19,10 @@ import {
   getStatsProjets,
   getStatsRcc,
 } from "@/lib/api";
-import { DEFAULT_ANNEE, PPM_STATUT_LABELS } from "@/types";
+import { PPM_STATUT_LABELS } from "@/types";
 import { cn } from "@/lib/utils";
+
+type StatsPeriodState = ReturnType<typeof useStatsPeriodState>;
 
 const views = [
   { id: "activites", label: "Activités" },
@@ -28,8 +34,18 @@ const views = [
 
 type ViewId = (typeof views)[number]["id"];
 
+const PERIOD_HINTS: Record<ViewId, string> = {
+  activites:
+    "Les activités PAO sont comptées selon leur date de début.",
+  rcc: "Filtrage sur la date de la recommandation RCC.",
+  missions: "Filtrage sur la date de la mission.",
+  ppm: "Filtrage sur la date du marché (PPM).",
+  projets: "Filtrage sur la date de début du projet.",
+};
+
 export default function AdminDashboardPage() {
   const [currentView, setCurrentView] = useState<ViewId>("activites");
+  const periodState = useStatsPeriodState();
 
   return (
     <>
@@ -59,22 +75,28 @@ export default function AdminDashboardPage() {
         ))}
       </div>
 
+      <StatsPeriodFilter
+        dateFieldHint={PERIOD_HINTS[currentView]}
+        state={periodState}
+      />
+
       {/* Contenu selon la vue */}
-      {currentView === "activites" && <ActivitesView />}
-      {currentView === "rcc" && <RccView />}
-      {currentView === "missions" && <MissionsView />}
-      {currentView === "ppm" && <PpmView />}
-      {currentView === "projets" && <ProjetsView />}
+      {currentView === "activites" && <ActivitesView periodState={periodState} />}
+      {currentView === "rcc" && <RccView periodState={periodState} />}
+      {currentView === "missions" && <MissionsView periodState={periodState} />}
+      {currentView === "ppm" && <PpmView periodState={periodState} />}
+      {currentView === "projets" && <ProjetsView periodState={periodState} />}
     </>
   );
 }
 
-function ActivitesView() {
+function ActivitesView({ periodState }: { periodState: StatsPeriodState }) {
   const [direction, setDirection] = useState<string | null>(null);
+  const { params: period } = periodState;
 
   const { data: stats, isLoading } = useQuery({
-    queryKey: ["stats-activites", direction],
-    queryFn: () => getStatsActivites(direction ?? undefined),
+    queryKey: ["stats-activites", direction, period],
+    queryFn: () => getStatsActivites(direction ?? undefined, period),
   });
 
   return (
@@ -134,12 +156,13 @@ function TrimestreSelector({ value, onChange }: { value: number | undefined; onC
   );
 }
 
-function RccView() {
+function RccView({ periodState }: { periodState: StatsPeriodState }) {
   const [trimestre, setTrimestre] = useState<number | undefined>(undefined);
+  const { params: period } = periodState;
 
   const { data: stats, isLoading } = useQuery({
-    queryKey: ["stats-rcc", trimestre, DEFAULT_ANNEE],
-    queryFn: () => getStatsRcc({ trimestre, annee: DEFAULT_ANNEE }),
+    queryKey: ["stats-rcc", trimestre, period],
+    queryFn: () => getStatsRcc({ trimestre, period }),
   });
 
   return (
@@ -164,12 +187,13 @@ function RccView() {
   );
 }
 
-function MissionsView() {
+function MissionsView({ periodState }: { periodState: StatsPeriodState }) {
   const [trimestre, setTrimestre] = useState<number | undefined>(undefined);
+  const { params: period } = periodState;
 
   const { data: stats, isLoading } = useQuery({
-    queryKey: ["stats-missions", trimestre, DEFAULT_ANNEE],
-    queryFn: () => getStatsMissions({ trimestre, annee: DEFAULT_ANNEE }),
+    queryKey: ["stats-missions", trimestre, period],
+    queryFn: () => getStatsMissions({ trimestre, period }),
   });
 
   return (
@@ -194,10 +218,12 @@ function MissionsView() {
   );
 }
 
-function PpmView() {
+function PpmView({ periodState }: { periodState: StatsPeriodState }) {
+  const { params: period } = periodState;
+
   const { data: stats, isLoading } = useQuery({
-    queryKey: ["stats-ppm"],
-    queryFn: () => getStatsPpm(),
+    queryKey: ["stats-ppm", period],
+    queryFn: () => getStatsPpm(undefined, period),
   });
 
   const progression =
@@ -227,10 +253,12 @@ function PpmView() {
   );
 }
 
-function ProjetsView() {
+function ProjetsView({ periodState }: { periodState: StatsPeriodState }) {
+  const { params: period } = periodState;
+
   const { data: stats, isLoading } = useQuery({
-    queryKey: ["stats-projets"],
-    queryFn: () => getStatsProjets(),
+    queryKey: ["stats-projets", period],
+    queryFn: () => getStatsProjets(undefined, period),
   });
 
   return (

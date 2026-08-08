@@ -93,7 +93,7 @@ class ActiviteTrimestre(Base):
     __tablename__ = "activite_trimestres"
     __table_args__ = (
         UniqueConstraint("activite_id", "annee", "trimestre"),
-        CheckConstraint("annee BETWEEN 2025 AND 2027", name="ck_trimestre_annee"),
+        CheckConstraint("annee >= 2026 AND annee <= 2040", name="ck_trimestre_annee"),
         CheckConstraint("trimestre BETWEEN 1 AND 4", name="ck_trimestre_num"),
     )
 

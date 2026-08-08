@@ -7,6 +7,10 @@ import { useState } from "react";
 import { DirectionFilter } from "@/components/direction-filter";
 import { ProgressBar } from "@/components/execution-badge";
 import { StatCard, StatGrid } from "@/components/stat-card";
+import {
+  StatsPeriodFilter,
+  useStatsPeriodState,
+} from "@/components/stats-period-filter";
 import { getStatsActivites } from "@/lib/api";
 
 export default function StatsPaoPage() {
@@ -15,10 +19,12 @@ export default function StatsPaoPage() {
 
 function StatsPaoContent() {
   const [direction, setDirection] = useState<string | null>(null);
+  const periodState = useStatsPeriodState();
+  const { params: period } = periodState;
 
   const { data: stats, isLoading } = useQuery({
-    queryKey: ["stats-activites", direction],
-    queryFn: () => getStatsActivites(direction ?? undefined),
+    queryKey: ["stats-activites", direction, period],
+    queryFn: () => getStatsActivites(direction ?? undefined, period),
   });
 
   return (
@@ -31,6 +37,11 @@ function StatsPaoContent() {
             Statistiques — Plan d&apos;Action
           </h1>
         </div>
+
+        <StatsPeriodFilter
+          dateFieldHint="Les activités PAO sont comptées selon leur date de début (ex. début en janvier → incluse dans le filtre janvier)."
+          state={periodState}
+        />
 
         <DirectionFilter value={direction} onChange={setDirection} />
 

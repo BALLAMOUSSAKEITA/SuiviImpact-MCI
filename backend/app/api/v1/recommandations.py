@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.years import MAX_ANNEE, MIN_ANNEE
 from app.api.deps import get_current_user, require_write_access
 from app.core.database import get_db
 from app.models.user import User
@@ -18,7 +19,7 @@ router = APIRouter()
 @router.get("/recommandations", response_model=ModuleListResponse)
 async def list_recommandations(
     trimestre: int | None = Query(default=None, ge=1, le=4),
-    annee: int | None = Query(default=None, ge=2025, le=2027),
+    annee: int | None = Query(default=None, ge=MIN_ANNEE, le=MAX_ANNEE),
     statut: str | None = Query(default=None),
     _: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),

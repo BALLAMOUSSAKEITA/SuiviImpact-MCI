@@ -79,7 +79,7 @@ async def _seed_activite(db_session: AsyncSession) -> int:
     db_session.add(
         ActiviteTrimestre(
             activite_id=activite.id,
-            annee=2025,
+            annee=2026,
             trimestre=1,
             planifie=True,
         )
@@ -93,7 +93,7 @@ async def test_list_planification_trimestre(client: AsyncClient, db_session: Asy
     await _seed_activite(db_session)
     headers = await _auth_headers(client)
 
-    response = await client.get("/api/v1/planification/2025/1", headers=headers)
+    response = await client.get("/api/v1/planification/2026/1", headers=headers)
     assert response.status_code == 200
     data = response.json()
     assert len(data) == 1
@@ -109,7 +109,7 @@ async def test_create_tache_with_ponderation_validation(
 
     payload = {
         "trimestre": 1,
-        "annee": 2025,
+        "annee": 2026,
         "description": "Rédiger le rapport T1",
         "responsable": "M. Diallo",
         "email_responsable": "diallo@mipme.gov.gn",
@@ -140,7 +140,7 @@ async def test_update_and_delete_tache(client: AsyncClient, db_session: AsyncSes
 
     payload = {
         "trimestre": 1,
-        "annee": 2025,
+        "annee": 2026,
         "description": "Tâche à modifier",
         "responsable": "M. Diallo",
         "email_responsable": "diallo@mipme.gov.gn",

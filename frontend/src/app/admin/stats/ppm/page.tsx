@@ -5,6 +5,10 @@ import Link from "next/link";
 
 import { ProgressBar } from "@/components/execution-badge";
 import { StatCard, StatGrid } from "@/components/stat-card";
+import {
+  StatsPeriodFilter,
+  useStatsPeriodState,
+} from "@/components/stats-period-filter";
 import { getStatsPpm } from "@/lib/api";
 import { PPM_STATUT_LABELS } from "@/types";
 
@@ -13,9 +17,12 @@ export default function StatsPpmPage() {
 }
 
 function StatsPpmContent() {
+  const periodState = useStatsPeriodState();
+  const { params: period } = periodState;
+
   const { data: stats, isLoading } = useQuery({
-    queryKey: ["stats-ppm"],
-    queryFn: () => getStatsPpm(),
+    queryKey: ["stats-ppm", period],
+    queryFn: () => getStatsPpm(undefined, period),
   });
 
   const progression =
@@ -33,6 +40,11 @@ function StatsPpmContent() {
           Statistiques — PPM
         </h1>
       </div>
+
+      <StatsPeriodFilter
+        dateFieldHint="Filtrage sur la date du marché (PPM)."
+        state={periodState}
+      />
 
       {isLoading ? (
         <p className="text-sm text-ash">Chargement…</p>

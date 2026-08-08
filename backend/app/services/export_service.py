@@ -6,6 +6,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.core.config import settings
+
 from app.models.direction import Direction
 from app.models.modules import Mission, Ppm, Projet, Recommandation
 from app.models.plan_action import Activite, TachePlan
@@ -166,7 +168,7 @@ async def export_pao(
     db: AsyncSession,
     *,
     mode: PaoExportMode = "annee",
-    annee: int = 2025,
+    annee: int = settings.DEFAULT_ANNEE,
     du: date | None = None,
     au: date | None = None,
     mois: str | None = None,

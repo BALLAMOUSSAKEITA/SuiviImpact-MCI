@@ -7,6 +7,7 @@ from sqlalchemy import delete, func, inspect as sa_inspect, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.core.years import MAX_ANNEE, MIN_ANNEE
 from app.models.direction import Direction
 from app.models.plan_action import Activite, ActiviteDirection, ActiviteTrimestre, Objectif, TachePlan
 from app.models.tache import TRIMESTRE_MOIS, Tache, TacheSemaine, TacheStatut, end_of_week_in_month
@@ -310,10 +311,10 @@ async def delete_tache(db: AsyncSession, tache: Tache) -> None:
 
 def _trimestre_from_date(d: date) -> tuple[int, int]:
     annee = d.year
-    if annee < 2025 or annee > 2027:
+    if annee < MIN_ANNEE or annee > MAX_ANNEE:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="L'année doit être entre 2025 et 2027",
+            detail=f"L'année doit être entre {MIN_ANNEE} et {MAX_ANNEE}",
         )
     trimestre = (d.month - 1) // 3 + 1
     return annee, trimestre

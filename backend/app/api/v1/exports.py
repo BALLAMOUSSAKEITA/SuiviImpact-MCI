@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user
 from app.core.config import settings
+from app.core.years import MAX_ANNEE, MIN_ANNEE
 from app.core.database import get_db
 from app.models.user import User
 from app.services import export_service as service
@@ -28,12 +29,12 @@ async def export_pao(
         "annee",
         description="annee = année calendaire ; plage = du/au ; mois = liste AAAA-MM",
     ),
-    annee: int = Query(default=settings.DEFAULT_ANNEE, ge=2025, le=2027),
+    annee: int = Query(default=settings.DEFAULT_ANNEE, ge=MIN_ANNEE, le=MAX_ANNEE),
     du: date | None = Query(None, description="Début de plage (date de début activité)"),
     au: date | None = Query(None, description="Fin de plage (date de début activité)"),
     mois: str | None = Query(
         None,
-        description="Mois cibles, ex. 2025-01,2025-06 (filtre sur date_debut)",
+        description="Mois cibles, ex. 2026-01,2026-06 (filtre sur date_debut)",
     ),
     _: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),

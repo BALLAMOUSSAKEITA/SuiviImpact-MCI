@@ -124,7 +124,7 @@ export interface ActiviteCreate {
   trimestres: TrimestrePlan[];
 }
 
-export const DEFAULT_ANNEE = 2025;
+export const DEFAULT_ANNEE = 2026;
 
 export const TRIMESTRE_MOIS: Record<number, number[]> = {
   1: [1, 2, 3],
@@ -577,6 +577,8 @@ export interface PaoExportOptions {
   /** Liste « AAAA-MM » séparée par des virgules */
   mois?: string;
 }
+
+export type StatsPeriodParams = PaoExportOptions;
 
 export interface Dossier {
   id: number;

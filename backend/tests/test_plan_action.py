@@ -97,11 +97,11 @@ async def test_create_activite_with_trimestres(client: AsyncClient):
             "description": "Activité test",
             "budget": 1000,
             "direction_ids": [],
-            "trimestres": [{"annee": 2025, "trimestre": 1}],
+            "trimestres": [{"annee": 2026, "trimestre": 1}],
         },
     )
     assert activite.status_code == 201
-    assert activite.json()["trimestres"] == [{"annee": 2025, "trimestre": 1}]
+    assert activite.json()["trimestres"] == [{"annee": 2026, "trimestre": 1}]
 
 
 @pytest.mark.asyncio

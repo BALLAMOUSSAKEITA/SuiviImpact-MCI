@@ -7,10 +7,14 @@ import { FormDialog } from "@/components/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { downloadExport } from "@/lib/api";
-import { DEFAULT_ANNEE, type ExportType, type PaoExportMode } from "@/types";
 import { cn } from "@/lib/utils";
-
-const ANNEE_OPTIONS = [2025, 2026, 2027] as const;
+import {
+  ANNEE_OPTIONS,
+  DEFAULT_ANNEE,
+  maxDateInput,
+  minDateInput,
+} from "@/lib/years";
+import { type ExportType, type PaoExportMode } from "@/types";
 
 const MOIS_LABELS = [
   "Janvier",
@@ -210,6 +214,8 @@ function ExportContent() {
                   id="pao-du"
                   type="date"
                   value={du}
+                  min={minDateInput()}
+                  max={maxDateInput()}
                   onChange={(e) => setDu(e.target.value)}
                   className="input-grain mt-1 w-full"
                 />
@@ -222,6 +228,8 @@ function ExportContent() {
                   id="pao-au"
                   type="date"
                   value={au}
+                  min={minDateInput()}
+                  max={maxDateInput()}
                   onChange={(e) => setAu(e.target.value)}
                   className="input-grain mt-1 w-full"
                 />

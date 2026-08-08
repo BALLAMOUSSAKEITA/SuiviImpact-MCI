@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 
+import { PlatformFooter } from "@/components/platform-footer";
 import { useAuth } from "@/components/auth-provider";
 import { Sidebar } from "@/components/sidebar";
 import { UserAvatar } from "@/components/user-avatar";
@@ -119,6 +120,7 @@ export function AdminShell({ children, className }: AdminShellProps) {
         >
           {children}
         </main>
+        <PlatformFooter />
       </div>
     </div>
   );

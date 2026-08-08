@@ -52,7 +52,7 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: str = ""
     SMTP_FROM: str = "noreply@suiviimpact.gov.gn"
 
-    DEFAULT_ANNEE: int = 2025
+    DEFAULT_ANNEE: int = 2026
     PORT: int = 8000
 
     @field_validator("DATABASE_URL", mode="before")

@@ -4,6 +4,8 @@ from enum import Enum
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from app.core.years import DEFAULT_ANNEE, MAX_ANNEE, MIN_ANNEE
+
 
 class TacheStatut(str, Enum):
     EN_COURS = "en_cours"
@@ -26,7 +28,7 @@ class SemaineRead(SemainePlan):
 
 class TacheCreate(BaseModel):
     trimestre: int = Field(ge=1, le=4)
-    annee: int = Field(default=2025, ge=2025, le=2027)
+    annee: int = Field(default=DEFAULT_ANNEE, ge=MIN_ANNEE, le=MAX_ANNEE)
     description: str = Field(min_length=1)
     responsable: str = Field(min_length=1, max_length=100)
     email_responsable: str | None = Field(default=None, max_length=255)

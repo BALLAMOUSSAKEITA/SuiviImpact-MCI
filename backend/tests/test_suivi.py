@@ -27,14 +27,14 @@ async def test_suivi_lists_pao_activite(client: AsyncClient, auth_headers: dict[
     tache_id = None
 
     taches = await client.get(
-        f"/api/v1/suivi/2025/1/activites/{activite_id}/taches",
+        f"/api/v1/suivi/2026/1/activites/{activite_id}/taches",
         headers=auth_headers,
     )
     assert taches.status_code == 200
     assert len(taches.json()) >= 1
     tache_id = taches.json()[0]["id"]
 
-    suivi = await client.get("/api/v1/suivi/2025/1", headers=auth_headers)
+    suivi = await client.get("/api/v1/suivi/2026/1", headers=auth_headers)
     assert suivi.status_code == 200
     codes = [a["code"] for a in suivi.json()]
     assert create.json()["code"] in codes

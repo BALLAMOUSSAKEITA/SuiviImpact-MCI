@@ -5,6 +5,10 @@ import Link from "next/link";
 
 import { ProgressBar } from "@/components/execution-badge";
 import { StatCard, StatGrid } from "@/components/stat-card";
+import {
+  StatsPeriodFilter,
+  useStatsPeriodState,
+} from "@/components/stats-period-filter";
 import { getStatsProjets } from "@/lib/api";
 
 export default function StatsProjetsPage() {
@@ -12,9 +16,12 @@ export default function StatsProjetsPage() {
 }
 
 function StatsProjetsContent() {
+  const periodState = useStatsPeriodState();
+  const { params: period } = periodState;
+
   const { data: stats, isLoading } = useQuery({
-    queryKey: ["stats-projets"],
-    queryFn: () => getStatsProjets(),
+    queryKey: ["stats-projets", period],
+    queryFn: () => getStatsProjets(undefined, period),
   });
 
   return (
@@ -27,6 +34,11 @@ function StatsProjetsContent() {
           Statistiques — Projets
         </h1>
       </div>
+
+      <StatsPeriodFilter
+        dateFieldHint="Filtrage sur la date de début du projet."
+        state={periodState}
+      />
 
       {isLoading ? (
         <p className="text-sm text-ash">Chargement…</p>
