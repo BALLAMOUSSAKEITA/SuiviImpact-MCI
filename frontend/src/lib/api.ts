@@ -98,9 +98,13 @@ import type {
 
   User,
 
+  PasswordChange,
+
   ProfileUpdate,
 
   UserCreate,
+
+  UserCreateResponse,
 
 } from "@/types";
 
@@ -575,9 +579,18 @@ export async function listUsers(): Promise<User[]> {
 
 
 
-export async function createUser(data: UserCreate): Promise<User> {
+export async function changePassword(data: PasswordChange): Promise<void> {
+  await apiFetch<void>("/api/v1/auth/me/password", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
 
-  return apiFetch<User>("/api/v1/users", {
+
+
+export async function createUser(data: UserCreate): Promise<UserCreateResponse> {
+
+  return apiFetch<UserCreateResponse>("/api/v1/users", {
 
     method: "POST",
 

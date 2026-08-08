@@ -13,12 +13,14 @@ from app.core.security import (
     create_access_token,
     create_refresh_token,
     decode_token,
+    hash_password,
     hash_token,
     verify_password,
 )
 from app.models.user import RefreshToken, User
 from app.schemas.auth import (
     LoginRequest,
+    PasswordChange,
     ProfileUpdate,
     RefreshRequest,
     TokenResponse,
@@ -139,6 +141,26 @@ async def update_me(
     await db.commit()
     await db.refresh(user)
     return user_to_read(user)
+
+
+@router.post("/me/password", status_code=status.HTTP_204_NO_CONTENT)
+async def change_password(
+    body: PasswordChange,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> None:
+    if not verify_password(body.current_password, user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Mot de passe actuel incorrect",
+        )
+    if body.current_password == body.new_password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Le nouveau mot de passe doit être différent de l'actuel",
+        )
+    user.password_hash = hash_password(body.new_password)
+    await db.commit()
 
 
 @router.post("/me/avatar", response_model=UserMe)

@@ -7,7 +7,8 @@ from app.core.database import get_db
 from app.core.security import hash_password
 from app.models.user import User
 from app.core.roles import normalize_role_for_create
-from app.schemas.auth import UserCreate, UserRead, user_to_read
+from app.schemas.auth import UserCreate, UserCreateResponse, UserRead, user_to_read
+from app.core.passwords import generate_temporary_password
 
 router = APIRouter(prefix="/users")
 
@@ -21,21 +22,27 @@ async def list_users(
     return [user_to_read(u) for u in result.scalars().all()]
 
 
-@router.post("", response_model=UserRead, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=UserCreateResponse, status_code=status.HTTP_201_CREATED)
 async def create_user(
     body: UserCreate,
     _: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db),
-) -> UserRead:
+) -> UserCreateResponse:
     existing = await db.execute(select(User).where(User.username == body.username))
     if existing.scalar_one_or_none():
         raise HTTPException(status_code=400, detail="Nom d'utilisateur déjà utilisé")
 
     type_acces = normalize_role_for_create(body.role, body.type_acces)
 
+    generated: str | None = None
+    plain_password = body.password
+    if not plain_password:
+        plain_password = generate_temporary_password()
+        generated = plain_password
+
     user = User(
         username=body.username,
-        password_hash=hash_password(body.password),
+        password_hash=hash_password(plain_password),
         prenom=body.prenom.strip(),
         nom=body.nom.strip(),
         type_acces=type_acces,
@@ -45,7 +52,7 @@ async def create_user(
     db.add(user)
     await db.commit()
     await db.refresh(user)
-    return user_to_read(user)
+    return UserCreateResponse(user=user_to_read(user), generated_password=generated)
 
 
 @router.patch("/{user_id}/activate", response_model=UserRead)

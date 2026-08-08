@@ -128,7 +128,63 @@ async def test_admin_can_create_user(client: AsyncClient):
         },
     )
     assert response.status_code == 201
-    assert response.json()["username"] == "nouveau"
+    data = response.json()
+    assert data["user"]["username"] == "nouveau"
+
+
+@pytest.mark.asyncio
+async def test_admin_create_user_generates_password(client: AsyncClient):
+    login = await client.post(
+        "/api/v1/auth/login",
+        json={"username": "admin", "password": "admin123"},
+    )
+    token = login.json()["access_token"]
+    headers = {"Authorization": f"Bearer {token}"}
+
+    response = await client.post(
+        "/api/v1/users",
+        headers=headers,
+        json={
+            "username": "auto_pwd",
+            "prenom": "Auto",
+            "type_acces": "lecture",
+            "role": "user",
+        },
+    )
+    assert response.status_code == 201
+    data = response.json()
+    assert data["user"]["username"] == "auto_pwd"
+    assert data["generated_password"]
+    assert len(data["generated_password"]) >= 12
+
+
+@pytest.mark.asyncio
+async def test_change_password(client: AsyncClient):
+    login = await client.post(
+        "/api/v1/auth/login",
+        json={"username": "admin", "password": "admin123"},
+    )
+    token = login.json()["access_token"]
+    headers = {"Authorization": f"Bearer {token}"}
+
+    response = await client.post(
+        "/api/v1/auth/me/password",
+        headers=headers,
+        json={"current_password": "admin123", "new_password": "admin456secure"},
+    )
+    assert response.status_code == 204
+
+    bad_login = await client.post(
+        "/api/v1/auth/login",
+        json={"username": "admin", "password": "admin123"},
+    )
+    assert bad_login.status_code == 401
+
+    ok_login = await client.post(
+        "/api/v1/auth/login",
+        json={"username": "admin", "password": "admin456secure"},
+    )
+    assert ok_login.status_code == 200
 
 
 @pytest.mark.asyncio

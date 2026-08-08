@@ -27,11 +27,21 @@ export interface LoginRequest {
 
 export interface UserCreate {
   username: string;
-  password: string;
+  password?: string;
   prenom: string;
   nom?: string;
   type_acces: AccessType;
   role?: UserRole;
+}
+
+export interface UserCreateResponse {
+  user: User;
+  generated_password: string | null;
+}
+
+export interface PasswordChange {
+  current_password: string;
+  new_password: string;
 }
 
 export interface ProfileUpdate {

@@ -9,7 +9,8 @@ import { FileUploadTrigger } from "@/components/file-upload-field";
 import { PageHeader } from "@/components/page-header";
 import { UserAvatar } from "@/components/user-avatar";
 import { Button } from "@/components/ui/button";
-import { updateProfile, uploadProfileAvatar } from "@/lib/api";
+import { changePassword, updateProfile, uploadProfileAvatar } from "@/lib/api";
+import { openUsageGuide } from "@/lib/onboarding";
 import { ROLE_LABELS } from "@/lib/roles";
 
 export default function ProfilPage() {
@@ -21,6 +22,9 @@ function ProfilContent() {
   const [prenom, setPrenom] = useState("");
   const [nom, setNom] = useState("");
   const [avatarKey, setAvatarKey] = useState(0);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   useEffect(() => {
     if (user) {
@@ -48,6 +52,21 @@ function ProfilContent() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const passwordMutation = useMutation({
+    mutationFn: () =>
+      changePassword({
+        current_password: currentPassword,
+        new_password: newPassword,
+      }),
+    onSuccess: () => {
+      toast.success("Mot de passe modifié");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   if (!user) {
     return (
       <p className="text-sm text-ash">Impossible de charger votre profil. Reconnectez-vous.</p>
@@ -56,12 +75,30 @@ function ProfilContent() {
 
   const displayName = [user.prenom, user.nom].filter(Boolean).join(" ");
 
+  const submitPassword = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newPassword.length < 6) {
+      toast.error("Le nouveau mot de passe doit contenir au moins 6 caractères");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error("La confirmation ne correspond pas");
+      return;
+    }
+    passwordMutation.mutate();
+  };
+
   return (
     <>
       <PageHeader
         eyebrow="Compte"
         title="Mon profil"
-        description="Vos informations personnelles et votre photo de profil."
+        description="Vos informations personnelles, votre sécurité et le guide d'utilisation."
+        actions={
+          <Button type="button" variant="outline" onClick={() => openUsageGuide()}>
+            Guide d&apos;utilisation
+          </Button>
+        }
       />
 
       <div className="panel-grain mx-auto max-w-2xl space-y-8">
@@ -90,12 +127,13 @@ function ProfilContent() {
         </div>
 
         <form
-          className="space-y-4 border-t border-cloud/60 pt-6"
+          className="space-y-4 border-t border-cloud pt-6"
           onSubmit={(e) => {
             e.preventDefault();
             profileMutation.mutate();
           }}
         >
+          <h2 className="text-base font-medium text-graphite">Identité</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label className="label-grain">Prénom</label>
@@ -116,13 +154,57 @@ function ProfilContent() {
               />
             </div>
           </div>
-          <p className="text-xs text-ash">
+          <p className="text-xs text-slate">
             L&apos;identifiant de connexion ({user.username}) est géré par l&apos;administrateur.
             {!canWrite &&
               " Votre rôle ne permet pas de modifier les données métier de la plateforme."}
           </p>
           <Button type="submit" disabled={profileMutation.isPending}>
             {profileMutation.isPending ? "Enregistrement…" : "Enregistrer le profil"}
+          </Button>
+        </form>
+
+        <form className="space-y-4 border-t border-cloud pt-6" onSubmit={submitPassword}>
+          <h2 className="text-base font-medium text-graphite">Mot de passe</h2>
+          <div>
+            <label className="label-grain">Mot de passe actuel</label>
+            <input
+              type="password"
+              required
+              autoComplete="current-password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              className="input-grain"
+            />
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="label-grain">Nouveau mot de passe</label>
+              <input
+                type="password"
+                required
+                minLength={6}
+                autoComplete="new-password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="input-grain"
+              />
+            </div>
+            <div>
+              <label className="label-grain">Confirmer</label>
+              <input
+                type="password"
+                required
+                minLength={6}
+                autoComplete="new-password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="input-grain"
+              />
+            </div>
+          </div>
+          <Button type="submit" disabled={passwordMutation.isPending}>
+            {passwordMutation.isPending ? "Modification…" : "Changer le mot de passe"}
           </Button>
         </form>
       </div>

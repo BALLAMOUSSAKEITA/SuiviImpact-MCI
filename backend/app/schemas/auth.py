@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class AccessType(str, Enum):
@@ -35,11 +35,18 @@ class RefreshRequest(BaseModel):
 
 class UserCreate(BaseModel):
     username: str = Field(min_length=3, max_length=50)
-    password: str = Field(min_length=6)
+    password: str | None = None
     prenom: str = Field(min_length=1, max_length=100)
     nom: str = Field(default="", max_length=100)
     type_acces: AccessType = AccessType.LECTURE
     role: UserRole = UserRole.USER
+
+    @field_validator("password")
+    @classmethod
+    def password_min_length(cls, value: str | None) -> str | None:
+        if value is not None and len(value) < 6:
+            raise ValueError("Le mot de passe doit contenir au moins 6 caractères")
+        return value
 
 
 class UserRead(BaseModel):
@@ -57,6 +64,11 @@ class UserRead(BaseModel):
     updated_at: datetime
 
 
+class UserCreateResponse(BaseModel):
+    user: UserRead
+    generated_password: str | None = None
+
+
 class UserMe(UserRead):
     pass
 
@@ -64,6 +76,11 @@ class UserMe(UserRead):
 class ProfileUpdate(BaseModel):
     prenom: str = Field(min_length=1, max_length=100)
     nom: str = Field(min_length=1, max_length=100)
+
+
+class PasswordChange(BaseModel):
+    current_password: str = Field(min_length=1)
+    new_password: str = Field(min_length=6, max_length=128)
 
 
 def user_to_read(user) -> UserRead:
