@@ -104,6 +104,8 @@ import type {
 
 } from "@/types";
 
+import { DEFAULT_ANNEE } from "@/types";
+
 import { messageFromFailedResponse } from "./api-errors";
 
 
@@ -1512,12 +1514,16 @@ export async function getStatsProjets(
 
 
 
-export async function downloadExport(type: ExportType): Promise<void> {
-
-  const { blob, filename } = await apiFetchBlob(`/api/v1/exports/${type}`);
-
+export async function downloadExport(
+  type: ExportType,
+  options?: { annee?: number },
+): Promise<void> {
+  const path =
+    type === "pao"
+      ? `/api/v1/exports/pao?annee=${options?.annee ?? DEFAULT_ANNEE}`
+      : `/api/v1/exports/${type}`;
+  const { blob, filename } = await apiFetchBlob(path);
   triggerDownload(blob, filename);
-
 }
 
 

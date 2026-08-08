@@ -460,20 +460,19 @@ function PlanificationPaoContent() {
               <th>Direction</th>
               <th>Période</th>
               <th>Montant</th>
-              <th>TDR</th>
             </tr>
           </thead>
           <tbody>
             {loadingList && (
               <tr>
-                <td colSpan={7} className="py-8 text-center text-ash">
+                <td colSpan={6} className="py-8 text-center text-ash">
                   Chargement…
                 </td>
               </tr>
             )}
             {!loadingList && activites.length === 0 && (
               <tr>
-                <td colSpan={7} className="py-8 text-center text-ash">
+                <td colSpan={6} className="py-8 text-center text-ash">
                   Aucune activité planifiée pour le moment.
                 </td>
               </tr>
@@ -515,17 +514,6 @@ function PlanificationPaoContent() {
                   {a.date_debut} → {a.date_fin}
                 </td>
                 <td className="text-sm tabular-nums">{a.budget}</td>
-                <td className="text-sm text-ash" onClick={(e) => e.stopPropagation()}>
-                  {a.tdr_nom_original ? (
-                    <StoredDocumentMenu
-                      label={a.tdr_nom_original}
-                      fetchForOpen={() => fetchPlanificationPaoTdr(a.id, true)}
-                      fetchForDownload={() => fetchPlanificationPaoTdr(a.id, false)}
-                    />
-                  ) : (
-                    "—"
-                  )}
-                </td>
               </tr>
             ))}
           </tbody>

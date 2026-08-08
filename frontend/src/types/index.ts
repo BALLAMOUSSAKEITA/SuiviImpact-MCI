@@ -561,8 +561,7 @@ export interface ProjetStats {
 }
 
 export type ExportType =
-  | "activites"
-  | "taches"
+  | "pao"
   | "recommandations"
   | "missions"
   | "ppm"

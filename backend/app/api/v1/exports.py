@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user
+from app.core.config import settings
 from app.core.database import get_db
 from app.models.user import User
 from app.services import export_service as service
@@ -18,22 +19,14 @@ def _excel_response(buffer, filename: str) -> StreamingResponse:
     )
 
 
-@router.get("/exports/activites")
-async def export_activites(
+@router.get("/exports/pao")
+async def export_pao(
+    annee: int = Query(default=settings.DEFAULT_ANNEE, ge=2025, le=2027),
     _: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> StreamingResponse:
-    buffer = await service.export_activites(db)
-    return _excel_response(buffer, "Activites_Trimestres.xlsx")
-
-
-@router.get("/exports/taches")
-async def export_taches(
-    _: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
-) -> StreamingResponse:
-    buffer = await service.export_taches(db)
-    return _excel_response(buffer, "Taches_Trimestres.xlsx")
+    buffer = await service.export_pao(db, annee)
+    return _excel_response(buffer, f"PAO_{annee}.xlsx")
 
 
 @router.get("/exports/recommandations")
