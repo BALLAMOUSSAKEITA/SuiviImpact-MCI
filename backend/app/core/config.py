@@ -53,6 +53,9 @@ class Settings(BaseSettings):
     SMTP_FROM: str = "noreply@suiviimpact.gov.gn"
     # Adresses BSD en copie (CSV) pour les rappels d'activités en retard
     SMTP_BSD_CC: str = ""
+    # Canal d'envoi : auto (Resend si clé présente, sinon SMTP), resend, smtp
+    EMAIL_PROVIDER: str = "auto"
+    RESEND_API_KEY: str = ""
 
     DEFAULT_ANNEE: int = 2026
     PORT: int = 8000

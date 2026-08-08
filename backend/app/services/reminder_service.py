@@ -17,9 +17,9 @@ from app.models.plan_action import Activite
 from app.models.tache import NotificationEmail, Tache, TacheStatut
 from app.services.email_service import (
     build_activite_retard_email,
+    email_configured,
     get_bsd_cc_emails,
     send_email,
-    smtp_configured,
 )
 
 logger = logging.getLogger(__name__)
@@ -171,7 +171,7 @@ async def check_activite_delays_and_notify(
             taches_non_validees=taches_payload,
         )
 
-        statut_base = "envoye" if smtp_configured() else "simule"
+        statut_base = "envoye" if email_configured() else "simule"
         to_list = list(destinataires.values())
         statut = statut_base
 

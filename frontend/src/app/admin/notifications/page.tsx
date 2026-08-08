@@ -89,7 +89,9 @@ export default function NotificationsPage() {
           Les rappels sont envoyés automatiquement chaque jour à 8h (Conakry) lorsqu'une
           activité PAO a dépassé sa date de fin avec des tâches non validées par le BSD.
           Destinataires : directeur responsable et ministre, avec le BSD en copie (
-          <code className="text-xs">SMTP_BSD_CC</code>).
+          <code className="text-xs">SMTP_BSD_CC</code>). Sur Railway, le SMTP sortant est
+          bloqué : configurez <code className="text-xs">RESEND_API_KEY</code> et{" "}
+          <code className="text-xs">EMAIL_PROVIDER=resend</code>.
         </CardContent>
       </Card>
 

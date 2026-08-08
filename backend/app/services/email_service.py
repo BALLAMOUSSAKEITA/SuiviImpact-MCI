@@ -1,4 +1,4 @@
-"""Envoi d'e-mails transactionnels via SMTP."""
+"""Envoi d'e-mails transactionnels (SMTP local, Resend HTTPS sur Railway)."""
 
 from __future__ import annotations
 
@@ -8,13 +8,41 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+import httpx
+
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
+RESEND_API_URL = "https://api.resend.com/emails"
+
 
 def smtp_configured() -> bool:
     return bool(settings.SMTP_HOST.strip())
+
+
+def resend_configured() -> bool:
+    return bool(settings.RESEND_API_KEY.strip())
+
+
+def email_configured() -> bool:
+    return resolve_email_provider() is not None
+
+
+def resolve_email_provider() -> str | None:
+    """Retourne 'resend', 'smtp' ou None si aucun canal utilisable."""
+    provider = settings.EMAIL_PROVIDER.strip().lower()
+
+    if provider == "resend":
+        return "resend" if resend_configured() else None
+    if provider == "smtp":
+        return "smtp" if smtp_configured() else None
+
+    if resend_configured():
+        return "resend"
+    if smtp_configured():
+        return "smtp"
+    return None
 
 
 def get_bsd_cc_emails() -> list[str]:
@@ -45,11 +73,50 @@ def _send_smtp_sync(
     message.attach(MIMEText(corps_html, "html", "utf-8"))
 
     all_recipients = destinataires + cc_list
-    with smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT, timeout=30) as server:
-        if settings.SMTP_USER:
-            server.starttls()
-            server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
-        server.sendmail(settings.SMTP_FROM, all_recipients, message.as_string())
+    try:
+        with smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT, timeout=30) as server:
+            if settings.SMTP_USER:
+                server.starttls()
+                server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
+            server.sendmail(settings.SMTP_FROM, all_recipients, message.as_string())
+    except OSError as exc:
+        if getattr(exc, "errno", None) == 101:
+            logger.error(
+                "Connexion SMTP impossible (réseau bloqué). Sur Railway, utilisez "
+                "EMAIL_PROVIDER=resend et RESEND_API_KEY au lieu de SMTP_HOST."
+            )
+        raise
+
+
+async def _send_via_resend(
+    destinataires: list[str],
+    sujet: str,
+    corps_texte: str,
+    corps_html: str,
+    cc: list[str] | None = None,
+) -> None:
+    payload: dict[str, object] = {
+        "from": settings.SMTP_FROM,
+        "to": destinataires,
+        "subject": sujet,
+        "html": corps_html,
+        "text": corps_texte,
+    }
+    if cc:
+        payload["cc"] = cc
+
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        response = await client.post(
+            RESEND_API_URL,
+            headers={
+                "Authorization": f"Bearer {settings.RESEND_API_KEY}",
+                "Content-Type": "application/json",
+            },
+            json=payload,
+        )
+        if response.status_code >= 400:
+            detail = response.text[:500]
+            raise RuntimeError(f"Resend HTTP {response.status_code}: {detail}")
 
 
 async def send_email(
@@ -60,15 +127,16 @@ async def send_email(
     *,
     cc: list[str] | None = None,
 ) -> bool:
-    """Envoie un e-mail. Retourne True si envoyé, False si SMTP non configuré."""
+    """Envoie un e-mail. Retourne True si envoyé, False si aucun canal configuré."""
     to_list = _normalize_recipients(destinataires)
     cc_list = _normalize_recipients(cc or [])
     if not to_list:
         raise ValueError("Au moins un destinataire est requis")
 
-    if not smtp_configured():
+    provider = resolve_email_provider()
+    if provider is None:
         logger.warning(
-            "SMTP non configuré — e-mail simulé pour %s (Cc: %s) : %s",
+            "E-mail non configuré — envoi simulé pour %s (Cc: %s) : %s",
             ", ".join(to_list),
             ", ".join(cc_list) if cc_list else "—",
             sujet,
@@ -76,16 +144,26 @@ async def send_email(
         return False
 
     try:
-        await asyncio.to_thread(
-            _send_smtp_sync,
-            to_list,
-            sujet,
-            corps_texte,
-            corps_html,
-            cc_list or None,
-        )
+        if provider == "resend":
+            await _send_via_resend(
+                to_list,
+                sujet,
+                corps_texte,
+                corps_html,
+                cc_list or None,
+            )
+        else:
+            await asyncio.to_thread(
+                _send_smtp_sync,
+                to_list,
+                sujet,
+                corps_texte,
+                corps_html,
+                cc_list or None,
+            )
         logger.info(
-            "E-mail envoyé à %s (Cc: %s) : %s",
+            "E-mail envoyé via %s à %s (Cc: %s) : %s",
+            provider,
             ", ".join(to_list),
             ", ".join(cc_list) if cc_list else "—",
             sujet,
@@ -93,7 +171,8 @@ async def send_email(
         return True
     except Exception:
         logger.exception(
-            "Échec envoi e-mail à %s (Cc: %s) : %s",
+            "Échec envoi e-mail (%s) à %s (Cc: %s) : %s",
+            provider,
             ", ".join(to_list),
             ", ".join(cc_list) if cc_list else "—",
             sujet,
