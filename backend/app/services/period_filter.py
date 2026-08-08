@@ -54,11 +54,16 @@ def build_period_on_date(
         raise ValueError(f"L'année doit être entre {MIN_ANNEE} et {MAX_ANNEE}")
 
     if mode == "annee":
+        du_y = date(annee, 1, 1)
+        au_y = date(annee, 12, 31)
         period = PeriodLabel(
             subtitle=f"{period_context} : année {annee}",
             filename_part=f"{annee}",
         )
-        return extract("year", date_column) == annee, period
+        return (
+            and_(date_column >= du_y, date_column <= au_y),
+            period,
+        )
 
     if mode == "plage":
         if du is None or au is None:

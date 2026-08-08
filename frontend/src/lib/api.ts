@@ -104,7 +104,7 @@ import type {
 
 } from "@/types";
 
-import { appendStatsPeriodToSearch } from "@/components/stats-period-filter";
+import { appendStatsPeriodToSearch, yearToDateRange } from "@/lib/stats-period";
 import { DEFAULT_ANNEE, type PaoExportOptions, type StatsPeriodParams } from "@/types";
 
 import { messageFromFailedResponse } from "./api-errors";
@@ -1507,8 +1507,9 @@ export async function downloadExport(
     if (p.mode === "annee") {
       params.set("annee", String(p.annee ?? DEFAULT_ANNEE));
     } else if (p.mode === "plage") {
-      if (p.du) params.set("du", p.du);
-      if (p.au) params.set("au", p.au);
+      const { du, au } = yearToDateRange(p.annee ?? DEFAULT_ANNEE);
+      params.set("du", p.du?.trim() || du);
+      params.set("au", p.au?.trim() || au);
     } else if (p.mode === "mois" && p.mois) {
       params.set("mois", p.mois);
     }

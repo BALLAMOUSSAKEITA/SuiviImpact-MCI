@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 
 import {
   ANNEE_OPTIONS,
@@ -9,6 +9,7 @@ import {
   maxDateInput,
   minDateInput,
 } from "@/lib/years";
+import { normalizeStatsPeriod, yearToDateRange } from "@/lib/stats-period";
 import type { PaoExportMode, StatsPeriodParams } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -46,10 +47,32 @@ export function useStatsPeriodState(initial?: Partial<StatsPeriodParams>) {
   );
 
   const params: StatsPeriodParams = useMemo(() => {
-    if (mode === "annee") return { mode, annee };
-    if (mode === "plage") return { mode, du, au };
-    return { mode, mois: moisParam };
+    let raw: StatsPeriodParams;
+    if (mode === "annee") raw = { mode, annee };
+    else if (mode === "plage") raw = { mode, annee, du, au };
+    else raw = { mode, mois: moisParam };
+    return normalizeStatsPeriod(raw);
   }, [mode, annee, du, au, moisParam]);
+
+  const setAnneeSynced = (y: number) => {
+    setAnnee(y);
+    setMoisAnnee(y);
+    const range = yearToDateRange(y);
+    setDu(range.du);
+    setAu(range.au);
+  };
+
+  const setModeSynced = (next: PaoExportMode) => {
+    setMode(next);
+    if (next === "plage") {
+      const range = yearToDateRange(annee);
+      setDu(range.du);
+      setAu(range.au);
+    }
+    if (next === "mois") {
+      setMoisAnnee(annee);
+    }
+  };
 
   const toggleMonth = (month: number) => {
     setSelectedMonths((prev) =>
@@ -59,9 +82,9 @@ export function useStatsPeriodState(initial?: Partial<StatsPeriodParams>) {
 
   return {
     mode,
-    setMode,
+    setMode: setModeSynced,
     annee,
-    setAnnee,
+    setAnnee: setAnneeSynced,
     du,
     setDu,
     au,
@@ -100,15 +123,17 @@ export function StatsPeriodFilter({
     toggleMonth,
   } = state;
 
+  const modeGroupName = useId();
+
   return (
     <div
       className={cn(
-        "rounded-[var(--radius-card)] border border-cloud/70 bg-paper/50 p-4 sm:p-5",
+        "panel-grain",
         className,
       )}
     >
-      <p className="text-sm font-semibold text-graphite">Période d&apos;analyse</p>
-      <p className="mt-1 text-xs leading-relaxed text-slate">{dateFieldHint}</p>
+      <p className="text-base font-medium text-graphite">Période d&apos;analyse</p>
+      <p className="mt-1 text-sm leading-[1.43] text-slate">{dateFieldHint}</p>
 
       <div className="mt-3 grid gap-2 sm:grid-cols-3">
         {(
@@ -121,15 +146,15 @@ export function StatsPeriodFilter({
           <label
             key={value}
             className={cn(
-              "flex cursor-pointer items-center justify-center rounded-[var(--radius-sm)] border px-3 py-2 text-center text-xs font-medium transition-colors sm:text-sm",
+              "flex cursor-pointer items-center justify-center rounded-[var(--radius-sm)] px-3 py-2 text-center text-sm font-medium transition-colors",
               mode === value
-                ? "border-forest-ink/40 bg-forest-ink/10 text-forest-ink"
-                : "border-cloud text-slate hover:bg-veil/60",
+                ? "bg-graphite text-white"
+                : "bg-veil text-slate hover:text-graphite",
             )}
           >
             <input
               type="radio"
-              name="stats-period-mode"
+              name={modeGroupName}
               className="sr-only"
               checked={mode === value}
               onChange={() => setMode(value)}
@@ -204,10 +229,10 @@ export function StatsPeriodFilter({
                   <label
                     key={name}
                     className={cn(
-                      "flex cursor-pointer items-center gap-2 rounded-[var(--radius-sm)] border px-2 py-1.5 text-xs",
+                      "flex cursor-pointer items-center gap-2 rounded-[var(--radius-sm)] px-2 py-1.5 text-sm",
                       checked
-                        ? "border-forest-ink/35 bg-forest-ink/8 text-forest-ink"
-                        : "border-cloud text-slate hover:bg-veil",
+                        ? "bg-graphite text-white"
+                        : "bg-veil text-slate hover:text-graphite",
                     )}
                   >
                     <input
@@ -228,19 +253,4 @@ export function StatsPeriodFilter({
   );
 }
 
-export function appendStatsPeriodToSearch(
-  search: URLSearchParams,
-  period: StatsPeriodParams,
-) {
-  search.set("mode", period.mode);
-  if (period.mode === "annee" && period.annee != null) {
-    search.set("annee", String(period.annee));
-  }
-  if (period.mode === "plage") {
-    if (period.du) search.set("du", period.du);
-    if (period.au) search.set("au", period.au);
-  }
-  if (period.mode === "mois" && period.mois) {
-    search.set("mois", period.mois);
-  }
-}
+export { appendStatsPeriodToSearch, normalizeStatsPeriod } from "@/lib/stats-period";

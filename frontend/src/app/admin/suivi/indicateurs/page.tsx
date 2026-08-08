@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -134,7 +134,7 @@ function SuiviIndicateursContent() {
       {showForm && canWrite && (
         <form
           onSubmit={handleSubmit}
-          className="space-y-4 rounded-card border border-cloud bg-paper p-6 shadow-sm"
+          className="space-y-4 panel-grain"
         >
           <h2 className="text-lg font-semibold">
             {editing ? "Modifier" : "Nouvel indicateur"}
@@ -146,7 +146,7 @@ function SuiviIndicateursContent() {
                 required
                 value={form.code}
                 onChange={(e) => setForm((f) => ({ ...f, code: e.target.value }))}
-                className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
+                className="input-grain w-full"
               />
             </div>
             <div className="sm:col-span-2">
@@ -155,7 +155,7 @@ function SuiviIndicateursContent() {
                 required
                 value={form.libelle}
                 onChange={(e) => setForm((f) => ({ ...f, libelle: e.target.value }))}
-                className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
+                className="input-grain w-full"
               />
             </div>
             <div>
@@ -163,7 +163,7 @@ function SuiviIndicateursContent() {
               <input
                 value={form.reference}
                 onChange={(e) => setForm((f) => ({ ...f, reference: e.target.value }))}
-                className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
+                className="input-grain w-full"
               />
             </div>
             <div>
@@ -172,7 +172,7 @@ function SuiviIndicateursContent() {
                 type="number"
                 value={form.cible}
                 onChange={(e) => setForm((f) => ({ ...f, cible: e.target.value }))}
-                className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
+                className="input-grain w-full"
               />
             </div>
             <div>
@@ -182,7 +182,7 @@ function SuiviIndicateursContent() {
                 min="0"
                 value={form.realise}
                 onChange={(e) => setForm((f) => ({ ...f, realise: e.target.value }))}
-                className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
+                className="input-grain w-full"
               />
             </div>
           </div>

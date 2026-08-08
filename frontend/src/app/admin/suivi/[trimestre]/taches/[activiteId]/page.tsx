@@ -126,7 +126,7 @@ function SuiviTachesContent() {
 
         {finalizing && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-            <div className="w-full max-w-md rounded-card bg-paper p-6 shadow-xl">
+            <div className="overlay-panel w-full max-w-md p-6">
               <h2 className="text-lg font-semibold text-graphite">
                 Finaliser la tâche
               </h2>
@@ -141,7 +141,7 @@ function SuiviTachesContent() {
                     value={observation}
                     onChange={(e) => setObservation(e.target.value)}
                     rows={3}
-                    className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
+                    className="input-grain w-full"
                   />
                 </div>
                 <FileUploadField

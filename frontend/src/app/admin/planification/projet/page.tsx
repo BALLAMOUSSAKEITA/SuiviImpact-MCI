@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus, Pencil, Trash2 } from "lucide-react";
@@ -427,7 +427,7 @@ function PlanificationProjetContent() {
                 {composantes.map((comp, compIndex) => (
                   <div
                     key={comp.key}
-                    className="rounded-[var(--radius-card)] border border-cloud/80 bg-white/60 p-4"
+                    className="panel-grain"
                   >
                     <div className="mb-3 flex flex-wrap items-start justify-between gap-2">
                       <p className="text-sm font-semibold text-forest-ink">
@@ -646,7 +646,7 @@ function PlanificationProjetContent() {
                   {selected.composantes.map((c) => (
                     <div
                       key={c.id}
-                      className="rounded-[var(--radius-card)] border border-cloud/50 bg-white/70 p-3.5 shadow-sm"
+                      className="panel-grain p-3.5"
                     >
                       <p className="text-sm font-semibold text-forest-ink">
                         {c.libelle?.trim() || `Composante ${c.ordre}`}

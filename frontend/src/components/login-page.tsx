@@ -68,24 +68,24 @@ export function LoginPage() {
           {/* Colonne institutionnelle */}
           <section className="hidden text-center lg:block lg:text-left">
             <div className="mb-8 flex items-center justify-center gap-4 lg:justify-start animate-fade-in">
-              <div className="flex h-14 w-14 items-center justify-center rounded-[var(--radius-card)] bg-forest-ink text-white shadow-[var(--shadow-glow)]">
-                <Building2 className="h-7 w-7" strokeWidth={1.75} />
+              <div className="flex h-12 w-12 items-center justify-center rounded-[var(--radius-card)] bg-forest-ink text-white">
+                <Building2 className="h-6 w-6" strokeWidth={1.75} />
               </div>
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-widest text-fog">
+                <p className="text-xs font-medium text-slate">
                   {BRAND.country}
                 </p>
-                <p className="text-sm font-semibold text-slate">{BRAND.ministry}</p>
+                <p className="text-sm font-medium text-graphite">{BRAND.ministry}</p>
               </div>
             </div>
 
-            <h1 className="font-display text-[3.5rem] leading-[1.05] text-forest-ink animate-fade-in">
+            <h1 className="font-display text-[2.75rem] leading-[1.1] text-graphite animate-fade-in">
               {BRAND.appName}
             </h1>
-            <p className="mt-5 max-w-md text-lg leading-relaxed text-slate animate-fade-in">
+            <p className="mt-4 max-w-md text-base leading-[1.43] text-slate animate-fade-in">
               {BRAND.tagline}
             </p>
-            <div className="mt-8 inline-flex items-center gap-2.5 rounded-full border border-cloud bg-white px-5 py-3 text-sm text-slate shadow-[var(--shadow-card)] animate-fade-in">
+            <div className="mt-8 inline-flex items-center gap-2.5 rounded-[var(--radius-pill)] bg-white px-5 py-3 text-sm text-slate shadow-[var(--shadow-subtle)] animate-fade-in">
               <ShieldCheck className="h-4 w-4 shrink-0 text-forest-ink" />
               <span>
                 {BRAND.bureau} · {BRAND.program}
@@ -98,18 +98,18 @@ export function LoginPage() {
             <div className="login-card">
               <div className="mb-6 lg:hidden">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-card)] bg-forest-ink text-white shadow-[var(--shadow-glow)]">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-card)] bg-forest-ink text-white">
                     <Building2 className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="font-display text-xl text-forest-ink">{BRAND.appName}</p>
-                    <p className="text-[11px] text-fog">{BRAND.ministryShort} · {BRAND.bureauShort}</p>
+                    <p className="font-display text-xl text-graphite">{BRAND.appName}</p>
+                    <p className="text-xs text-slate">{BRAND.ministryShort} · {BRAND.bureauShort}</p>
                   </div>
                 </div>
               </div>
 
-              <h2 className="text-xl font-bold text-graphite tracking-tight">Connexion</h2>
-              <p className="mt-1 text-sm text-fog">{BRAND.loginSubtitle}</p>
+              <h2 className="text-xl font-semibold text-graphite tracking-tight">Connexion</h2>
+              <p className="mt-1 text-sm text-slate">{BRAND.loginSubtitle}</p>
 
               <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-4">
                 <div>
@@ -163,7 +163,7 @@ export function LoginPage() {
         </div>
       </main>
 
-      <footer className="border-t border-cloud/60 bg-white/60 px-6 py-4 text-center text-xs text-ash backdrop-blur-sm">
+      <footer className="border-t border-cloud bg-white px-6 py-4 text-center text-xs text-slate">
         © {new Date().getFullYear()} {BRAND.country} · {BRAND.ministry} · {BRAND.bureau}
       </footer>
     </div>

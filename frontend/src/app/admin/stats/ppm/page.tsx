@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { ProgressBar } from "@/components/execution-badge";
 import { StatCard, StatGrid } from "@/components/stat-card";
+import { StatsQueryStatus } from "@/components/stats-query-status";
 import {
   StatsPeriodFilter,
   useStatsPeriodState,
@@ -20,7 +21,7 @@ function StatsPpmContent() {
   const periodState = useStatsPeriodState();
   const { params: period } = periodState;
 
-  const { data: stats, isLoading } = useQuery({
+  const { data: stats, isLoading, isError, error } = useQuery({
     queryKey: ["stats-ppm", period],
     queryFn: () => getStatsPpm(undefined, period),
   });
@@ -33,10 +34,10 @@ function StatsPpmContent() {
   return (
     <>
       <div>
-        <Link href="/admin/stats" className="text-sm text-forest-ink hover:underline">
+        <Link href="/admin/stats" className="text-sm font-medium text-graphite hover:underline">
           ← Statistiques
         </Link>
-        <h1 className="mt-2 text-xl font-bold text-graphite sm:text-2xl">
+        <h1 className="mt-2 font-display text-[var(--text-heading-sm)] text-graphite">
           Statistiques — PPM
         </h1>
       </div>
@@ -46,11 +47,10 @@ function StatsPpmContent() {
         state={periodState}
       />
 
-      {isLoading ? (
-        <p className="text-sm text-ash">Chargement…</p>
-      ) : stats ? (
-        <>
-          <StatGrid>
+      <StatsQueryStatus isLoading={isLoading} isError={isError} error={error}>
+        {stats ? (
+          <>
+            <StatGrid>
             <StatCard title="Total marchés" value={stats.total} />
             <StatCard
               title={PPM_STATUT_LABELS.dao_elabore}
@@ -69,14 +69,15 @@ function StatsPpmContent() {
               value={stats.contrat_signe}
             />
           </StatGrid>
-          <div className="rounded-card border border-cloud bg-paper p-4 shadow-sm sm:p-6">
+          <div className="panel-grain">
             <ProgressBar
               label="Contrats signés / total"
               value={progression}
             />
           </div>
         </>
-      ) : null}
+        ) : null}
+      </StatsQueryStatus>
     </>
   );
 }

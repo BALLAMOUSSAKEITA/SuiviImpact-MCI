@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, FileUp, Loader2 } from "lucide-react";
@@ -243,7 +243,7 @@ function SuiviProjetDrawer({
 
       {showRapportFor && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-md rounded-card bg-paper p-6 shadow-xl">
+          <div className="overlay-panel w-full max-w-md p-6">
             <h2 className="text-lg font-semibold text-graphite">
               Marquer l&apos;activité terminée
             </h2>

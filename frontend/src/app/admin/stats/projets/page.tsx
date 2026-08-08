@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { ProgressBar } from "@/components/execution-badge";
 import { StatCard, StatGrid } from "@/components/stat-card";
+import { StatsQueryStatus } from "@/components/stats-query-status";
 import {
   StatsPeriodFilter,
   useStatsPeriodState,
@@ -19,7 +20,7 @@ function StatsProjetsContent() {
   const periodState = useStatsPeriodState();
   const { params: period } = periodState;
 
-  const { data: stats, isLoading } = useQuery({
+  const { data: stats, isLoading, isError, error } = useQuery({
     queryKey: ["stats-projets", period],
     queryFn: () => getStatsProjets(undefined, period),
   });
@@ -27,10 +28,10 @@ function StatsProjetsContent() {
   return (
     <>
       <div>
-        <Link href="/admin/stats" className="text-sm text-forest-ink hover:underline">
+        <Link href="/admin/stats" className="text-sm font-medium text-graphite hover:underline">
           ← Statistiques
         </Link>
-        <h1 className="mt-2 text-xl font-bold text-graphite sm:text-2xl">
+        <h1 className="mt-2 font-display text-[var(--text-heading-sm)] text-graphite">
           Statistiques — Projets
         </h1>
       </div>
@@ -40,21 +41,20 @@ function StatsProjetsContent() {
         state={periodState}
       />
 
-      {isLoading ? (
-        <p className="text-sm text-ash">Chargement…</p>
-      ) : stats ? (
-        <>
-          <StatGrid>
+      <StatsQueryStatus isLoading={isLoading} isError={isError} error={error}>
+        {stats ? (
+          <>
+            <StatGrid>
             <StatCard title="Total projets" value={stats.total} />
           </StatGrid>
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-card border border-cloud bg-paper p-4 shadow-sm sm:p-6">
+            <div className="panel-grain">
               <ProgressBar
                 label="Exécution financière moyenne"
                 value={stats.execution_financiere}
               />
             </div>
-            <div className="rounded-card border border-cloud bg-paper p-4 shadow-sm sm:p-6">
+            <div className="panel-grain">
               <ProgressBar
                 label="Exécution physique moyenne"
                 value={stats.execution_physique}
@@ -62,7 +62,8 @@ function StatsProjetsContent() {
             </div>
           </div>
         </>
-      ) : null}
+        ) : null}
+      </StatsQueryStatus>
     </>
   );
 }

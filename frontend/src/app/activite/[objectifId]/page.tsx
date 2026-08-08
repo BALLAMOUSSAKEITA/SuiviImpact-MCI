@@ -124,7 +124,7 @@ function ActivitesContent() {
         </div>
 
         {canWrite && (
-          <div className="rounded-card border border-cloud bg-paper p-4 shadow-sm">
+          <div className="panel-grain">
             <button
               type="button"
               className="text-sm font-medium text-forest-ink"
@@ -139,20 +139,20 @@ function ActivitesContent() {
                     placeholder="Code activité"
                     value={code}
                     onChange={(e) => setCode(e.target.value)}
-                    className="rounded-card border border-mist px-3 py-2 text-sm"
+                    className="input-grain"
                   />
                   <input
                     placeholder="Description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="rounded-card border border-mist px-3 py-2 text-sm sm:col-span-2"
+                    className="input-grain sm:col-span-2"
                   />
                   <input
                     type="number"
                     placeholder="Budget"
                     value={budget}
                     onChange={(e) => setBudget(e.target.value)}
-                    className="rounded-card border border-mist px-3 py-2 text-sm"
+                    className="input-grain"
                   />
                 </div>
 

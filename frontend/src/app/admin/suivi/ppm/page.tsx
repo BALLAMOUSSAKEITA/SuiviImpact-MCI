@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -159,7 +159,7 @@ function SuiviPpmContent() {
       {showForm && canWrite && (
         <form
           onSubmit={handleSubmit}
-          className="space-y-4 rounded-card border border-cloud bg-paper p-6 shadow-sm"
+          className="space-y-4 panel-grain"
         >
           <h2 className="text-lg font-semibold">
             {editing ? "Modifier" : "Nouveau marché PPM"}
@@ -170,7 +170,7 @@ function SuiviPpmContent() {
               <input
                 value={form.numero}
                 onChange={(e) => setForm((f) => ({ ...f, numero: e.target.value }))}
-                className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
+                className="input-grain w-full"
               />
             </div>
             <div className="sm:col-span-2">
@@ -179,7 +179,7 @@ function SuiviPpmContent() {
                 required
                 value={form.intitule}
                 onChange={(e) => setForm((f) => ({ ...f, intitule: e.target.value }))}
-                className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
+                className="input-grain w-full"
               />
             </div>
             <div>
@@ -187,7 +187,7 @@ function SuiviPpmContent() {
               <input
                 value={form.type_marche}
                 onChange={(e) => setForm((f) => ({ ...f, type_marche: e.target.value }))}
-                className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
+                className="input-grain w-full"
               />
             </div>
             <div>
@@ -195,7 +195,7 @@ function SuiviPpmContent() {
               <input
                 value={form.mode_passation}
                 onChange={(e) => setForm((f) => ({ ...f, mode_passation: e.target.value }))}
-                className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
+                className="input-grain w-full"
               />
             </div>
             <div>
@@ -205,7 +205,7 @@ function SuiviPpmContent() {
                 onChange={(e) =>
                   setForm((f) => ({ ...f, statut: e.target.value as PpmStatut }))
                 }
-                className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
+                className="input-grain w-full"
               >
                 {STATUTS.map((s) => (
                   <option key={s} value={s}>
@@ -221,7 +221,7 @@ function SuiviPpmContent() {
                 min="0"
                 value={form.montant_estime}
                 onChange={(e) => setForm((f) => ({ ...f, montant_estime: e.target.value }))}
-                className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
+                className="input-grain w-full"
               />
             </div>
             <div>
@@ -231,7 +231,7 @@ function SuiviPpmContent() {
                 min="0"
                 value={form.montant_attribue}
                 onChange={(e) => setForm((f) => ({ ...f, montant_attribue: e.target.value }))}
-                className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
+                className="input-grain w-full"
               />
             </div>
             <div>
@@ -240,7 +240,7 @@ function SuiviPpmContent() {
                 type="date"
                 value={form.date_marche}
                 onChange={(e) => setForm((f) => ({ ...f, date_marche: e.target.value }))}
-                className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
+                className="input-grain w-full"
               />
             </div>
           </div>

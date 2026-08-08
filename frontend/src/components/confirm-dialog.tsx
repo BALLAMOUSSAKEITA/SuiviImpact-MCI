@@ -29,13 +29,13 @@ function DialogIcon({ variant }: { variant: ConfirmDialogProps["variant"] }) {
   }
   if (variant === "info") {
     return (
-      <div className={cn(base, "bg-forest-ink/10 text-forest-ink")}>
+      <div className={cn(base, "bg-veil text-graphite")}>
         <Pencil className="h-5 w-5" strokeWidth={2} />
       </div>
     );
   }
   return (
-    <div className={cn(base, "bg-forest-ink/10 text-forest-ink")}>
+    <div className={cn(base, "bg-veil text-forest-ink")}>
       <Info className="h-5 w-5" strokeWidth={2} />
     </div>
   );
@@ -68,9 +68,8 @@ export function ConfirmDialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby="confirm-dialog-title"
-        className="relative w-full max-w-md overflow-hidden rounded-[var(--radius-card)] border border-cloud/80 bg-white shadow-[var(--shadow-elevated)]"
+        className="relative w-full max-w-md overflow-hidden overlay-panel"
       >
-        <div className={cn("h-1 w-full", destructive ? "bg-red-500" : "bg-forest-ink")} />
         <div className="p-6">
           <div className="flex gap-4">
             <DialogIcon variant={variant} />
@@ -129,12 +128,11 @@ export function FormDialog({
         role="dialog"
         aria-modal="true"
         className={cn(
-          "relative w-full max-w-lg overflow-hidden rounded-[var(--radius-card)] border border-cloud/80 bg-white shadow-[var(--shadow-elevated)]",
+          "relative w-full max-w-lg overflow-hidden overlay-panel",
           className,
         )}
       >
-        <div className="h-1 w-full bg-forest-ink" />
-        <div className="flex items-start justify-between gap-3 border-b border-cloud/60 px-6 py-4">
+        <div className="flex items-start justify-between gap-3 border-b border-cloud px-6 py-4">
           <h2 className="text-base font-semibold text-graphite">{title}</h2>
           <button
             type="button"

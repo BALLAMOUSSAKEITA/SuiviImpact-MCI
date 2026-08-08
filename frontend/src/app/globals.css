@@ -7,17 +7,17 @@
   --color-neon-sprout: #00ff95;
   --color-ice-blue: #3de1ff;
 
-  /* ─── Neutrals ─── */
+  /* ─── Neutrals (achromatic canvas — accent vert inchangé) ─── */
   --color-obsidian: #000000;
-  --color-graphite: #1a1a2e;
-  --color-carbon: #2d2d3a;
-  --color-slate: #535768;
-  --color-fog: #707080;
-  --color-ash: #9a9ab0;
-  --color-mist: #d0d4e4;
-  --color-cloud: #e8eaf0;
-  --color-veil: #f0f2f7;
-  --color-paper: #f8f9fc;
+  --color-graphite: #222222;
+  --color-carbon: #2d2d2d;
+  --color-slate: #6a6a6a;
+  --color-fog: #6a6a6a;
+  --color-ash: #9a9a9a;
+  --color-mist: #c1c1c1;
+  --color-cloud: #ebebeb;
+  --color-veil: #f7f7f7;
+  --color-paper: #f7f7f7;
   --color-white: #ffffff;
 
   /* ─── Pastel Accents ─── */
@@ -28,23 +28,39 @@
   --color-periwinkle: #e7ecff;
 
   /* ─── Typography ─── */
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, sans-serif;
+  --font-display: var(--font-sans);
+
+  --text-body: 0.875rem;
+  --leading-body: 1.43;
+  --text-ui: 1rem;
+  --text-heading-sm: 1.375rem;
+  --tracking-heading-sm: -0.02em;
+  --text-heading: 1.75rem;
+  --leading-heading: 1.43;
+
+  /* ─── Spacing ─── */
+  --section-gap: 3rem;
+  --card-padding: 0.75rem;
+  --element-gap: 0.75rem;
 
   /* ─── Border Radius ─── */
   --radius-sm: 8px;
-  --radius-card: 16px;
-  --radius-lg: 24px;
-  --radius-image: 16px;
-  --radius-pill: 100px;
+  --radius-card: 12px;
+  --radius-lg: 16px;
+  --radius-image: 12px;
+  --radius-pill: 9999px;
   --radius-full: 9999px;
 
-  /* ─── Shadows ─── */
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 16px rgba(100, 110, 140, 0.06);
-  --shadow-elevated: 0 4px 12px rgba(100, 110, 140, 0.08), 0 12px 40px rgba(100, 110, 140, 0.06);
-  --shadow-soft: 0 2px 48px rgba(100, 120, 160, 0.1);
+  /* ─── Shadows (réservées aux overlays / recherche) ─── */
+  --shadow-subtle: rgba(0, 0, 0, 0.02) 0px 0px 0px 1px, rgba(0, 0, 0, 0.04) 0px 2px 6px 0px,
+    rgba(0, 0, 0, 0.06) 0px 4px 8px 0px;
+  --shadow-card: var(--shadow-subtle);
+  --shadow-elevated: 0 8px 28px rgba(0, 0, 0, 0.12);
+  --shadow-soft: 0 6px 20px rgba(0, 0, 0, 0.1);
   --shadow-inset: rgba(0, 0, 0, 0.03) 0px 0px 12px 0px inset;
-  --shadow-glow: 0 0 24px rgba(0, 153, 89, 0.15);
+  --shadow-glow: 0 0 0 1px rgba(0, 153, 89, 0.08);
 
   /* ─── Animation ─── */
   --duration-fast: 150ms;
@@ -54,14 +70,18 @@
 }
 
 :root {
-  --background: #f8f9fc;
-  --foreground: #1a1a2e;
+  --background: #f7f7f7;
+  --foreground: #222222;
+  --surface-canvas: #f7f7f7;
+  --surface-card: #ffffff;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
   font-feature-settings: "cv11", "ss01";
   -webkit-font-smoothing: antialiased;
 }
@@ -108,59 +128,46 @@ body {
   animation: scale-in var(--duration-normal) var(--ease-out-expo) both;
 }
 
-.grain-gradient {
-  background: linear-gradient(
-    135deg,
-    rgba(0, 153, 89, 0.04) 0%,
-    rgba(0, 185, 108, 0.02) 50%,
-    rgba(61, 225, 255, 0.01) 100%
-  );
-}
-
-.grain-mesh {
-  background-image:
-    radial-gradient(at 20% 80%, rgba(0, 153, 89, 0.03) 0%, transparent 50%),
-    radial-gradient(at 80% 20%, rgba(0, 185, 108, 0.02) 0%, transparent 50%),
-    radial-gradient(at 50% 50%, rgba(61, 225, 255, 0.01) 0%, transparent 50%);
-}
-
 .font-display {
   font-family: var(--font-display);
   font-weight: 600;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--tracking-heading-sm);
 }
 
 /* ─── Inputs ─── */
 .input-grain {
   width: 100%;
   border-radius: var(--radius-sm);
-  border: 1.5px solid var(--color-cloud);
+  border: 1px solid var(--color-cloud);
   background-color: var(--color-white);
   padding: 0.625rem 1rem;
-  font-size: 0.875rem;
-  line-height: 1.4;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
   color: var(--color-graphite);
   outline: none;
   transition: border-color var(--duration-fast), box-shadow var(--duration-fast), background-color var(--duration-fast);
 }
 
+.input-grain::placeholder {
+  color: var(--color-mist);
+}
+
 .input-grain:hover {
-  border-color: var(--color-mist);
-  background-color: var(--color-paper);
+  background-color: var(--color-veil);
 }
 
 .input-grain:focus {
-  border-color: var(--color-forest-ink);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-forest-ink) 10%, transparent);
+  border-color: var(--color-graphite);
+  box-shadow: 0 0 0 1px var(--color-graphite);
   background-color: var(--color-white);
 }
 
 .label-grain {
   display: block;
   margin-bottom: 0.375rem;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--color-slate);
+  font-size: var(--text-body);
+  font-weight: 500;
+  color: var(--color-graphite);
 }
 
 /* ─── Tables ─── */
@@ -173,18 +180,17 @@ body {
 }
 
 .table-grain thead {
-  background: var(--color-paper);
+  background: var(--color-white);
 }
 
 .table-grain th {
-  padding: 0.875rem 1.25rem;
+  padding: 0.75rem 1rem;
   text-align: left;
   font-weight: 600;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--color-ash);
+  font-size: var(--text-body);
+  color: var(--color-slate);
   white-space: nowrap;
+  border-bottom: 1px solid var(--color-cloud);
 }
 
 .table-grain tbody tr {
@@ -197,8 +203,8 @@ body {
 }
 
 .table-grain td {
-  padding: 0.875rem 1.25rem;
-  color: var(--color-slate);
+  padding: 0.875rem 1rem;
+  color: var(--color-graphite);
 }
 
 .table-shell {
@@ -207,33 +213,37 @@ body {
   border-radius: var(--radius-card);
   border: 1px solid var(--color-cloud);
   background-color: var(--color-white);
-  box-shadow: var(--shadow-card);
-  transition: box-shadow var(--duration-normal);
-}
-
-.table-shell:hover {
-  box-shadow: var(--shadow-elevated);
 }
 
 /* ─── Panels ─── */
 .panel-grain {
   border-radius: var(--radius-card);
-  border: 1px solid var(--color-cloud);
+  border: none;
   background-color: var(--color-white);
-  padding: 1.5rem;
-  box-shadow: var(--shadow-card);
-  transition: box-shadow var(--duration-normal), border-color var(--duration-normal);
-}
-
-.panel-grain:hover {
-  box-shadow: var(--shadow-elevated);
-  border-color: var(--color-mist);
+  padding: 1.25rem;
 }
 
 @media (min-width: 640px) {
   .panel-grain {
-    padding: 2rem;
+    padding: 1.5rem;
   }
+}
+
+.surface-card {
+  border-radius: var(--radius-card);
+  background-color: var(--color-white);
+}
+
+.overlay-panel {
+  border-radius: var(--radius-card);
+  background-color: var(--color-white);
+  box-shadow: var(--shadow-elevated);
+}
+
+.dropdown-panel {
+  border-radius: var(--radius-card);
+  background-color: var(--color-white);
+  box-shadow: var(--shadow-soft);
 }
 
 /* ─── Badges ─── */
@@ -241,63 +251,58 @@ body {
   display: inline-flex;
   align-items: center;
   border-radius: var(--radius-pill);
-  border: 1px solid var(--color-cloud);
+  border: none;
   background-color: var(--color-white);
-  padding: 0.375rem 0.875rem;
+  padding: 0.375rem 0.75rem;
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--color-slate);
-  transition: all var(--duration-fast);
+  color: var(--color-graphite);
+  box-shadow: var(--shadow-subtle);
+  transition: background-color var(--duration-fast);
 }
 
 .badge-grain:hover {
-  border-color: var(--color-mist);
-  box-shadow: var(--shadow-card);
+  background-color: var(--color-veil);
 }
 
 /* ─── Login ─── */
 .login-shell {
-  background: linear-gradient(160deg, #f0f5f2 0%, #f2f4f8 50%, #eef3f7 100%);
+  background: var(--surface-canvas);
 }
 
 .login-card {
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-cloud);
+  border-radius: var(--radius-card);
+  border: none;
   background-color: var(--color-white);
-  padding: 2.5rem;
-  box-shadow: var(--shadow-elevated);
-  transition: box-shadow var(--duration-slow);
-}
-
-.login-card:hover {
-  box-shadow: var(--shadow-soft);
+  padding: 2rem;
+  box-shadow: var(--shadow-subtle);
 }
 
 .login-input {
   width: 100%;
   border-radius: var(--radius-sm);
-  border: 1.5px solid var(--color-cloud);
+  border: 1px solid var(--color-cloud);
   background-color: var(--color-white);
   padding: 0.875rem 1rem;
-  font-size: 1rem;
-  line-height: 1.4;
+  font-size: var(--text-ui);
+  line-height: 1.25;
   color: var(--color-graphite);
   outline: none;
-  transition: border-color var(--duration-fast), box-shadow var(--duration-fast), transform var(--duration-fast);
+  transition: border-color var(--duration-fast), box-shadow var(--duration-fast);
 }
 
 .login-input::placeholder {
-  color: var(--color-ash);
+  color: var(--color-mist);
 }
 
 .login-input:hover {
-  border-color: var(--color-mist);
+  background-color: var(--color-veil);
 }
 
 .login-input:focus {
-  border-color: var(--color-forest-ink);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-forest-ink) 10%, transparent);
-  transform: translateY(-1px);
+  border-color: var(--color-graphite);
+  box-shadow: 0 0 0 1px var(--color-graphite);
+  background-color: var(--color-white);
 }
 
 /* ─── Scrollbar ─── */

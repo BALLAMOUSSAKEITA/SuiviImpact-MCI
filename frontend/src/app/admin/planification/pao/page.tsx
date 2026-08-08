@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus, Pencil, Trash2 } from "lucide-react";
@@ -373,7 +373,7 @@ function PlanificationPaoContent() {
                 {slots.map((slot) => (
                   <div
                     key={slot.key}
-                    className="flex flex-col gap-2 rounded-[var(--radius-card)] border border-cloud/80 bg-white/60 p-3 sm:flex-row sm:items-end"
+                    className="panel-grain flex flex-col gap-2 p-3 sm:flex-row sm:items-end"
                   >
                     <div className="flex-1">
                       <label className="label-grain">Tâche</label>

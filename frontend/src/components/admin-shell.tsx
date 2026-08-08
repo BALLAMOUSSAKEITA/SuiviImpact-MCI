@@ -79,12 +79,12 @@ export function AdminShell({ children, className }: AdminShellProps) {
       />
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-cloud/60 bg-white/80 px-4 py-3 backdrop-blur-md lg:hidden">
+        <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-cloud bg-white px-4 py-3 lg:hidden">
           <button
             type="button"
             aria-label={mobileOpen ? "Fermer le menu" : "Ouvrir le menu"}
             aria-expanded={mobileOpen}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-card)] text-slate transition-all hover:bg-veil hover:text-graphite active:scale-95"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-veil text-graphite transition-colors hover:bg-cloud active:scale-95"
             onClick={() => setMobileOpen((open) => !open)}
           >
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -113,7 +113,7 @@ export function AdminShell({ children, className }: AdminShellProps) {
 
         <main
           className={cn(
-            "min-w-0 flex-1 space-y-6 p-4 sm:space-y-8 sm:p-6 lg:p-8 xl:p-10",
+            "min-w-0 flex-1 space-y-6 p-4 sm:space-y-[var(--section-gap)] sm:p-6 lg:px-10 lg:py-8",
             "animate-fade-in",
             className,
           )}

@@ -179,7 +179,7 @@ function TachesContent() {
         {showForm && canWrite && (
           <form
             onSubmit={handleSubmit}
-            className="space-y-4 rounded-card border border-cloud bg-paper p-6 shadow-sm"
+            className="panel-grain space-y-4"
           >
             <h2 className="text-lg font-semibold text-graphite">
               {editing ? "Modifier la tâche" : "Nouvelle tâche"}
@@ -195,7 +195,7 @@ function TachesContent() {
                   onChange={(e) =>
                     setForm((f) => ({ ...f, description: e.target.value }))
                   }
-                  className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
+                  className="input-grain w-full"
                 />
               </div>
               <div>
@@ -208,7 +208,7 @@ function TachesContent() {
                   onChange={(e) =>
                     setForm((f) => ({ ...f, responsable: e.target.value }))
                   }
-                  className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
+                  className="input-grain w-full"
                 />
               </div>
               <div>
@@ -224,7 +224,7 @@ function TachesContent() {
                       email_responsable: e.target.value,
                     }))
                   }
-                  className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
+                  className="input-grain w-full"
                 />
               </div>
               <div>
@@ -241,7 +241,7 @@ function TachesContent() {
                   onChange={(e) =>
                     setForm((f) => ({ ...f, ponderation: e.target.value }))
                   }
-                  className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
+                  className="input-grain w-full"
                 />
               </div>
             </div>
@@ -254,13 +254,13 @@ function TachesContent() {
                 <table className="min-w-full border-collapse text-xs">
                   <thead>
                     <tr>
-                      <th className="border border-cloud bg-paper px-2 py-1">
+                      <th className="border border-cloud bg-veil px-2 py-1">
                         Mois
                       </th>
                       {[1, 2, 3, 4].map((s) => (
                         <th
                           key={s}
-                          className="border border-cloud bg-paper px-2 py-1"
+                          className="border border-cloud bg-veil px-2 py-1"
                         >
                           S{s}
                         </th>
@@ -318,7 +318,7 @@ function TachesContent() {
             {taches.map((tache) => (
               <div
                 key={tache.id}
-                className="rounded-card border border-cloud bg-paper p-4 shadow-sm"
+                className="panel-grain"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
@@ -356,13 +356,13 @@ function TachesContent() {
                   <table className="min-w-full border-collapse text-xs">
                     <thead>
                       <tr>
-                        <th className="border border-cloud bg-paper px-2 py-1">
+                        <th className="border border-cloud bg-veil px-2 py-1">
                           Mois
                         </th>
                         {[1, 2, 3, 4].map((s) => (
                           <th
                             key={s}
-                            className="border border-cloud bg-paper px-2 py-1"
+                            className="border border-cloud bg-veil px-2 py-1"
                           >
                             S{s}
                           </th>
@@ -381,7 +381,7 @@ function TachesContent() {
                               className={`border border-cloud p-1 text-center ${
                                 isSemainePlanned(tache, mois, semaine)
                                   ? "bg-veil text-forest-ink"
-                                  : "bg-paper"
+                                  : "bg-veil"
                               }`}
                             >
                               {isSemainePlanned(tache, mois, semaine) ? "●" : ""}

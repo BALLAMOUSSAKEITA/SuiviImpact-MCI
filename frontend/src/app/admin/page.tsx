@@ -7,6 +7,7 @@ import { DirectionFilter } from "@/components/direction-filter";
 import { ProgressBar } from "@/components/execution-badge";
 import { PageHeader } from "@/components/page-header";
 import { StatCard, StatGrid } from "@/components/stat-card";
+import { StatsQueryStatus } from "@/components/stats-query-status";
 import {
   StatsPeriodFilter,
   useStatsPeriodState,
@@ -20,6 +21,7 @@ import {
   getStatsRcc,
 } from "@/lib/api";
 import { PPM_STATUT_LABELS } from "@/types";
+import { TrimestreFilter } from "@/components/trimestre-tabs";
 import { cn } from "@/lib/utils";
 
 type StatsPeriodState = ReturnType<typeof useStatsPeriodState>;
@@ -57,17 +59,17 @@ export default function AdminDashboardPage() {
       />
 
       {/* Sélecteur de vue */}
-      <div className="flex flex-wrap gap-1.5 rounded-[var(--radius-pill)] border border-cloud bg-paper p-1.5">
+      <div className="inline-flex flex-wrap gap-1 rounded-[var(--radius-sm)] bg-veil p-1">
         {views.map((view) => (
           <button
             key={view.id}
             type="button"
             onClick={() => setCurrentView(view.id)}
             className={cn(
-              "rounded-[var(--radius-pill)] px-4 py-2 text-[13px] font-medium transition-all duration-[var(--duration-fast)]",
+              "rounded-[var(--radius-sm)] px-4 py-2 text-sm font-medium transition-colors duration-[var(--duration-fast)]",
               currentView === view.id
-                ? "bg-forest-ink text-white shadow-sm"
-                : "text-slate hover:bg-veil hover:text-graphite",
+                ? "bg-white text-graphite shadow-[var(--shadow-subtle)]"
+                : "text-slate hover:text-graphite",
             )}
           >
             {view.label}
@@ -94,7 +96,7 @@ function ActivitesView({ periodState }: { periodState: StatsPeriodState }) {
   const [direction, setDirection] = useState<string | null>(null);
   const { params: period } = periodState;
 
-  const { data: stats, isLoading } = useQuery({
+  const { data: stats, isLoading, isError, error } = useQuery({
     queryKey: ["stats-activites", direction, period],
     queryFn: () => getStatsActivites(direction ?? undefined, period),
   });
@@ -102,57 +104,27 @@ function ActivitesView({ periodState }: { periodState: StatsPeriodState }) {
   return (
     <>
       <DirectionFilter value={direction} onChange={setDirection} />
-      {isLoading ? (
-        <p className="text-sm text-ash">Chargement…</p>
-      ) : stats ? (
-        <>
-          <StatGrid>
+      <StatsQueryStatus
+        isLoading={isLoading}
+        isError={isError}
+        error={error}
+      >
+        {stats ? (
+          <>
+            <StatGrid>
             <StatCard title="Total activités" value={stats.total} />
             <StatCard title="Non démarrées" value={stats.non_demare} />
             <StatCard title="En cours" value={stats.en_cours} />
             <StatCard title="Terminées" value={stats.termine} />
             <StatCard title="En retard" value={stats.en_retard} />
           </StatGrid>
-          <div className="rounded-[var(--radius-card)] border border-cloud bg-paper p-6 shadow-[var(--shadow-card)]">
+          <div className="panel-grain">
             <ProgressBar label="Progression globale" value={stats.progression} />
           </div>
         </>
-      ) : null}
+        ) : null}
+      </StatsQueryStatus>
     </>
-  );
-}
-
-function TrimestreSelector({ value, onChange }: { value: number | undefined; onChange: (v: number | undefined) => void }) {
-  return (
-    <div className="flex flex-wrap gap-1.5">
-      <button
-        type="button"
-        onClick={() => onChange(undefined)}
-        className={cn(
-          "rounded-[var(--radius-card)] px-3 py-1.5 text-sm font-medium transition-colors",
-          value === undefined
-            ? "bg-forest-ink text-white"
-            : "bg-paper ring-1 ring-cloud text-slate hover:bg-veil",
-        )}
-      >
-        Année
-      </button>
-      {[1, 2, 3, 4].map((t) => (
-        <button
-          key={t}
-          type="button"
-          onClick={() => onChange(t)}
-          className={cn(
-            "rounded-[var(--radius-card)] px-3 py-1.5 text-sm font-medium transition-colors",
-            value === t
-              ? "bg-forest-ink text-white"
-              : "bg-paper ring-1 ring-cloud text-slate hover:bg-veil",
-          )}
-        >
-          T{t}
-        </button>
-      ))}
-    </div>
   );
 }
 
@@ -160,29 +132,29 @@ function RccView({ periodState }: { periodState: StatsPeriodState }) {
   const [trimestre, setTrimestre] = useState<number | undefined>(undefined);
   const { params: period } = periodState;
 
-  const { data: stats, isLoading } = useQuery({
+  const { data: stats, isLoading, isError, error } = useQuery({
     queryKey: ["stats-rcc", trimestre, period],
     queryFn: () => getStatsRcc({ trimestre, period }),
   });
 
   return (
     <>
-      <TrimestreSelector value={trimestre} onChange={setTrimestre} />
-      {isLoading ? (
-        <p className="text-sm text-ash">Chargement…</p>
-      ) : stats ? (
-        <>
-          <StatGrid>
+      <TrimestreFilter value={trimestre} onChange={setTrimestre} />
+      <StatsQueryStatus isLoading={isLoading} isError={isError} error={error}>
+        {stats ? (
+          <>
+            <StatGrid>
             <StatCard title="Total RCC" value={stats.total} />
             <StatCard title="Non démarrées" value={stats.non_demare} />
             <StatCard title="En cours" value={stats.en_cours} />
             <StatCard title="Terminées" value={stats.termine} />
           </StatGrid>
-          <div className="rounded-[var(--radius-card)] border border-cloud bg-paper p-6 shadow-[var(--shadow-card)]">
+          <div className="panel-grain">
             <ProgressBar label="Progression" value={stats.progression} />
           </div>
         </>
-      ) : null}
+        ) : null}
+      </StatsQueryStatus>
     </>
   );
 }
@@ -191,29 +163,29 @@ function MissionsView({ periodState }: { periodState: StatsPeriodState }) {
   const [trimestre, setTrimestre] = useState<number | undefined>(undefined);
   const { params: period } = periodState;
 
-  const { data: stats, isLoading } = useQuery({
+  const { data: stats, isLoading, isError, error } = useQuery({
     queryKey: ["stats-missions", trimestre, period],
     queryFn: () => getStatsMissions({ trimestre, period }),
   });
 
   return (
     <>
-      <TrimestreSelector value={trimestre} onChange={setTrimestre} />
-      {isLoading ? (
-        <p className="text-sm text-ash">Chargement…</p>
-      ) : stats ? (
-        <>
-          <StatGrid>
+      <TrimestreFilter value={trimestre} onChange={setTrimestre} />
+      <StatsQueryStatus isLoading={isLoading} isError={isError} error={error}>
+        {stats ? (
+          <>
+            <StatGrid>
             <StatCard title="Total missions" value={stats.total} />
             <StatCard title="Non démarrées" value={stats.non_demare} />
             <StatCard title="En cours" value={stats.en_cours} />
             <StatCard title="Terminées" value={stats.termine} />
           </StatGrid>
-          <div className="rounded-[var(--radius-card)] border border-cloud bg-paper p-6 shadow-[var(--shadow-card)]">
+          <div className="panel-grain">
             <ProgressBar label="Progression" value={stats.progression} />
           </div>
         </>
-      ) : null}
+        ) : null}
+      </StatsQueryStatus>
     </>
   );
 }
@@ -221,7 +193,7 @@ function MissionsView({ periodState }: { periodState: StatsPeriodState }) {
 function PpmView({ periodState }: { periodState: StatsPeriodState }) {
   const { params: period } = periodState;
 
-  const { data: stats, isLoading } = useQuery({
+  const { data: stats, isLoading, isError, error } = useQuery({
     queryKey: ["stats-ppm", period],
     queryFn: () => getStatsPpm(undefined, period),
   });
@@ -233,22 +205,22 @@ function PpmView({ periodState }: { periodState: StatsPeriodState }) {
 
   return (
     <>
-      {isLoading ? (
-        <p className="text-sm text-ash">Chargement…</p>
-      ) : stats ? (
-        <>
-          <StatGrid>
+      <StatsQueryStatus isLoading={isLoading} isError={isError} error={error}>
+        {stats ? (
+          <>
+            <StatGrid>
             <StatCard title="Total marchés" value={stats.total} />
             <StatCard title={PPM_STATUT_LABELS.dao_elabore} value={stats.dao_elabore} />
             <StatCard title={PPM_STATUT_LABELS.dao_publie} value={stats.dao_publie} />
             <StatCard title={PPM_STATUT_LABELS.marche_attribue} value={stats.marche_attribue} />
             <StatCard title={PPM_STATUT_LABELS.contrat_signe} value={stats.contrat_signe} />
           </StatGrid>
-          <div className="rounded-[var(--radius-card)] border border-cloud bg-paper p-6 shadow-[var(--shadow-card)]">
+          <div className="panel-grain">
             <ProgressBar label="Contrats signés / total" value={progression} />
           </div>
         </>
-      ) : null}
+        ) : null}
+      </StatsQueryStatus>
     </>
   );
 }
@@ -256,30 +228,30 @@ function PpmView({ periodState }: { periodState: StatsPeriodState }) {
 function ProjetsView({ periodState }: { periodState: StatsPeriodState }) {
   const { params: period } = periodState;
 
-  const { data: stats, isLoading } = useQuery({
+  const { data: stats, isLoading, isError, error } = useQuery({
     queryKey: ["stats-projets", period],
     queryFn: () => getStatsProjets(undefined, period),
   });
 
   return (
     <>
-      {isLoading ? (
-        <p className="text-sm text-ash">Chargement…</p>
-      ) : stats ? (
-        <>
-          <StatGrid>
+      <StatsQueryStatus isLoading={isLoading} isError={isError} error={error}>
+        {stats ? (
+          <>
+            <StatGrid>
             <StatCard title="Total projets" value={stats.total} />
           </StatGrid>
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-[var(--radius-card)] border border-cloud bg-paper p-6 shadow-[var(--shadow-card)]">
+            <div className="panel-grain">
               <ProgressBar label="Exécution financière moyenne" value={stats.execution_financiere} />
             </div>
-            <div className="rounded-[var(--radius-card)] border border-cloud bg-paper p-6 shadow-[var(--shadow-card)]">
+            <div className="panel-grain">
               <ProgressBar label="Exécution physique moyenne" value={stats.execution_physique} />
             </div>
           </div>
         </>
-      ) : null}
+        ) : null}
+      </StatsQueryStatus>
     </>
   );
 }

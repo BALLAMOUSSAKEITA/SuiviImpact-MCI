@@ -81,32 +81,32 @@ function NouveauCompteContent() {
             <Field label="Prénom" error={errors.prenom?.message}>
               <input
                 {...register("prenom")}
-                className="w-full rounded-card border border-mist px-3 py-2 text-sm"
+                className="input-grain w-full"
               />
             </Field>
             <Field label="Nom" error={errors.nom?.message}>
               <input
                 {...register("nom")}
-                className="w-full rounded-card border border-mist px-3 py-2 text-sm"
+                className="input-grain w-full"
               />
             </Field>
             <Field label="Identifiant" error={errors.username?.message}>
               <input
                 {...register("username")}
-                className="w-full rounded-card border border-mist px-3 py-2 text-sm"
+                className="input-grain w-full"
               />
             </Field>
             <Field label="Mot de passe" error={errors.password?.message}>
               <input
                 type="password"
                 {...register("password")}
-                className="w-full rounded-card border border-mist px-3 py-2 text-sm"
+                className="input-grain w-full"
               />
             </Field>
             <Field label="Rôle" error={errors.role?.message}>
               <select
                 {...register("role")}
-                className="w-full rounded-card border border-mist px-3 py-2 text-sm"
+                className="input-grain w-full"
               >
                 {ROLES.map((r) => (
                   <option key={r} value={r}>
@@ -116,7 +116,7 @@ function NouveauCompteContent() {
               </select>
             </Field>
             {isInstitution ? (
-              <p className="rounded-card border border-cloud bg-paper px-3 py-2 text-xs text-slate">
+              <p className="rounded-[var(--radius-sm)] bg-veil px-3 py-2 text-xs text-slate">
                 Ce rôle a un accès <strong>lecture seule</strong> : workflow, archives
                 {role === "directeur" ? ", vue d'ensemble et planification PAO" : ", vue d'ensemble et statistiques"}
                 . Pas d&apos;accès au suivi ni à l&apos;édition des données.
@@ -125,7 +125,7 @@ function NouveauCompteContent() {
               <Field label="Type d'accès" error={errors.type_acces?.message}>
                 <select
                   {...register("type_acces")}
-                  className="w-full rounded-card border border-mist px-3 py-2 text-sm"
+                  className="input-grain w-full"
                 >
                   <option value="lecture">Lecture (Visiteur)</option>
                   <option value="ecriture">Écriture (Éditeur)</option>

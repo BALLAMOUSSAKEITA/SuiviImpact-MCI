@@ -135,17 +135,17 @@ export function Sidebar({
 
   const navLinkClass = (active: boolean) =>
     cn(
-      "group relative flex items-center rounded-[var(--radius-sm)] text-[13px] font-medium transition-all duration-[var(--duration-fast)]",
+      "group relative flex items-center rounded-[var(--radius-sm)] text-sm font-medium transition-colors duration-[var(--duration-fast)]",
       narrow ? "justify-center px-2 py-2.5" : "gap-3 px-3 py-2.5",
       active
-        ? "bg-forest-ink/[0.07] text-forest-ink"
+        ? "text-graphite"
         : "text-slate hover:bg-veil hover:text-graphite",
     );
 
   return (
     <aside
       className={cn(
-        "flex shrink-0 flex-col border-r border-cloud/80 bg-white",
+        "flex shrink-0 flex-col border-r border-cloud bg-white",
         "fixed inset-y-0 left-0 z-50 transition-[width,transform] duration-300 ease-[var(--ease-out-expo)] lg:static lg:translate-x-0",
         narrow ? "w-[72px]" : "w-[272px]",
         mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
@@ -154,12 +154,11 @@ export function Sidebar({
       {/* En-tête */}
       <div
         className={cn(
-          "relative overflow-hidden border-b border-cloud/60",
+          "border-b border-cloud",
           narrow ? "px-2 py-4" : "px-5 py-5",
         )}
       >
-        <div className="absolute inset-0 grain-gradient opacity-60" />
-        <div className="relative flex items-start justify-between gap-2">
+        <div className="flex items-start justify-between gap-2">
           <div className={cn("min-w-0 flex-1", narrow && "flex justify-center")}>
             {narrow ? (
               <div
@@ -170,13 +169,13 @@ export function Sidebar({
               </div>
             ) : (
               <>
-                <p className="text-[10px] font-semibold uppercase leading-tight tracking-wider text-fog">
+                <p className="text-xs font-medium leading-tight text-slate">
                   {BRAND.ministryShort}
                 </p>
-                <p className="mt-1.5 text-base font-bold text-forest-ink tracking-tight">
+                <p className="mt-1 text-base font-semibold text-graphite tracking-tight">
                   {BRAND.appName}
                 </p>
-                <p className="text-[11px] text-ash">
+                <p className="text-xs text-slate">
                   {BRAND.bureauShort} · {BRAND.program}
                 </p>
               </>
@@ -186,7 +185,7 @@ export function Sidebar({
             <button
               type="button"
               onClick={onToggleCollapsed}
-              className="hidden shrink-0 rounded-[var(--radius-card)] p-1.5 text-ash transition-colors hover:bg-veil hover:text-graphite lg:flex"
+              className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full bg-veil text-graphite transition-colors hover:bg-cloud lg:flex"
               aria-label="Replier le menu"
               title="Replier le menu"
             >
@@ -201,9 +200,9 @@ export function Sidebar({
           title="Mon profil"
           aria-label="Mon profil"
           className={cn(
-            "mt-4 flex items-center border-t border-cloud/60 pt-4 transition-colors hover:bg-veil/80 rounded-[var(--radius-sm)]",
+            "mt-4 flex items-center border-t border-cloud pt-4 transition-colors hover:bg-veil rounded-[var(--radius-sm)]",
             narrow ? "justify-center px-1 py-2" : "gap-3 px-1 py-1",
-            pathname.startsWith("/admin/profil") && "bg-forest-ink/[0.07]",
+            pathname.startsWith("/admin/profil") && "bg-veil",
           )}
         >
           <UserAvatar
@@ -281,7 +280,7 @@ export function Sidebar({
                           className="fixed inset-0 z-40"
                           onClick={() => setFlyoutHref(null)}
                         />
-                        <div className="absolute left-full top-0 z-50 ml-2 min-w-[180px] rounded-[var(--radius-card)] border border-cloud bg-white py-1.5 shadow-[var(--shadow-elevated)]">
+                        <div className="dropdown-panel absolute left-full top-0 z-50 ml-2 min-w-[180px] py-1.5">
                           <p className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-fog">
                             {item.label}
                           </p>
@@ -401,7 +400,7 @@ export function Sidebar({
           <button
             type="button"
             onClick={onToggleCollapsed}
-            className="mb-2 flex w-full items-center justify-center rounded-[var(--radius-card)] p-2 text-ash transition-colors hover:bg-veil hover:text-graphite"
+            className="mb-2 flex h-10 w-full items-center justify-center rounded-full bg-veil text-graphite transition-colors hover:bg-cloud"
             aria-label="Déplier le menu"
             title="Déplier le menu"
           >

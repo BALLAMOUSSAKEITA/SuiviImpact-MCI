@@ -7,6 +7,7 @@ import { useState } from "react";
 import { DirectionFilter } from "@/components/direction-filter";
 import { ProgressBar } from "@/components/execution-badge";
 import { StatCard, StatGrid } from "@/components/stat-card";
+import { StatsQueryStatus } from "@/components/stats-query-status";
 import {
   StatsPeriodFilter,
   useStatsPeriodState,
@@ -22,7 +23,7 @@ function StatsPaoContent() {
   const periodState = useStatsPeriodState();
   const { params: period } = periodState;
 
-  const { data: stats, isLoading } = useQuery({
+  const { data: stats, isLoading, isError, error } = useQuery({
     queryKey: ["stats-activites", direction, period],
     queryFn: () => getStatsActivites(direction ?? undefined, period),
   });
@@ -30,10 +31,10 @@ function StatsPaoContent() {
   return (
     <>
         <div>
-          <Link href="/admin/stats" className="text-sm text-forest-ink hover:underline">
+          <Link href="/admin/stats" className="text-sm font-medium text-graphite hover:underline">
             ← Statistiques
           </Link>
-          <h1 className="mt-2 text-xl font-bold text-graphite sm:text-2xl">
+          <h1 className="mt-2 font-display text-[var(--text-heading-sm)] text-graphite">
             Statistiques — Plan d&apos;Action
           </h1>
         </div>
@@ -45,25 +46,25 @@ function StatsPaoContent() {
 
         <DirectionFilter value={direction} onChange={setDirection} />
 
-        {isLoading ? (
-          <p className="text-sm text-ash">Chargement…</p>
-        ) : stats ? (
-          <>
-            <StatGrid>
+        <StatsQueryStatus isLoading={isLoading} isError={isError} error={error}>
+          {stats ? (
+            <>
+              <StatGrid>
               <StatCard title="Total activités" value={stats.total} />
               <StatCard title="Non démarrées" value={stats.non_demare} />
               <StatCard title="En cours" value={stats.en_cours} />
               <StatCard title="Terminées" value={stats.termine} />
               <StatCard title="En retard" value={stats.en_retard} />
             </StatGrid>
-            <div className="rounded-card border border-cloud bg-paper p-6 shadow-sm">
+            <div className="panel-grain">
               <ProgressBar
                 label="Progression globale"
                 value={stats.progression}
               />
             </div>
           </>
-        ) : null}
+          ) : null}
+        </StatsQueryStatus>
     </>
   );
 }

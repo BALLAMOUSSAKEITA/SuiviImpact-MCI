@@ -27,22 +27,22 @@ export function PageHeader({
     >
       <div className="min-w-0 space-y-1.5">
         {eyebrow && (
-          <p className="text-[11px] font-bold uppercase tracking-widest text-forest-ink/80">
+          <p className="text-xs font-medium text-slate">
             {eyebrow}
           </p>
         )}
         <h1
           className={cn(
-            "text-graphite tracking-tight",
+            "font-display text-graphite",
             display
-              ? "font-display text-2xl leading-tight sm:text-[32px] lg:text-[38px] lg:leading-[1.15]"
-              : "font-display text-xl sm:text-2xl",
+              ? "text-[var(--text-heading)] leading-[var(--leading-heading)] sm:text-[1.75rem]"
+              : "text-[var(--text-heading-sm)] leading-[1.18] tracking-[var(--tracking-heading-sm)]",
           )}
         >
           {title}
         </h1>
         {description && (
-          <p className="max-w-2xl text-sm leading-relaxed text-fog">
+          <p className="max-w-2xl text-sm leading-[1.43] text-slate">
             {description}
           </p>
         )}

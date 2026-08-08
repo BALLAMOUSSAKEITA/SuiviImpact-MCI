@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
@@ -113,12 +113,12 @@ function ArchiveContent() {
         </div>
 
         {showNewFolder && canWrite && (
-          <div className="flex gap-2 rounded-card border border-cloud bg-paper p-4">
+          <div className="panel-grain flex gap-2 p-4">
             <input
               value={newFolderName}
               onChange={(e) => setNewFolderName(e.target.value)}
               placeholder="Nom du dossier"
-              className="flex-1 rounded-card border border-cloud px-3 py-2 text-sm"
+              className="input-grain flex-1"
             />
             <Button
               onClick={() => createFolderMutation.mutate()}
@@ -134,7 +134,7 @@ function ArchiveContent() {
 
         {canWrite && (
           <div
-            className="rounded-card border-2 border-dashed border-mist bg-paper p-8 text-center"
+            className="panel-grain border-2 border-dashed border-cloud p-8 text-center"
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => {
               e.preventDefault();
@@ -151,11 +151,11 @@ function ArchiveContent() {
         {isLoading ? (
           <p className="text-sm text-ash">Chargement…</p>
         ) : (
-          <div className="space-y-2 rounded-card border border-cloud bg-paper p-4 shadow-sm">
+          <div className="space-y-2 panel-grain">
             {data?.dossiers.map((d) => (
               <div
                 key={d.id}
-                className="flex items-center justify-between rounded-card px-3 py-2 hover:bg-paper"
+                className="flex items-center justify-between rounded-card px-3 py-2 hover:bg-veil"
               >
                 <Link
                   href={`/admin/archive/dossier/${d.id}`}
@@ -180,7 +180,7 @@ function ArchiveContent() {
             {data?.fichiers.map((f) => (
               <div
                 key={f.id}
-                className="flex items-center justify-between rounded-card px-3 py-2 hover:bg-paper"
+                className="flex items-center justify-between rounded-card px-3 py-2 hover:bg-veil"
               >
                 <div className="flex items-center gap-2 text-sm text-slate">
                   <File className="h-4 w-4 text-ash" />

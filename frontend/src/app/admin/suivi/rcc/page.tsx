@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -18,6 +18,7 @@ import {
 } from "@/lib/api";
 import type { ExecutionStatutFilter, Recommandation } from "@/types";
 import { DEFAULT_ANNEE } from "@/types";
+import { cn } from "@/lib/utils";
 
 const STATUT_TABS: { key: ExecutionStatutFilter; label: string }[] = [
   { key: null, label: "Toutes" },
@@ -155,17 +156,18 @@ function SuiviRccContent() {
         }
       />
 
-      <div className="flex flex-wrap gap-2">
+      <div className="inline-flex flex-wrap gap-1 rounded-[var(--radius-sm)] bg-veil p-1">
         {STATUT_TABS.map(({ key, label }) => (
           <button
             key={label}
             type="button"
             onClick={() => setStatut(key)}
-            className={`rounded-card px-3 py-1.5 text-sm font-medium transition-colors ${
+            className={cn(
+              "rounded-[var(--radius-sm)] px-3 py-1.5 text-sm font-medium transition-colors",
               statut === key
-                ? "bg-forest-ink text-white"
-                : "bg-paper text-slate ring-1 ring-cloud hover:bg-veil"
-            }`}
+                ? "bg-white text-graphite shadow-[var(--shadow-subtle)]"
+                : "text-slate hover:text-graphite",
+            )}
           >
             {label}
           </button>
@@ -175,7 +177,7 @@ function SuiviRccContent() {
       {showForm && canWrite && (
         <form
           onSubmit={handleSubmit}
-          className="space-y-4 rounded-card border border-cloud bg-paper p-6 shadow-sm"
+          className="space-y-4 panel-grain"
         >
           <h2 className="text-lg font-semibold">
             {editing ? "Modifier" : "Nouvelle recommandation"}
@@ -190,7 +192,7 @@ function SuiviRccContent() {
                 onChange={(e) =>
                   setForm((f) => ({ ...f, date_recommandation: e.target.value }))
                 }
-                className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
+                className="input-grain w-full"
               />
             </div>
             <div>
@@ -201,7 +203,7 @@ function SuiviRccContent() {
                 onChange={(e) =>
                   setForm((f) => ({ ...f, responsable: e.target.value }))
                 }
-                className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
+                className="input-grain w-full"
               />
             </div>
             <div className="sm:col-span-2">
@@ -213,7 +215,7 @@ function SuiviRccContent() {
                   setForm((f) => ({ ...f, description: e.target.value }))
                 }
                 rows={2}
-                className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
+                className="input-grain w-full"
               />
             </div>
             <div>
@@ -226,7 +228,7 @@ function SuiviRccContent() {
                 onChange={(e) =>
                   setForm((f) => ({ ...f, execution: e.target.value }))
                 }
-                className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
+                className="input-grain w-full"
               />
             </div>
             <div>
@@ -236,7 +238,7 @@ function SuiviRccContent() {
                 onChange={(e) =>
                   setForm((f) => ({ ...f, observations: e.target.value }))
                 }
-                className="w-full rounded-card border border-cloud px-3 py-2 text-sm"
+                className="input-grain w-full"
               />
             </div>
           </div>

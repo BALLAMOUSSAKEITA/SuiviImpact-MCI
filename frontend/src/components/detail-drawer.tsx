@@ -70,7 +70,7 @@ export function StoredDocumentMenu({
           e.stopPropagation();
           setOpen((v) => !v);
         }}
-        className="inline-flex max-w-full items-center gap-2 rounded-[var(--radius-pill)] bg-forest-ink/8 px-3 py-1.5 text-left text-sm font-medium text-forest-ink transition-colors hover:bg-forest-ink/12"
+        className="inline-flex max-w-full items-center gap-2 rounded-[var(--radius-pill)] bg-veil px-3 py-1.5 text-left text-sm font-medium text-graphite transition-colors hover:bg-cloud"
         title={label}
       >
         <FileText className="h-4 w-4 shrink-0" strokeWidth={1.75} />
@@ -80,7 +80,7 @@ export function StoredDocumentMenu({
       {open && (
         <div
           role="menu"
-          className="absolute left-0 top-full z-50 mt-1.5 min-w-[180px] overflow-hidden rounded-[var(--radius-card)] border border-cloud/80 bg-white py-1 shadow-[var(--shadow-elevated)]"
+          className="dropdown-panel absolute left-0 top-full z-50 mt-1.5 min-w-[180px] overflow-hidden py-1"
           onClick={(e) => e.stopPropagation()}
         >
           <button
@@ -170,20 +170,15 @@ export function DetailDrawer({
         aria-modal="true"
         aria-labelledby="detail-drawer-title"
         className={cn(
-          "relative flex max-h-[92vh] w-full flex-col overflow-hidden rounded-t-[1.25rem] border border-cloud/70 bg-white shadow-[0_24px_80px_-12px_rgba(15,23,42,0.22)] sm:max-h-[min(88vh,780px)] sm:rounded-[var(--radius-card)] animate-scale-in",
+          "overlay-panel relative flex max-h-[92vh] w-full flex-col overflow-hidden rounded-t-[var(--radius-card)] sm:max-h-[min(88vh,780px)] sm:rounded-[var(--radius-card)] animate-scale-in",
           size === "wide" ? "sm:max-w-2xl" : "sm:max-w-xl",
         )}
       >
-        <div
-          className="h-1 shrink-0 bg-gradient-to-r from-forest-ink via-emerald-600/90 to-forest-ink/70"
-          aria-hidden
-        />
-
-        <header className="relative shrink-0 px-5 pb-4 pt-5 sm:px-6 sm:pt-6">
+        <header className="relative shrink-0 border-b border-cloud px-5 pb-4 pt-5 sm:px-6 sm:pt-6">
           <button
             type="button"
             aria-label="Fermer"
-            className="absolute right-3 top-3 rounded-full p-2 text-ash transition-colors hover:bg-veil hover:text-graphite sm:right-4 sm:top-4"
+            className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full bg-veil text-graphite transition-colors hover:bg-cloud sm:right-4 sm:top-4"
             onClick={onClose}
           >
             <X className="h-5 w-5" strokeWidth={1.75} />
@@ -191,11 +186,11 @@ export function DetailDrawer({
 
           <div className="pr-10">
             {eyebrow && (
-              <p className="text-xs font-medium tracking-wide text-fog">{eyebrow}</p>
+              <p className="text-xs font-medium text-slate">{eyebrow}</p>
             )}
             <div className="mt-1 flex flex-wrap items-center gap-2">
               {subtitle && (
-                <span className="inline-flex rounded-[var(--radius-pill)] bg-forest-ink/10 px-2.5 py-0.5 text-xs font-semibold text-forest-ink">
+                <span className="inline-flex rounded-[var(--radius-pill)] bg-veil px-2.5 py-0.5 text-xs font-semibold text-graphite">
                   {subtitle}
                 </span>
               )}
@@ -227,7 +222,7 @@ function DetailRow({ label, children, className }: DetailRowProps) {
   return (
     <div
       className={cn(
-        "rounded-[var(--radius-card)] border border-cloud/60 bg-gradient-to-b from-paper/90 to-white px-4 py-3.5",
+        "rounded-[var(--radius-sm)] bg-veil px-4 py-3.5",
         className,
       )}
     >
