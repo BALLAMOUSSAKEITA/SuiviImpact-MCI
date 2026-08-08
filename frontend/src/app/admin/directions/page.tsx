@@ -269,18 +269,18 @@ function DirectionsContent() {
         ) : ministre ? (
           <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <div>
-              <dt className="text-xs font-medium uppercase tracking-wide text-ash">Identité</dt>
+              <dt className="text-xs font-medium text-slate">Identité</dt>
               <dd className="mt-1 text-base font-medium text-graphite">
                 {[ministre.prenom, ministre.nom].filter(Boolean).join(" ")}
               </dd>
             </div>
             <div>
-              <dt className="text-xs font-medium uppercase tracking-wide text-ash">E-mail</dt>
+              <dt className="text-xs font-medium text-slate">E-mail</dt>
               <dd className="mt-1 text-sm text-slate">{ministre.email}</dd>
             </div>
             {ministre.updated_at && (
               <div>
-                <dt className="text-xs font-medium uppercase tracking-wide text-ash">Dernière mise à jour</dt>
+                <dt className="text-xs font-medium text-slate">Dernière mise à jour</dt>
                 <dd className="mt-1 text-sm text-slate">
                   {new Date(ministre.updated_at).toLocaleString("fr-FR", {
                     dateStyle: "medium",

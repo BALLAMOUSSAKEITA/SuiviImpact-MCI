@@ -459,7 +459,7 @@ function PlanificationProjetContent() {
 
                     <div className="space-y-2">
                       <div className="flex items-center justify-between gap-2">
-                        <p className="text-xs font-medium uppercase tracking-wide text-fog">
+                        <p className="text-xs font-medium text-slate">
                           Activités
                         </p>
                         <Button

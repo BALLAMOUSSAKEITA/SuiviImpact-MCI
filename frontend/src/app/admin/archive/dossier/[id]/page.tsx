@@ -9,6 +9,7 @@ import { ChevronRight, Folder, File } from "lucide-react";
 
 import { useAuth } from "@/components/auth-provider";
 import { ConfirmDialog } from "@/components/confirm-dialog";
+import { PageHeader } from "@/components/page-header";
 import { FileUploadTrigger } from "@/components/file-upload-field";
 import { Button } from "@/components/ui/button";
 import {
@@ -123,7 +124,7 @@ function DossierContent() {
                 ) : (
                   <Link
                     href={`/admin/archive/dossier/${item.id}`}
-                    className="hover:text-forest-ink"
+                    className="hover:text-graphite hover:underline"
                   >
                     {item.nom}
                   </Link>
@@ -132,32 +133,33 @@ function DossierContent() {
             ))}
           </nav>
 
-          <div className="mt-4 flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-graphite">
-              {data?.dossier.nom ?? "Dossier"}
-            </h1>
-            {canWrite && (
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setRenaming(true);
-                    setRenameValue(data?.dossier.nom ?? "");
-                  }}
-                >
-                  Renommer
-                </Button>
-                <Button variant="outline" onClick={() => setShowNewFolder(true)}>
-                  Nouveau sous-dossier
-                </Button>
-                <FileUploadTrigger
-                  label="Joindre un fichier"
-                  loading={uploadMutation.isPending}
-                  onFile={(file) => uploadMutation.mutate(file)}
-                />
-              </div>
-            )}
-          </div>
+          <PageHeader
+            className="mt-4"
+            title={data?.dossier.nom ?? "Dossier"}
+            actions={
+              canWrite ? (
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setRenaming(true);
+                      setRenameValue(data?.dossier.nom ?? "");
+                    }}
+                  >
+                    Renommer
+                  </Button>
+                  <Button variant="outline" onClick={() => setShowNewFolder(true)}>
+                    Nouveau sous-dossier
+                  </Button>
+                  <FileUploadTrigger
+                    label="Joindre un fichier"
+                    loading={uploadMutation.isPending}
+                    onFile={(file) => uploadMutation.mutate(file)}
+                  />
+                </div>
+              ) : undefined
+            }
+          />
         </div>
 
         {renaming && canWrite && (

@@ -197,7 +197,7 @@ function SuiviIndicateursContent() {
 
       <div className="table-shell">
         <table className="table-grain min-w-[640px]">
-          <thead className="bg-paper">
+          <thead>
             <tr>
               <th className="px-4 py-3 text-left font-medium text-slate">Code</th>
               <th className="px-4 py-3 text-left font-medium text-slate">Libellé</th>
@@ -215,7 +215,7 @@ function SuiviIndicateursContent() {
               </tr>
             )}
             {items.map((item) => (
-              <tr key={item.id} className="hover:bg-paper">
+              <tr key={item.id} className="hover:bg-veil">
                 <td className="px-4 py-3 font-medium">{item.code}</td>
                 <td className="max-w-xs truncate px-4 py-3">{item.libelle}</td>
                 <td className="px-4 py-3">

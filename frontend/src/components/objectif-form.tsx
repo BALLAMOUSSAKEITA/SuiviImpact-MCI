@@ -34,7 +34,7 @@ export function ObjectifForm({ queryKey }: { queryKey: string[] }) {
     <div className="panel-grain">
       <button
         type="button"
-        className="flex items-center gap-2 text-sm font-semibold text-forest-ink transition-colors hover:text-vine"
+        className="flex items-center gap-2 text-sm font-medium text-graphite transition-colors hover:text-slate"
         onClick={() => setOpen((v) => !v)}
       >
         {open ? (

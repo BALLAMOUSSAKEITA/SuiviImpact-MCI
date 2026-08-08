@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import Link from "next/link";
+import { PageBackLink, PageHeader } from "@/components/page-header";
 
 import { ProgressBar } from "@/components/execution-badge";
 import { StatCard, StatGrid } from "@/components/stat-card";
@@ -27,14 +27,8 @@ function StatsProjetsContent() {
 
   return (
     <>
-      <div>
-        <Link href="/admin/stats" className="text-sm font-medium text-graphite hover:underline">
-          ← Statistiques
-        </Link>
-        <h1 className="mt-2 font-display text-[var(--text-heading-sm)] text-graphite">
-          Statistiques — Projets
-        </h1>
-      </div>
+      <PageBackLink href="/admin/stats">← Statistiques</PageBackLink>
+      <PageHeader className="mt-2" title="Projets" description="Filtrage sur la date de début du projet." />
 
       <StatsPeriodFilter
         dateFieldHint="Filtrage sur la date de début du projet."

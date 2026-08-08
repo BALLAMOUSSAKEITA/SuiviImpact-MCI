@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/components/auth-provider";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { ExecutionBadge } from "@/components/execution-badge";
+import { SegmentedControl } from "@/components/segmented-control";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,7 +19,6 @@ import {
 } from "@/lib/api";
 import type { ExecutionStatutFilter, Recommandation } from "@/types";
 import { DEFAULT_ANNEE } from "@/types";
-import { cn } from "@/lib/utils";
 
 const STATUT_TABS: { key: ExecutionStatutFilter; label: string }[] = [
   { key: null, label: "Toutes" },
@@ -156,23 +156,11 @@ function SuiviRccContent() {
         }
       />
 
-      <div className="inline-flex flex-wrap gap-1 rounded-[var(--radius-sm)] bg-veil p-1">
-        {STATUT_TABS.map(({ key, label }) => (
-          <button
-            key={label}
-            type="button"
-            onClick={() => setStatut(key)}
-            className={cn(
-              "rounded-[var(--radius-sm)] px-3 py-1.5 text-sm font-medium transition-colors",
-              statut === key
-                ? "bg-white text-graphite shadow-[var(--shadow-subtle)]"
-                : "text-slate hover:text-graphite",
-            )}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+      <SegmentedControl
+        value={statut}
+        onChange={setStatut}
+        options={STATUT_TABS.map(({ key, label }) => ({ value: key, label }))}
+      />
 
       {showForm && canWrite && (
         <form
@@ -253,7 +241,7 @@ function SuiviRccContent() {
 
       <div className="table-shell">
         <table className="table-grain min-w-[640px]">
-          <thead className="bg-paper">
+          <thead>
             <tr>
               <th className="px-4 py-3 text-left font-medium text-slate">Date</th>
               <th className="px-4 py-3 text-left font-medium text-slate">Description</th>
@@ -271,7 +259,7 @@ function SuiviRccContent() {
               </tr>
             )}
             {data?.items.map((item) => (
-              <tr key={item.id} className="hover:bg-paper">
+              <tr key={item.id} className="hover:bg-veil">
                 <td className="px-4 py-3">{item.date_recommandation}</td>
                 <td className="max-w-xs truncate px-4 py-3">{item.description}</td>
                 <td className="px-4 py-3">{item.responsable}</td>

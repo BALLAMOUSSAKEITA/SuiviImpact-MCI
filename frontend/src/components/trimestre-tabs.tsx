@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 
+import { SegmentedControl, type SegmentedOption } from "@/components/segmented-control";
 import { cn } from "@/lib/utils";
 
 interface TrimestreTabsProps {
@@ -54,24 +55,20 @@ export function TrimestreFilter({
   allLabel = "Année",
   className,
 }: TrimestreFilterProps) {
-  const chip = (active: boolean) =>
-    cn(
-      "rounded-[var(--radius-sm)] px-3 py-1.5 text-sm font-medium transition-colors",
-      active
-        ? "bg-graphite text-white"
-        : "bg-white text-slate ring-1 ring-cloud hover:bg-veil",
-    );
+  const options: SegmentedOption<number | undefined>[] = [
+    { value: undefined, label: allLabel },
+    { value: 1, label: "T1" },
+    { value: 2, label: "T2" },
+    { value: 3, label: "T3" },
+    { value: 4, label: "T4" },
+  ];
 
   return (
-    <div className={cn("inline-flex flex-wrap gap-1 rounded-[var(--radius-sm)] bg-veil p-1", className)}>
-      <button type="button" onClick={() => onChange(undefined)} className={chip(value === undefined)}>
-        {allLabel}
-      </button>
-      {[1, 2, 3, 4].map((t) => (
-        <button key={t} type="button" onClick={() => onChange(t)} className={chip(value === t)}>
-          T{t}
-        </button>
-      ))}
-    </div>
+    <SegmentedControl
+      value={value}
+      onChange={onChange}
+      options={options}
+      className={className}
+    />
   );
 }

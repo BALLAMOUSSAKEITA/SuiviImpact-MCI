@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { PageBackLink, PageHeader } from "@/components/page-header";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -53,17 +54,8 @@ function ObjectifEditForm({ objectif }: { objectif: Objectif }) {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <div>
-        <Link
-          href="/admin/objectifs"
-          className="text-sm text-forest-ink hover:underline"
-        >
-          ← Retour aux objectifs
-        </Link>
-        <h1 className="mt-2 text-xl font-bold text-graphite sm:text-2xl">
-          Modifier l&apos;objectif
-        </h1>
-      </div>
+      <PageBackLink href="/admin/objectifs">← Retour aux objectifs</PageBackLink>
+      <PageHeader className="mt-2" title="Modifier l'objectif" />
 
       <form
         onSubmit={(e) => {

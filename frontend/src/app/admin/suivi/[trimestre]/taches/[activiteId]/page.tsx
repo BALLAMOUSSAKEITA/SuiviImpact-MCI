@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import Link from "next/link";
+import { PageBackLink, PageHeader } from "@/components/page-header";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -55,21 +55,17 @@ function SuiviTachesContent() {
 
   return (
     <>
-        <div>
-          <Link
-            href={`/admin/suivi/${trimestre}`}
-            className="text-sm text-forest-ink hover:underline"
-          >
-            ← Retour suivi T{trimestre}
-          </Link>
-          <h1 className="mt-2 text-xl font-bold text-graphite sm:text-2xl">
-            Tâches — Activité #{activiteId} — T{trimestre}
-          </h1>
-        </div>
+      <PageBackLink href={`/admin/suivi/${trimestre}`}>
+        ← Retour suivi T{trimestre}
+      </PageBackLink>
+      <PageHeader
+        className="mt-2"
+        title={`Tâches — Activité #${activiteId} — T${trimestre}`}
+      />
 
         <div className="table-shell">
           <table className="table-grain min-w-[560px]">
-            <thead className="bg-paper">
+            <thead>
               <tr>
                 <th className="px-4 py-3 text-left font-medium text-slate">
                   Description
@@ -97,7 +93,7 @@ function SuiviTachesContent() {
                 </tr>
               )}
               {taches.map((t) => (
-                <tr key={t.id} className="hover:bg-paper">
+                <tr key={t.id} className="hover:bg-veil">
                   <td className="px-4 py-3">{t.description}</td>
                   <td className="px-4 py-3">{t.responsable}</td>
                   <td className="px-4 py-3">{t.ponderation} %</td>

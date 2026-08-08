@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import Link from "next/link";
+import { PageBackLink, PageHeader } from "@/components/page-header";
 import { useState } from "react";
 
 import { DirectionFilter } from "@/components/direction-filter";
@@ -30,14 +30,12 @@ function StatsPaoContent() {
 
   return (
     <>
-        <div>
-          <Link href="/admin/stats" className="text-sm font-medium text-graphite hover:underline">
-            ← Statistiques
-          </Link>
-          <h1 className="mt-2 font-display text-[var(--text-heading-sm)] text-graphite">
-            Statistiques — Plan d&apos;Action
-          </h1>
-        </div>
+      <PageBackLink href="/admin/stats">← Statistiques</PageBackLink>
+      <PageHeader
+        className="mt-2"
+        title="Plan d'action (PAO)"
+        description="Les activités sont comptées selon leur date de début."
+      />
 
         <StatsPeriodFilter
           dateFieldHint="Les activités PAO sont comptées selon leur date de début (ex. début en janvier → incluse dans le filtre janvier)."

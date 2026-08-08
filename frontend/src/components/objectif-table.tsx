@@ -91,7 +91,7 @@ export function ObjectifTable({ objectifs, queryKey }: ObjectifTableProps) {
             {objectifs.map((objectif) => (
               <tr key={objectif.id} className="group">
                 <td>
-                  <span className="inline-flex rounded-full bg-forest-ink/8 px-2.5 py-0.5 text-xs font-bold text-forest-ink">
+                  <span className="inline-flex rounded-full bg-veil px-2.5 py-0.5 text-xs font-semibold text-graphite">
                     {objectif.code}
                   </span>
                 </td>

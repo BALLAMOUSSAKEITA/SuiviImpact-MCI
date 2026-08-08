@@ -7,6 +7,7 @@ import { useState } from "react";
 
 import { DirectionFilter } from "@/components/direction-filter";
 import { ExecutionBadge } from "@/components/execution-badge";
+import { PageHeader } from "@/components/page-header";
 import { TrimestreTabs } from "@/components/trimestre-tabs";
 import { Button } from "@/components/ui/button";
 import { getPlanification } from "@/lib/api";
@@ -29,14 +30,10 @@ function PlanificationContent() {
 
   return (
     <>
-        <div>
-          <h1 className="text-xl font-bold text-graphite sm:text-2xl">
-            Planification — T{trimestre} {DEFAULT_ANNEE}
-          </h1>
-          <p className="mt-1 text-sm text-fog">
-            Activités planifiées pour le trimestre
-          </p>
-        </div>
+      <PageHeader
+        title={`Planification — T${trimestre} ${DEFAULT_ANNEE}`}
+        description="Activités planifiées pour le trimestre"
+      />
 
         <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
           <TrimestreTabs
@@ -48,7 +45,7 @@ function PlanificationContent() {
 
         <div className="table-shell">
           <table className="table-grain min-w-[720px]">
-            <thead className="bg-paper">
+            <thead>
               <tr>
                 <th className="px-4 py-3 text-left font-medium text-slate">Code</th>
                 <th className="px-4 py-3 text-left font-medium text-slate">Description</th>
@@ -74,7 +71,7 @@ function PlanificationContent() {
                 </tr>
               )}
               {activites.map((a) => (
-                <tr key={a.id} className="hover:bg-paper">
+                <tr key={a.id} className="hover:bg-veil">
                   <td className="px-4 py-3 font-medium">{a.code}</td>
                   <td className="max-w-xs truncate px-4 py-3">{a.description}</td>
                   <td className="px-4 py-3">

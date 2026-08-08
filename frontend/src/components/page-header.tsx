@@ -1,4 +1,24 @@
 import { cn } from "@/lib/utils";
+import Link from "next/link";
+
+export function PageBackLink({
+  href,
+  children,
+  className,
+}: {
+  href: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className={cn("text-sm font-medium text-graphite hover:underline", className)}
+    >
+      {children}
+    </Link>
+  );
+}
 
 interface PageHeaderProps {
   eyebrow?: string;

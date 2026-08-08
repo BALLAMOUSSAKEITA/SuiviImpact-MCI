@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/components/auth-provider";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { TacheStatutBadge } from "@/components/execution-badge";
+import { PageBackLink, PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import {
   createTache,
@@ -159,22 +160,18 @@ function TachesContent() {
 
   return (
     <>
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <Link
-              href={`/admin/planification/${trimestre}`}
-              className="text-sm text-forest-ink hover:underline"
-            >
-              ← Retour planification T{trimestre}
-            </Link>
-            <h1 className="mt-2 text-xl font-bold text-graphite sm:text-2xl">
-              Tâches — Activité #{activiteId} — T{trimestre}
-            </h1>
-          </div>
-          {canWrite && !showForm && (
+      <PageBackLink href={`/admin/planification/${trimestre}`}>
+        ← Retour planification T{trimestre}
+      </PageBackLink>
+      <PageHeader
+        className="mt-2"
+        title={`Tâches — Activité #${activiteId} — T${trimestre}`}
+        actions={
+          canWrite && !showForm ? (
             <Button onClick={() => setShowForm(true)}>Nouvelle tâche</Button>
-          )}
-        </div>
+          ) : undefined
+        }
+      />
 
         {showForm && canWrite && (
           <form

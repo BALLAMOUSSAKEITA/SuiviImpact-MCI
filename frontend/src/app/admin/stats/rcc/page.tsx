@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import Link from "next/link";
+import { PageBackLink, PageHeader } from "@/components/page-header";
 import { useState } from "react";
 
 import { ProgressBar } from "@/components/execution-badge";
@@ -30,14 +30,12 @@ function StatsRccContent() {
 
   return (
     <>
-      <div>
-        <Link href="/admin/stats" className="text-sm font-medium text-graphite hover:underline">
-          ← Statistiques
-        </Link>
-        <h1 className="mt-2 font-display text-[var(--text-heading-sm)] text-graphite">
-          Statistiques — Recommandations RCC
-        </h1>
-      </div>
+      <PageBackLink href="/admin/stats">← Statistiques</PageBackLink>
+      <PageHeader
+        className="mt-2"
+        title="Recommandations RCC"
+        description="Filtrage sur la date de la recommandation RCC."
+      />
 
       <StatsPeriodFilter
         dateFieldHint="Filtrage sur la date de la recommandation RCC."

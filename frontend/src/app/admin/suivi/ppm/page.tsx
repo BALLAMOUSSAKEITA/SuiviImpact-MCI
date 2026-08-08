@@ -255,7 +255,7 @@ function SuiviPpmContent() {
 
       <div className="table-shell">
         <table className="table-grain min-w-[640px]">
-          <thead className="bg-paper">
+          <thead>
             <tr>
               <th className="px-4 py-3 text-left font-medium text-slate">N°</th>
               <th className="px-4 py-3 text-left font-medium text-slate">Intitulé</th>
@@ -273,7 +273,7 @@ function SuiviPpmContent() {
               </tr>
             )}
             {items.map((item) => (
-              <tr key={item.id} className="hover:bg-paper">
+              <tr key={item.id} className="hover:bg-veil">
                 <td className="px-4 py-3">{item.numero ?? "—"}</td>
                 <td className="max-w-xs truncate px-4 py-3">{item.intitule}</td>
                 <td className="px-4 py-3">

@@ -91,7 +91,7 @@ export function TachePlanTable({ taches, queryKey }: TachePlanTableProps) {
             {taches.map((tache) => (
               <tr key={tache.id}>
                 <td>
-                  <span className="inline-flex rounded-full bg-forest-ink/8 px-2.5 py-0.5 text-xs font-bold text-forest-ink">
+                  <span className="inline-flex rounded-full bg-veil px-2.5 py-0.5 text-xs font-semibold text-graphite">
                     {tache.code}
                   </span>
                 </td>

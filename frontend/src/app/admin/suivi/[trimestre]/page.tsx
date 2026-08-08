@@ -7,6 +7,7 @@ import { useState } from "react";
 
 import { DirectionFilter } from "@/components/direction-filter";
 import { ExecutionBadge } from "@/components/execution-badge";
+import { PageHeader } from "@/components/page-header";
 import { TrimestreTabs } from "@/components/trimestre-tabs";
 import { Button } from "@/components/ui/button";
 import { getSuivi } from "@/lib/api";
@@ -29,14 +30,10 @@ function SuiviContent() {
 
   return (
     <>
-        <div>
-          <h1 className="text-xl font-bold text-graphite sm:text-2xl">
-            Suivi — T{trimestre} {DEFAULT_ANNEE}
-          </h1>
-          <p className="mt-1 text-sm text-fog">
-            Tableau de suivi des activités et taux d&apos;exécution
-          </p>
-        </div>
+      <PageHeader
+        title={`Suivi — T${trimestre} ${DEFAULT_ANNEE}`}
+        description="Tableau de suivi des activités et taux d'exécution"
+      />
 
         <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
           <TrimestreTabs basePath="/admin/suivi" currentTrimestre={trimestre} />
@@ -45,7 +42,7 @@ function SuiviContent() {
 
         <div className="table-shell">
           <table className="table-grain min-w-[720px]">
-            <thead className="bg-paper">
+            <thead>
               <tr>
                 <th className="px-4 py-3 text-left font-medium text-slate">Code</th>
                 <th className="px-4 py-3 text-left font-medium text-slate">Description</th>
@@ -72,7 +69,7 @@ function SuiviContent() {
                 </tr>
               )}
               {activites.map((a) => (
-                <tr key={a.id} className="hover:bg-paper">
+                <tr key={a.id} className="hover:bg-veil">
                   <td className="px-4 py-3 font-medium">{a.code}</td>
                   <td className="max-w-xs truncate px-4 py-3">{a.description}</td>
                   <td className="px-4 py-3">

@@ -43,7 +43,7 @@ function SuiviProjetContent() {
 
       <div className="table-shell">
         <table className="table-grain min-w-[700px]">
-          <thead className="bg-paper">
+          <thead>
             <tr>
               <th className="px-4 py-3 text-left font-medium text-slate">Projet</th>
               <th className="px-4 py-3 text-left font-medium text-slate">Budget</th>
@@ -84,7 +84,7 @@ function SuiviProjetContent() {
                 <tr
                   key={p.id}
                   className={cn(
-                    "cursor-pointer hover:bg-paper",
+                    "cursor-pointer hover:bg-veil",
                     selected?.id === p.id && "bg-veil"
                   )}
                   onClick={() => setSelected(p)}
@@ -198,7 +198,7 @@ function SuiviProjetDrawer({
       <div className="mt-6 space-y-5">
         {projet.composantes.map((comp) => (
           <div key={comp.id}>
-            <h4 className="text-xs font-bold uppercase tracking-wide text-fog">
+            <h4 className="text-xs font-semibold text-slate">
               {comp.libelle || `Composante ${comp.ordre}`}
             </h4>
             <ul className="mt-2 divide-y divide-cloud/50">

@@ -281,7 +281,7 @@ export function Sidebar({
                           onClick={() => setFlyoutHref(null)}
                         />
                         <div className="dropdown-panel absolute left-full top-0 z-50 ml-2 min-w-[180px] py-1.5">
-                          <p className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-fog">
+                          <p className="px-3 py-1.5 text-xs font-semibold text-slate">
                             {item.label}
                           </p>
                           {children.map(({ href, label, icon: ChildIcon }) => {

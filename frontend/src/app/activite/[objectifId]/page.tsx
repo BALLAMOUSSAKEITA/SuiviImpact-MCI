@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { PageBackLink, PageHeader } from "@/components/page-header";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -111,23 +112,18 @@ function ActivitesContent() {
 
   return (
     <>
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <Link href="/admin/objectifs" className="text-sm text-forest-ink hover:underline">
-              ← Objectifs
-            </Link>
-            <h1 className="mt-2 text-2xl font-bold text-graphite">
-              Activités — {objectif?.code ?? `Objectif #${objectifId}`}
-            </h1>
-            <p className="mt-1 text-sm text-fog">{objectif?.description}</p>
-          </div>
-        </div>
+        <PageBackLink href="/admin/objectifs">← Objectifs</PageBackLink>
+        <PageHeader
+          className="mt-2"
+          title={`Activités — ${objectif?.code ?? `Objectif #${objectifId}`}`}
+          description={objectif?.description}
+        />
 
         {canWrite && (
           <div className="panel-grain">
             <button
               type="button"
-              className="text-sm font-medium text-forest-ink"
+              className="text-sm font-medium text-graphite"
               onClick={() => setOpen((v) => !v)}
             >
               {open ? "− Masquer" : "+ Nouvelle activité"}
@@ -166,7 +162,7 @@ function ActivitesContent() {
                         onClick={() => toggleDirection(d.id)}
                         className={
                           selectedDirections.includes(d.id)
-                            ? "rounded-full bg-forest-ink px-3 py-1 text-xs text-white"
+                            ? "rounded-full bg-graphite px-3 py-1 text-xs text-white"
                             : "rounded-full bg-veil px-3 py-1 text-xs text-slate"
                         }
                       >
@@ -189,8 +185,8 @@ function ActivitesContent() {
                             onClick={() => toggleTrimestre(year, t)}
                             className={
                               isTrimestreSelected(year, t)
-                                ? "rounded bg-forest-ink px-2 py-1 text-xs text-white"
-                                : "rounded bg-veil px-2 py-1 text-xs text-slate"
+                                ? "rounded-[var(--radius-sm)] bg-graphite px-2 py-1 text-xs text-white"
+                                : "rounded-[var(--radius-sm)] bg-veil px-2 py-1 text-xs text-slate"
                             }
                           >
                             T{t}
@@ -221,8 +217,8 @@ function ActivitesContent() {
         )}
 
         <div className="table-shell">
-          <table className="min-w-full text-sm">
-            <thead className="bg-paper">
+          <table className="table-grain">
+            <thead>
               <tr>
                 <th className="px-3 py-3 text-left">Code</th>
                 <th className="px-3 py-3 text-left">Activité</th>

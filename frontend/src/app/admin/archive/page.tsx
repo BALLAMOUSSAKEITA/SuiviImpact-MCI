@@ -8,6 +8,7 @@ import { Folder, File } from "lucide-react";
 
 import { useAuth } from "@/components/auth-provider";
 import { ConfirmDialog } from "@/components/confirm-dialog";
+import { PageHeader } from "@/components/page-header";
 import { FileUploadTrigger } from "@/components/file-upload-field";
 import { Button } from "@/components/ui/button";
 import {
@@ -91,15 +92,12 @@ function ArchiveContent() {
 
   return (
     <>
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-graphite">Archive</h1>
-            <p className="mt-1 text-sm text-fog">
-              Explorateur de documents — racine
-            </p>
-          </div>
-          {canWrite && (
-            <div className="flex gap-2">
+      <PageHeader
+        title="Archive"
+        description="Explorateur de documents — racine"
+        actions={
+          canWrite ? (
+            <div className="flex flex-wrap gap-2">
               <Button variant="outline" onClick={() => setShowNewFolder(true)}>
                 Nouveau dossier
               </Button>
@@ -109,8 +107,9 @@ function ArchiveContent() {
                 onFile={(file) => uploadMutation.mutate(file)}
               />
             </div>
-          )}
-        </div>
+          ) : undefined
+        }
+      />
 
         {showNewFolder && canWrite && (
           <div className="panel-grain flex gap-2 p-4">
@@ -142,7 +141,7 @@ function ArchiveContent() {
               if (file) uploadMutation.mutate(file);
             }}
           >
-            <p className="text-sm text-fog">
+            <p className="text-sm text-slate">
               Glissez-déposez un fichier ici pour l&apos;uploader à la racine
             </p>
           </div>
@@ -159,7 +158,7 @@ function ArchiveContent() {
               >
                 <Link
                   href={`/admin/archive/dossier/${d.id}`}
-                  className="flex items-center gap-2 text-sm font-medium text-graphite hover:text-forest-ink"
+                  className="flex items-center gap-2 text-sm font-medium text-graphite hover:underline"
                 >
                   <Folder className="h-4 w-4 text-amber-500" />
                   {d.nom}

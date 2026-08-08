@@ -5,11 +5,11 @@ import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const DASHBOARDS = [
-  { href: "/admin/stats/pao", label: "Plan d'Action (PAO)", desc: "Activités et progression", icon: ClipboardList, color: "text-emerald-600 bg-emerald-50" },
-  { href: "/admin/stats/rcc", label: "Recommandations RCC", desc: "Exécution des RCC", icon: Briefcase, color: "text-blue-600 bg-blue-50" },
-  { href: "/admin/stats/missions", label: "Missions", desc: "Exécution des missions", icon: BarChart3, color: "text-violet-600 bg-violet-50" },
-  { href: "/admin/stats/ppm", label: "PPM", desc: "Statuts des marchés", icon: ShoppingCart, color: "text-amber-600 bg-amber-50" },
-  { href: "/admin/stats/projets", label: "Projets", desc: "Exécution financière et physique", icon: FolderKanban, color: "text-rose-600 bg-rose-50" },
+  { href: "/admin/stats/pao", label: "Plan d'Action (PAO)", desc: "Activités et progression", icon: ClipboardList },
+  { href: "/admin/stats/rcc", label: "Recommandations RCC", desc: "Exécution des RCC", icon: Briefcase },
+  { href: "/admin/stats/missions", label: "Missions", desc: "Exécution des missions", icon: BarChart3 },
+  { href: "/admin/stats/ppm", label: "PPM", desc: "Statuts des marchés", icon: ShoppingCart },
+  { href: "/admin/stats/projets", label: "Projets", desc: "Exécution financière et physique", icon: FolderKanban },
 ];
 
 export default function StatsHubPage() {
@@ -22,20 +22,20 @@ export default function StatsHubPage() {
       />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {DASHBOARDS.map(({ href, label, desc, icon: Icon, color }) => (
+        {DASHBOARDS.map(({ href, label, desc, icon: Icon }) => (
           <Link key={href} href={href} className="group block">
-            <Card className="h-full transition-all duration-[var(--duration-normal)] group-hover:-translate-y-1">
-              <CardHeader>
+            <Card className="h-full p-4 transition-shadow sm:p-5 group-hover:shadow-[var(--shadow-subtle)]">
+              <CardHeader className="p-0 pb-2">
                 <CardTitle className="flex items-center gap-3">
-                  <span className={`flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)] ${color}`}>
-                    <Icon className="h-[18px] w-[18px]" />
+                  <span className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-sm)] bg-veil text-graphite">
+                    <Icon className="h-[18px] w-[18px]" strokeWidth={1.75} />
                   </span>
                   {label}
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="mb-3 text-sm text-fog">{desc}</p>
-                <span className="inline-flex items-center gap-1 text-sm font-semibold text-forest-ink group-hover:gap-2 transition-all">
+              <CardContent className="p-0">
+                <p className="mb-3 text-sm text-slate">{desc}</p>
+                <span className="inline-flex items-center gap-1 text-sm font-medium text-graphite transition-all group-hover:gap-2">
                   Consulter
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />

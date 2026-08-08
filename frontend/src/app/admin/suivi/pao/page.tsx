@@ -48,7 +48,7 @@ function SuiviPaoContent() {
 
       <div className="table-shell">
         <table className="table-grain min-w-[700px]">
-          <thead className="bg-paper">
+          <thead>
             <tr>
               <th className="px-4 py-3 text-left font-medium text-slate">Code</th>
               <th className="px-4 py-3 text-left font-medium text-slate">Activité</th>
@@ -81,7 +81,7 @@ function SuiviPaoContent() {
                 <tr
                   key={a.id}
                   className={cn(
-                    "cursor-pointer hover:bg-paper",
+                    "cursor-pointer hover:bg-veil",
                     selected?.id === a.id && "bg-veil"
                   )}
                   onClick={() => setSelected(a)}
@@ -171,7 +171,7 @@ function SuiviPaoDrawer({
         <DetailRow label="Email responsable">{activite.email_responsable}</DetailRow>
       </DetailDrawerRows>
 
-      <h3 className="mt-6 text-sm font-bold text-graphite">
+      <h3 className="mt-6 text-sm font-semibold text-graphite">
         Tâches ({taches.length})
       </h3>
 

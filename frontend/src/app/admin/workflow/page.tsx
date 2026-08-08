@@ -355,7 +355,7 @@ function WorkflowFileButton({ actionId, fileName }: { actionId: number; fileName
       type="button"
       onClick={() => void openFile()}
       disabled={loading}
-      className="mt-0.5 flex items-center gap-1 text-[11px] font-medium text-forest-ink hover:underline"
+      className="mt-0.5 flex items-center gap-1 text-xs font-medium text-graphite hover:underline"
     >
       <FileText className="h-3 w-3" />
       {loading ? "Ouverture…" : fileName}
