@@ -1,37 +1,25 @@
 "use client";
 
 import { useQueries, useQuery } from "@tanstack/react-query";
-import {
-  Activity,
-  AlertTriangle,
-  Briefcase,
-  ClipboardList,
-  FolderKanban,
-  LayoutGrid,
-  Scale,
-  Target,
-  TrendingUp,
-} from "lucide-react";
 import { useState } from "react";
 
 import { ComparisonBarChart } from "@/components/charts/comparison-bar-chart";
 import { ChartPanel } from "@/components/charts/chart-panel";
 import { FunnelBarChart } from "@/components/charts/funnel-bar-chart";
-import { ProgressionRing } from "@/components/charts/progression-ring";
-import {
-  StatusDonutChart,
-  StatusLegend,
-} from "@/components/charts/status-donut-chart";
 import {
   StatusStackBar,
-  StatusStackLegend,
 } from "@/components/charts/status-stack-bar";
 import { DashboardToolbar } from "@/components/dashboard/dashboard-toolbar";
-import { KpiMetric, ModuleTile } from "@/components/dashboard/kpi-metric";
+import {
+  DashboardSurface,
+  ExecutionGauge,
+  MetricStrip,
+  ModuleOverview,
+  StatusBreakdown,
+  type MetricItem,
+} from "@/components/dashboard/kpi-metric";
 import { DirectionFilter } from "@/components/direction-filter";
-import { ProgressBar } from "@/components/execution-badge";
 import { PageHeader } from "@/components/page-header";
-import { StatCard, StatGrid } from "@/components/stat-card";
 import { StatsQueryStatus } from "@/components/stats-query-status";
 import { useStatsPeriodState } from "@/components/stats-period-filter";
 import { BRAND } from "@/lib/brand";
@@ -55,12 +43,12 @@ import { TrimestreFilter } from "@/components/trimestre-tabs";
 type StatsPeriodState = ReturnType<typeof useStatsPeriodState>;
 
 const views = [
-  { id: "synthese", label: "Synthèse", icon: LayoutGrid },
-  { id: "activites", label: "Activités", icon: Activity },
-  { id: "rcc", label: "RCC", icon: Scale },
-  { id: "missions", label: "Missions", icon: Briefcase },
-  { id: "ppm", label: "PPM", icon: ClipboardList },
-  { id: "projets", label: "Projets", icon: FolderKanban },
+  { id: "synthese", label: "Synthèse" },
+  { id: "activites", label: "Activités" },
+  { id: "rcc", label: "RCC" },
+  { id: "missions", label: "Missions" },
+  { id: "ppm", label: "PPM" },
+  { id: "projets", label: "Projets" },
 ] as const;
 
 type ViewId = (typeof views)[number]["id"];
@@ -88,7 +76,7 @@ export default function AdminDashboardPage() {
     ) : null;
 
   return (
-    <div className="space-y-5">
+    <div className="mx-auto max-w-[1400px] space-y-4">
       <PageHeader
         eyebrow={`${BRAND.bureauShort} · ${BRAND.program}`}
         title="Tableau de bord"
@@ -122,8 +110,6 @@ export default function AdminDashboardPage() {
     </div>
   );
 }
-
-/* ─── Synthèse ─── */
 
 function SyntheseView({
   periodState,
@@ -184,114 +170,84 @@ function SyntheseView({
     projets?.execution_physique ?? 0,
   ]);
 
+  const retards = activites?.en_retard ?? 0;
+
+  const modules = [
+    activites && {
+      id: "activites",
+      title: "Activités PAO",
+      total: activites.total,
+      progression: activites.progression,
+      segments: executionStatusSlices(activites, true),
+    },
+    rcc && {
+      id: "rcc",
+      title: "Recommandations RCC",
+      total: rcc.total,
+      progression: rcc.progression,
+      segments: executionStatusSlices(rcc),
+    },
+    missions && {
+      id: "missions",
+      title: "Missions",
+      total: missions.total,
+      progression: missions.progression,
+      segments: executionStatusSlices(missions),
+    },
+  ].filter(Boolean) as {
+    id: ViewId;
+    title: string;
+    total: number;
+    progression: string;
+    segments: ReturnType<typeof executionStatusSlices>;
+  }[];
+
   return (
     <StatsQueryStatus isLoading={isLoading} isError={isError} error={error}>
-      <div className="space-y-5 animate-fade-in">
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <KpiMetric
-            label="Éléments suivis"
-            value={totalItems}
-            hint="Tous modules"
-            icon={Target}
-            iconBgClassName="bg-mint"
-            iconClassName="text-forest-ink"
-          />
-          <KpiMetric
-            label="Progression moyenne"
-            value={`${avgExec} %`}
-            hint="Exécution globale"
-            icon={TrendingUp}
-            iconBgClassName="bg-sky"
-            iconClassName="text-carbon"
-          />
-          <KpiMetric
-            label="Activités en retard"
-            value={activites?.en_retard ?? 0}
-            hint="Tâches PAO dépassées"
-            icon={AlertTriangle}
-            iconBgClassName="bg-peach"
-            iconClassName="text-[#c0392b]"
-          />
-          <KpiMetric
-            label="Projets actifs"
-            value={projets?.total ?? 0}
-            hint="Suivi financier & physique"
-            icon={FolderKanban}
-            iconBgClassName="bg-lavender"
-            iconClassName="text-carbon"
-          />
-        </div>
+      <DashboardSurface>
+        <MetricStrip
+          metrics={[
+            {
+              label: "Éléments suivis",
+              value: totalItems,
+              hint: "Ensemble des modules",
+            },
+            {
+              label: "Progression moyenne",
+              value: `${avgExec} %`,
+              hint: "Taux d'exécution global",
+            },
+            {
+              label: "Activités en retard",
+              value: retards,
+              hint: "Tâches PAO dépassées",
+              emphasize: retards > 0,
+            },
+            {
+              label: "Projets actifs",
+              value: projets?.total ?? 0,
+              hint: "Suivi financier et physique",
+            },
+          ]}
+        />
 
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {activites && (
-            <ModuleTile
-              title="Activités PAO"
-              subtitle={`${activites.total} activité${activites.total > 1 ? "s" : ""}`}
-              progression={activites.progression}
-              accentBar="bg-forest-ink"
-              accentText="text-forest-ink"
-              onClick={() => onNavigate("activites")}
-            >
-              <StatusStackBar
-                segments={executionStatusSlices(activites, true)}
-                height={8}
-              />
-              <StatusStackLegend
-                segments={executionStatusSlices(activites, true)}
-                compact
-                className="mt-3"
-              />
-            </ModuleTile>
-          )}
-          {rcc && (
-            <ModuleTile
-              title="Recommandations RCC"
-              subtitle={`${rcc.total} recommandation${rcc.total > 1 ? "s" : ""}`}
-              progression={rcc.progression}
-              accentBar="bg-ice-blue"
-              accentText="text-carbon"
-              onClick={() => onNavigate("rcc")}
-            >
-              <StatusStackBar segments={executionStatusSlices(rcc)} height={8} />
-              <StatusStackLegend
-                segments={executionStatusSlices(rcc)}
-                compact
-                className="mt-3"
-              />
-            </ModuleTile>
-          )}
-          {missions && (
-            <ModuleTile
-              title="Missions"
-              subtitle={`${missions.total} mission${missions.total > 1 ? "s" : ""}`}
-              progression={missions.progression}
-              accentBar="bg-periwinkle"
-              accentText="text-carbon"
-              onClick={() => onNavigate("missions")}
-            >
-              <StatusStackBar segments={executionStatusSlices(missions)} height={8} />
-              <StatusStackLegend
-                segments={executionStatusSlices(missions)}
-                compact
-                className="mt-3"
-              />
-            </ModuleTile>
-          )}
-        </div>
+        <ModuleOverview
+          modules={modules}
+          onSelect={(id) => onNavigate(id as ViewId)}
+        />
 
         <div className="grid gap-3 lg:grid-cols-2">
           {ppm && (
             <ChartPanel
               title="Pipeline PPM"
-              subtitle={`${ppm.total} marché${ppm.total > 1 ? "s" : ""}`}
-              className="border border-cloud/70 shadow-[var(--shadow-subtle)]"
+              subtitle={`${ppm.total} marché${ppm.total > 1 ? "s" : ""} sur la période`}
               action={
                 <button
                   type="button"
                   onClick={() => onNavigate("ppm")}
-                  className="text-xs font-medium text-forest-ink hover:underline"
+                  className="text-xs font-medium text-slate hover:text-graphite"
                 >
-                  Détail
+                  Ouvrir
                 </button>
               }
             >
@@ -301,15 +257,14 @@ function SyntheseView({
           {projets && (
             <ChartPanel
               title="Exécution projets"
-              subtitle="Financier vs physique"
-              className="border border-cloud/70 shadow-[var(--shadow-subtle)]"
+              subtitle="Moyennes financière et physique"
               action={
                 <button
                   type="button"
                   onClick={() => onNavigate("projets")}
-                  className="text-xs font-medium text-forest-ink hover:underline"
+                  className="text-xs font-medium text-slate hover:text-graphite"
                 >
-                  Détail
+                  Ouvrir
                 </button>
               }
             >
@@ -321,12 +276,10 @@ function SyntheseView({
             </ChartPanel>
           )}
         </div>
-      </div>
+      </DashboardSurface>
     </StatsQueryStatus>
   );
 }
-
-/* ─── Vues détaillées ─── */
 
 function ExecutionDashboard({
   stats,
@@ -347,59 +300,42 @@ function ExecutionDashboard({
     includeRetard,
   );
 
+  const metrics: MetricItem[] = [
+    { label: "Total", value: stats.total },
+    { label: "Non démarrées", value: stats.non_demare },
+    { label: "En cours", value: stats.en_cours },
+    { label: "Terminées", value: stats.termine },
+  ];
+  if (includeRetard && stats.en_retard != null) {
+    metrics.push({
+      label: "En retard",
+      value: stats.en_retard,
+      emphasize: stats.en_retard > 0,
+    });
+  }
+
   return (
-    <div className="space-y-4">
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-        <StatCard title="Total" value={stats.total} accent="forest" className="lg:col-span-1" />
-        <StatCard title="Non démarrées" value={stats.non_demare} accent="default" />
-        <StatCard title="En cours" value={stats.en_cours} accent="sky" />
-        <StatCard title="Terminées" value={stats.termine} accent="mint" />
-        {includeRetard && stats.en_retard != null && (
-          <StatCard title="En retard" value={stats.en_retard} accent="alert" />
-        )}
-      </div>
+    <DashboardSurface>
+      <MetricStrip metrics={metrics} />
 
       <div className="grid gap-3 lg:grid-cols-12">
         <ChartPanel
-          title="Répartition"
-          subtitle="Distribution par statut d'exécution"
-          className="border border-cloud/70 shadow-[var(--shadow-subtle)] lg:col-span-8"
+          title="Répartition par statut"
+          subtitle={`${stats.total} élément${stats.total > 1 ? "s" : ""} sur la période`}
+          className="lg:col-span-8"
         >
-          <StatusStackBar segments={slices} height={10} className="mb-4" />
-          <div className="grid gap-4 sm:grid-cols-[1fr_auto]">
-            <StatusDonutChart
-              data={slices}
-              centerValue={stats.total}
-              centerLabel="Total"
-              height={240}
-              innerRadius={58}
-              outerRadius={82}
-            />
-            <StatusLegend items={slices} className="sm:min-w-[150px] sm:pt-6" />
-          </div>
+          <StatusStackBar segments={slices} height={6} className="mb-5" />
+          <StatusBreakdown segments={slices} />
         </ChartPanel>
 
         <ChartPanel
-          title="Progression"
-          subtitle="Taux d'exécution"
-          className="border border-cloud/70 shadow-[var(--shadow-subtle)] lg:col-span-4"
+          title="Taux d'exécution"
+          className="lg:col-span-4"
         >
-          <div className="flex flex-col items-center py-2">
-            <ProgressionRing
-              value={stats.progression}
-              size={128}
-              strokeWidth={9}
-              label="Exécution"
-            />
-            <ProgressBar
-              label="Avancement"
-              value={stats.progression}
-              className="mt-6 w-full"
-            />
-          </div>
+          <ExecutionGauge value={stats.progression} label="Progression globale" />
         </ChartPanel>
       </div>
-    </div>
+    </DashboardSurface>
   );
 }
 
@@ -419,11 +355,7 @@ function ActivitesView({
 
   return (
     <StatsQueryStatus isLoading={isLoading} isError={isError} error={error}>
-      {stats ? (
-        <div className="animate-fade-in">
-          <ExecutionDashboard stats={stats} includeRetard />
-        </div>
-      ) : null}
+      {stats ? <ExecutionDashboard stats={stats} includeRetard /> : null}
     </StatsQueryStatus>
   );
 }
@@ -444,11 +376,7 @@ function RccView({
 
   return (
     <StatsQueryStatus isLoading={isLoading} isError={isError} error={error}>
-      {stats ? (
-        <div className="animate-fade-in">
-          <ExecutionDashboard stats={stats} />
-        </div>
-      ) : null}
+      {stats ? <ExecutionDashboard stats={stats} /> : null}
     </StatsQueryStatus>
   );
 }
@@ -469,11 +397,7 @@ function MissionsView({
 
   return (
     <StatsQueryStatus isLoading={isLoading} isError={isError} error={error}>
-      {stats ? (
-        <div className="animate-fade-in">
-          <ExecutionDashboard stats={stats} />
-        </div>
-      ) : null}
+      {stats ? <ExecutionDashboard stats={stats} /> : null}
     </StatsQueryStatus>
   );
 }
@@ -492,46 +416,37 @@ function PpmView({ periodState }: { periodState: StatsPeriodState }) {
   return (
     <StatsQueryStatus isLoading={isLoading} isError={isError} error={error}>
       {stats ? (
-        <div className="space-y-4 animate-fade-in">
-          <StatGrid className="xl:grid-cols-5">
-            <StatCard title="Total marchés" value={stats.total} accent="forest" />
-            <StatCard title={PPM_STATUT_LABELS.dao_elabore} value={stats.dao_elabore} accent="sky" />
-            <StatCard title={PPM_STATUT_LABELS.dao_publie} value={stats.dao_publie} accent="sky" />
-            <StatCard title={PPM_STATUT_LABELS.marche_attribue} value={stats.marche_attribue} accent="mint" />
-            <StatCard title={PPM_STATUT_LABELS.contrat_signe} value={stats.contrat_signe} accent="forest" />
-          </StatGrid>
+        <DashboardSurface>
+          <MetricStrip
+            metrics={[
+              { label: "Total marchés", value: stats.total },
+              { label: PPM_STATUT_LABELS.dao_elabore, value: stats.dao_elabore },
+              { label: PPM_STATUT_LABELS.dao_publie, value: stats.dao_publie },
+              { label: PPM_STATUT_LABELS.contrat_signe, value: stats.contrat_signe },
+            ]}
+          />
 
           <div className="grid gap-3 lg:grid-cols-12">
             <ChartPanel
-              title="Entonnoir des statuts"
-              subtitle="Cycle de passation des marchés"
-              className="border border-cloud/70 shadow-[var(--shadow-subtle)] lg:col-span-8"
+              title="Cycle de passation"
+              subtitle="Progression par statut de marché"
+              className="lg:col-span-8"
             >
               <FunnelBarChart data={funnel} height={260} />
             </ChartPanel>
 
             <ChartPanel
               title="Contractualisation"
-              subtitle="Contrats signés / total"
-              className="border border-cloud/70 shadow-[var(--shadow-subtle)] lg:col-span-4"
+              subtitle="Part des contrats signés"
+              className="lg:col-span-4"
             >
-              <div className="flex flex-col items-center py-2">
-                <ProgressionRing
-                  value={progression}
-                  size={128}
-                  strokeWidth={9}
-                  fillColor="#009959"
-                  label="Signés"
-                />
-                <ProgressBar
-                  label="Contrats signés / total"
-                  value={progression}
-                  className="mt-6 w-full"
-                />
-              </div>
+              <ExecutionGauge
+                value={progression}
+                label="Contrats signés / total"
+              />
             </ChartPanel>
           </div>
-        </div>
+        </DashboardSurface>
       ) : null}
     </StatsQueryStatus>
   );
@@ -547,75 +462,33 @@ function ProjetsView({ periodState }: { periodState: StatsPeriodState }) {
 
   const fin = stats ? parseProgress(stats.execution_financiere) : 0;
   const phys = stats ? parseProgress(stats.execution_physique) : 0;
-  const ecart = Math.abs(fin - phys);
+  const ecart = fin - phys;
 
   return (
     <StatsQueryStatus isLoading={isLoading} isError={isError} error={error}>
       {stats ? (
-        <div className="space-y-4 animate-fade-in">
-          <div className="grid gap-3 sm:grid-cols-3">
-            <StatCard title="Total projets" value={stats.total} accent="forest" />
-            <StatCard
-              title="Exécution financière"
-              value={`${fin.toFixed(0)} %`}
-              accent="mint"
-              showProgress
-              progressValue={stats.execution_financiere}
-            />
-            <StatCard
-              title="Exécution physique"
-              value={`${phys.toFixed(0)} %`}
-              accent="sky"
-              showProgress
-              progressValue={stats.execution_physique}
-            />
-          </div>
+        <DashboardSurface>
+          <MetricStrip
+            metrics={[
+              { label: "Total projets", value: stats.total },
+              { label: "Exécution financière", value: `${fin.toFixed(0)} %` },
+              { label: "Exécution physique", value: `${phys.toFixed(0)} %` },
+              {
+                label: "Écart financier − physique",
+                value: `${ecart >= 0 ? "+" : ""}${ecart.toFixed(0)} pts`,
+                emphasize: Math.abs(ecart) >= 15,
+              },
+            ]}
+          />
 
-          <div className="grid gap-3 lg:grid-cols-12">
-            <ChartPanel
-              title="Comparaison des exécutions"
-              subtitle="Moyennes financière et physique"
-              className="border border-cloud/70 shadow-[var(--shadow-subtle)] lg:col-span-8"
-            >
-              <ComparisonBarChart
-                financier={stats.execution_financiere}
-                physique={stats.execution_physique}
-                height={260}
-              />
-            </ChartPanel>
-
-            <ChartPanel
-              title="Écart d'exécution"
-              subtitle="Financier − physique"
-              className="border border-cloud/70 shadow-[var(--shadow-subtle)] lg:col-span-4"
-            >
-              <div className="flex h-[260px] flex-col items-center justify-center gap-4">
-                <div className="flex gap-6">
-                  <ProgressionRing
-                    value={fin}
-                    size={88}
-                    strokeWidth={7}
-                    fillColor="#009959"
-                    label="Financier"
-                  />
-                  <ProgressionRing
-                    value={phys}
-                    size={88}
-                    strokeWidth={7}
-                    fillColor="#3de1ff"
-                    label="Physique"
-                  />
-                </div>
-                <p className="text-center text-sm text-slate">
-                  Écart de{" "}
-                  <span className="font-semibold text-graphite">
-                    {ecart.toFixed(0)} pts
-                  </span>
-                </p>
-              </div>
-            </ChartPanel>
-          </div>
-        </div>
+          <ChartPanel title="Comparaison des exécutions">
+            <ComparisonBarChart
+              financier={stats.execution_financiere}
+              physique={stats.execution_physique}
+              height={280}
+            />
+          </ChartPanel>
+        </DashboardSurface>
       ) : null}
     </StatsQueryStatus>
   );

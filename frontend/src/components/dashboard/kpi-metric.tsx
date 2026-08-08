@@ -1,109 +1,215 @@
-import { cn } from "@/lib/utils";
-import type { LucideIcon } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 
-interface KpiMetricProps {
+import {
+  StatusStackBar,
+  type StackSegment,
+} from "@/components/charts/status-stack-bar";
+import { parseProgress } from "@/lib/chart-colors";
+import { cn } from "@/lib/utils";
+
+export interface MetricItem {
   label: string;
   value: number | string;
   hint?: string;
-  icon: LucideIcon;
-  iconClassName?: string;
-  iconBgClassName?: string;
-  className?: string;
+  emphasize?: boolean;
 }
 
-export function KpiMetric({
-  label,
-  value,
-  hint,
-  icon: Icon,
-  iconClassName = "text-forest-ink",
-  iconBgClassName = "bg-mint",
-  className,
-}: KpiMetricProps) {
+interface MetricStripProps {
+  metrics: MetricItem[];
+  className?: string;
+}
+export function MetricStrip({ metrics, className }: MetricStripProps) {
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-[var(--radius-card)] border border-cloud/70 bg-white p-4 shadow-[var(--shadow-subtle)] transition-[box-shadow,transform] duration-[var(--duration-normal)] hover:shadow-[var(--shadow-soft)] sm:p-5",
+        "overflow-hidden rounded-[var(--radius-card)] border border-cloud bg-white",
         className,
       )}
     >
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-slate">
-            {label}
-          </p>
-          <p className="mt-1.5 text-2xl font-semibold tabular-nums tracking-tight text-graphite sm:text-[1.75rem]">
-            {value}
-          </p>
-          {hint && (
-            <p className="mt-1 truncate text-xs text-slate">{hint}</p>
-          )}
-        </div>
-        <div
-          className={cn(
-            "flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-sm)]",
-            iconBgClassName,
-          )}
-        >
-          <Icon className={cn("size-5", iconClassName)} aria-hidden />
-        </div>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 lg:divide-x lg:divide-cloud">
+        {metrics.map((metric, i) => (
+          <div
+            key={metric.label}
+            className={cn(
+              "px-5 py-4",
+              i > 0 && "border-t border-cloud sm:border-t-0",
+              i % 2 === 1 && "sm:border-l sm:border-cloud lg:border-l-0",
+              i >= 2 && "lg:border-t-0",
+            )}
+          >
+            <p className="text-xs font-medium text-slate">{metric.label}</p>
+            <p
+              className={cn(
+                "mt-1 text-[1.625rem] font-semibold tabular-nums leading-none tracking-tight",
+                metric.emphasize ? "text-[#c0392b]" : "text-graphite",
+              )}
+            >
+              {metric.value}
+            </p>
+            {metric.hint && (
+              <p className="mt-1.5 text-xs text-slate">{metric.hint}</p>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );
 }
 
-interface ModuleTileProps {
-  title: string;
-  subtitle: string;
-  progression: number | string;
-  accentBar: string;
-  accentText: string;
-  children: React.ReactNode;
-  onClick?: () => void;
+interface ModuleOverviewProps {
+  modules: {
+    id: string;
+    title: string;
+    total: number;
+    progression: number | string;
+    segments: StackSegment[];
+  }[];
+  onSelect: (id: string) => void;
   className?: string;
 }
 
-export function ModuleTile({
-  title,
-  subtitle,
-  progression,
-  accentBar,
-  accentText,
-  children,
-  onClick,
+/** Tableau de synthèse par module — dense, lisible, sans fioritures. */
+export function ModuleOverview({
+  modules,
+  onSelect,
   className,
-}: ModuleTileProps) {
-  const pct =
-    typeof progression === "string"
-      ? parseFloat(progression)
-      : progression;
-
+}: ModuleOverviewProps) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
+    <div
       className={cn(
-        "group relative flex w-full flex-col overflow-hidden rounded-[var(--radius-card)] border border-cloud/70 bg-white p-4 text-left shadow-[var(--shadow-subtle)] transition-all duration-[var(--duration-normal)] hover:-translate-y-0.5 hover:border-cloud hover:shadow-[var(--shadow-soft)] sm:p-5",
+        "overflow-hidden rounded-[var(--radius-card)] border border-cloud bg-white",
         className,
       )}
     >
-      <div
-        className={cn("absolute inset-x-0 top-0 h-0.5", accentBar)}
-        aria-hidden
-      />
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h3 className={cn("text-sm font-semibold", accentText)}>{title}</h3>
-          <p className="mt-0.5 text-xs text-slate">{subtitle}</p>
-        </div>
-        <span className="shrink-0 rounded-full bg-veil px-2.5 py-1 text-xs font-semibold tabular-nums text-graphite">
-          {Number.isFinite(pct) ? `${pct.toFixed(0)} %` : "—"}
-        </span>
+      <div className="hidden border-b border-cloud px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.05em] text-slate md:grid md:grid-cols-[minmax(0,1.4fr)_4.5rem_4.5rem_minmax(0,1fr)_1.25rem] md:gap-4">
+        <span>Module</span>
+        <span className="text-right">Total</span>
+        <span className="text-right">Exec.</span>
+        <span>Répartition</span>
+        <span aria-hidden />
       </div>
-      <div className="mt-4 flex-1">{children}</div>
-      <p className="mt-3 text-xs font-medium text-slate opacity-0 transition-opacity group-hover:opacity-100">
-        Voir le détail →
+
+      <ul className="divide-y divide-cloud">
+        {modules.map((mod) => {
+          const pct = parseProgress(mod.progression);
+          return (
+            <li key={mod.id}>
+              <button
+                type="button"
+                onClick={() => onSelect(mod.id)}
+                className="group grid w-full gap-3 px-5 py-4 text-left transition-colors hover:bg-veil/60 md:grid-cols-[minmax(0,1.4fr)_4.5rem_4.5rem_minmax(0,1fr)_1.25rem] md:items-center md:gap-4"
+              >
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-graphite">{mod.title}</p>
+                  <div className="mt-2 md:hidden">
+                    <StatusStackBar segments={mod.segments} height={5} />
+                  </div>
+                </div>
+                <p className="text-sm tabular-nums text-graphite md:text-right">
+                  <span className="mr-2 text-xs text-slate md:hidden">Total</span>
+                  {mod.total}
+                </p>
+                <p className="text-sm font-medium tabular-nums text-graphite md:text-right">
+                  <span className="mr-2 text-xs font-normal text-slate md:hidden">
+                    Exec.
+                  </span>
+                  {pct.toFixed(0)}&nbsp;%
+                </p>
+                <div className="hidden md:block">
+                  <StatusStackBar segments={mod.segments} height={5} />
+                </div>
+                <ChevronRight
+                  className="hidden size-4 text-slate transition-colors group-hover:text-graphite md:block"
+                  aria-hidden
+                />
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
+interface ExecutionGaugeProps {
+  value: number | string;
+  label: string;
+  className?: string;
+}
+
+/** Indicateur d'exécution typographique — sans anneau décoratif. */
+export function ExecutionGauge({ value, label, className }: ExecutionGaugeProps) {
+  const pct = parseProgress(value);
+
+  return (
+    <div className={cn("flex h-full flex-col justify-center", className)}>
+      <p className="text-xs font-medium text-slate">{label}</p>
+      <div className="mt-2 flex items-baseline gap-0.5">
+        <span className="text-[2.75rem] font-semibold tabular-nums leading-none tracking-tight text-graphite">
+          {pct.toFixed(0)}
+        </span>
+        <span className="text-lg font-medium text-slate">%</span>
+      </div>
+      <div className="mt-5 h-1 w-full overflow-hidden rounded-full bg-cloud">
+        <div
+          className="h-full rounded-full bg-forest-ink transition-[width] duration-500 ease-[var(--ease-out-expo)]"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
+interface StatusBreakdownProps {
+  segments: StackSegment[];
+  className?: string;
+}
+
+/** Grille de compteurs par statut — alternative sobre au donut. */
+export function StatusBreakdown({ segments, className }: StatusBreakdownProps) {
+  const visible = segments.filter((s) => s.value > 0);
+  if (visible.length === 0) {
+    return (
+      <p className={cn("text-sm text-slate", className)}>
+        Aucune donnée sur la période sélectionnée.
       </p>
-    </button>
+    );
+  }
+
+  return (
+    <div
+      className={cn(
+        "grid gap-px overflow-hidden rounded-[var(--radius-sm)] border border-cloud bg-cloud sm:grid-cols-2",
+        className,
+      )}
+    >
+      {visible.map((seg) => (
+        <div key={seg.name} className="bg-white px-4 py-3">
+          <div className="flex items-center gap-2">
+            <span
+              className="size-2 shrink-0 rounded-full"
+              style={{ backgroundColor: seg.color }}
+            />
+            <span className="text-xs text-slate">{seg.name}</span>
+          </div>
+          <p className="mt-1 text-lg font-semibold tabular-nums text-graphite">
+            {seg.value}
+          </p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+interface DashboardSurfaceProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+export function DashboardSurface({ children, className }: DashboardSurfaceProps) {
+  return (
+    <div className={cn("space-y-4", className)}>
+      {children}
+    </div>
   );
 }

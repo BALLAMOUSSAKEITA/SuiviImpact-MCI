@@ -80,8 +80,8 @@ export function StatsPeriodCompact({ state, className }: StatsPeriodCompactProps
         aria-expanded={open}
         aria-haspopup="dialog"
         className={cn(
-          "inline-flex items-center gap-2 rounded-[var(--radius-sm)] border border-cloud bg-white px-3 py-1.5 text-sm font-medium text-graphite shadow-[var(--shadow-subtle)] transition-colors hover:bg-veil",
-          open && "ring-1 ring-graphite/20",
+          "inline-flex items-center gap-2 rounded-[var(--radius-sm)] border border-cloud bg-white px-3 py-1.5 text-sm text-graphite transition-colors hover:bg-veil/80",
+          open && "border-graphite/30",
         )}
       >
         <Calendar className="size-3.5 shrink-0 text-slate" aria-hidden />

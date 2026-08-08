@@ -6,6 +6,8 @@ interface StackSegment {
   color: string;
 }
 
+export type { StackSegment };
+
 interface StatusStackBarProps {
   segments: StackSegment[];
   height?: number;

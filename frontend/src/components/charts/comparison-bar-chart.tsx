@@ -33,7 +33,7 @@ export function ComparisonBarChart({
     {
       name: "Physique",
       value: parseProgress(physique),
-      fill: "#3de1ff",
+      fill: "#5eb8cc",
     },
   ];
 

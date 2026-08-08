@@ -1,15 +1,15 @@
-/** Palette graphiques alignée sur la charte SuiviImpact */
+/** Palette graphiques — sobre, lisible, une seule accentuation verte. */
 
 export const STATUS_COLORS = {
-  non_demare: "#c1c1c1",
-  en_cours: "#3de1ff",
+  non_demare: "#d4d4d4",
+  en_cours: "#5eb8cc",
   termine: "#009959",
-  en_retard: "#e85d4c",
+  en_retard: "#d64545",
 } as const;
 
 export const PPM_COLORS = {
-  dao_elabore: "#ddf4ff",
-  dao_publie: "#3de1ff",
+  dao_elabore: "#e8e8e8",
+  dao_publie: "#5eb8cc",
   marche_attribue: "#00b96c",
   contrat_signe: "#009959",
 } as const;
