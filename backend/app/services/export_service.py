@@ -1,7 +1,8 @@
+from datetime import date
 from io import BytesIO
 
 from openpyxl import Workbook
-from sqlalchemy import extract, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -14,6 +15,10 @@ from app.services.excel_branding import (
     prepare_branded_sheet,
     write_data_rows,
     write_row_cells,
+)
+from app.services.pao_export_filter import (
+    PaoExportMode,
+    build_date_debut_condition,
 )
 
 TACHE_STATUT_LABEL: dict[TacheStatut, str] = {
@@ -44,7 +49,8 @@ def _pao_avancement_pct(taches: list[Tache]) -> float:
 
 
 async def _load_pao_export_rows(
-    db: AsyncSession, annee: int
+    db: AsyncSession,
+    date_debut_condition,
 ) -> tuple[list[tuple], list[tuple]]:
     """Retourne (lignes activités, lignes tâches) pour l'export PAO."""
     result = await db.execute(
@@ -52,13 +58,13 @@ async def _load_pao_export_rows(
         .where(
             Activite.date_debut.isnot(None),
             Activite.date_fin.isnot(None),
-            extract("year", Activite.date_debut) == annee,
+            date_debut_condition,
         )
         .options(
             selectinload(Activite.objectif),
             selectinload(Activite.directions),
         )
-        .order_by(Activite.code)
+        .order_by(Activite.date_debut, Activite.code)
     )
     activites = result.scalars().all()
     if not activites:
@@ -70,7 +76,6 @@ async def _load_pao_export_rows(
         .where(
             Tache.activite_id.in_(activite_ids),
             Tache.tache_plan_id.isnot(None),
-            Tache.annee == annee,
         )
         .order_by(Tache.activite_id, Tache.id)
     )
@@ -157,7 +162,18 @@ async def _load_pao_export_rows(
     return activite_rows, tache_rows
 
 
-async def export_pao(db: AsyncSession, annee: int) -> BytesIO:
+async def export_pao(
+    db: AsyncSession,
+    *,
+    mode: PaoExportMode = "annee",
+    annee: int = 2025,
+    du: date | None = None,
+    au: date | None = None,
+    mois: str | None = None,
+) -> tuple[BytesIO, str]:
+    date_cond, period = build_date_debut_condition(
+        mode, annee=annee, du=du, au=au, mois_csv=mois
+    )
     wb = Workbook()
     ws_act = wb.active
     ws_act.title = "Activités"
@@ -181,7 +197,7 @@ async def export_pao(db: AsyncSession, annee: int) -> BytesIO:
     start_act = prepare_branded_sheet(
         ws_act,
         report_title="Plan d'action opérationnel — Activités",
-        subtitle=f"Année {annee} · SuiviImpact",
+        subtitle=period.subtitle,
         headers=headers_act,
     )
 
@@ -203,15 +219,16 @@ async def export_pao(db: AsyncSession, annee: int) -> BytesIO:
     start_taches = prepare_branded_sheet(
         ws_taches,
         report_title="Plan d'action opérationnel — Tâches",
-        subtitle=f"Année {annee} · SuiviImpact",
+        subtitle=period.subtitle,
         headers=headers_taches,
     )
 
-    activite_rows, tache_rows = await _load_pao_export_rows(db, annee)
+    activite_rows, tache_rows = await _load_pao_export_rows(db, date_cond)
     write_data_rows(ws_act, start_act, activite_rows)
     write_data_rows(ws_taches, start_taches, tache_rows)
 
-    return _save_workbook(wb)
+    filename = f"PAO_{period.filename_part}.xlsx"
+    return _save_workbook(wb), filename
 
 
 async def export_recommandations(db: AsyncSession) -> BytesIO:

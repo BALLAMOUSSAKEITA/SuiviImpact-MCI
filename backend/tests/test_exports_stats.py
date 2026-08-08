@@ -3,7 +3,7 @@ from httpx import AsyncClient
 
 
 EXPORT_PATHS = [
-    "/api/v1/exports/pao",
+    "/api/v1/exports/pao?mode=annee&annee=2025",
     "/api/v1/exports/recommandations",
     "/api/v1/exports/missions",
     "/api/v1/exports/ppm",
@@ -43,7 +43,10 @@ async def test_export_pao_with_activite(client: AsyncClient, auth_headers: dict[
     )
     assert create.status_code == 201
 
-    response = await client.get("/api/v1/exports/pao?annee=2025", headers=auth_headers)
+    response = await client.get(
+        "/api/v1/exports/pao?mode=annee&annee=2025",
+        headers=auth_headers,
+    )
     assert response.status_code == 200
     assert "spreadsheet" in response.headers.get("content-type", "")
     assert len(response.content) > 200
@@ -57,6 +60,24 @@ async def test_export_pao_with_activite(client: AsyncClient, auth_headers: dict[
     wb = load_workbook(BytesIO(response.content))
     assert wb["Activités"]["A1"].value == EXPORT_MINISTRY
     assert "Plan d" in str(wb["Activités"]["A3"].value or "")
+
+    # Filtre mois : date_debut 2025-01-15 → inclus pour janvier 2025 uniquement
+    jan = await client.get(
+        "/api/v1/exports/pao?mode=mois&mois=2025-01",
+        headers=auth_headers,
+    )
+    assert jan.status_code == 200
+    wb_jan = load_workbook(BytesIO(jan.content))
+    assert wb_jan["Activités"].max_row >= 6  # en-tête + au moins une ligne
+
+    fev = await client.get(
+        "/api/v1/exports/pao?mode=mois&mois=2025-02",
+        headers=auth_headers,
+    )
+    assert fev.status_code == 200
+    wb_fev = load_workbook(BytesIO(fev.content))
+    # Pas d'activité avec date_debut en février
+    assert wb_fev["Activités"].max_row == 5  # en-tête branding seulement
 
 
 @pytest.mark.asyncio

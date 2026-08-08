@@ -567,6 +567,17 @@ export type ExportType =
   | "ppm"
   | "projets";
 
+export type PaoExportMode = "annee" | "plage" | "mois";
+
+export interface PaoExportOptions {
+  mode: PaoExportMode;
+  annee?: number;
+  du?: string;
+  au?: string;
+  /** Liste « AAAA-MM » séparée par des virgules */
+  mois?: string;
+}
+
 export interface Dossier {
   id: number;
   nom: string;

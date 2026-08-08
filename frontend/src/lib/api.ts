@@ -104,7 +104,7 @@ import type {
 
 } from "@/types";
 
-import { DEFAULT_ANNEE } from "@/types";
+import { DEFAULT_ANNEE, type PaoExportOptions } from "@/types";
 
 import { messageFromFailedResponse } from "./api-errors";
 
@@ -1516,12 +1516,24 @@ export async function getStatsProjets(
 
 export async function downloadExport(
   type: ExportType,
-  options?: { annee?: number },
+  options?: { pao?: PaoExportOptions },
 ): Promise<void> {
-  const path =
-    type === "pao"
-      ? `/api/v1/exports/pao?annee=${options?.annee ?? DEFAULT_ANNEE}`
-      : `/api/v1/exports/${type}`;
+  let path: string;
+  if (type === "pao") {
+    const p = options?.pao ?? { mode: "annee" as const, annee: DEFAULT_ANNEE };
+    const params = new URLSearchParams({ mode: p.mode });
+    if (p.mode === "annee") {
+      params.set("annee", String(p.annee ?? DEFAULT_ANNEE));
+    } else if (p.mode === "plage") {
+      if (p.du) params.set("du", p.du);
+      if (p.au) params.set("au", p.au);
+    } else if (p.mode === "mois" && p.mois) {
+      params.set("mois", p.mois);
+    }
+    path = `/api/v1/exports/pao?${params.toString()}`;
+  } else {
+    path = `/api/v1/exports/${type}`;
+  }
   const { blob, filename } = await apiFetchBlob(path);
   triggerDownload(blob, filename);
 }

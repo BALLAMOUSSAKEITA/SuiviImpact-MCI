@@ -1,4 +1,7 @@
-from fastapi import APIRouter, Depends, Query
+from datetime import date
+from typing import Literal
+
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -21,12 +24,32 @@ def _excel_response(buffer, filename: str) -> StreamingResponse:
 
 @router.get("/exports/pao")
 async def export_pao(
+    mode: Literal["annee", "plage", "mois"] = Query(
+        "annee",
+        description="annee = année calendaire ; plage = du/au ; mois = liste AAAA-MM",
+    ),
     annee: int = Query(default=settings.DEFAULT_ANNEE, ge=2025, le=2027),
+    du: date | None = Query(None, description="Début de plage (date de début activité)"),
+    au: date | None = Query(None, description="Fin de plage (date de début activité)"),
+    mois: str | None = Query(
+        None,
+        description="Mois cibles, ex. 2025-01,2025-06 (filtre sur date_debut)",
+    ),
     _: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> StreamingResponse:
-    buffer = await service.export_pao(db, annee)
-    return _excel_response(buffer, f"PAO_{annee}.xlsx")
+    try:
+        buffer, filename = await service.export_pao(
+            db,
+            mode=mode,
+            annee=annee,
+            du=du,
+            au=au,
+            mois=mois,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+    return _excel_response(buffer, filename)
 
 
 @router.get("/exports/recommandations")
