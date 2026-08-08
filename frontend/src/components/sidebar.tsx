@@ -30,6 +30,10 @@ import { useAuth } from "@/components/auth-provider";
 import { UserAvatar } from "@/components/user-avatar";
 import { Button } from "@/components/ui/button";
 import { BRAND } from "@/lib/brand";
+import {
+  USAGE_GUIDE_PREPARE_STEP_EVENT,
+  type UsageGuideStepPrepareDetail,
+} from "@/lib/onboarding";
 import { canSeeNavGroup, canSeeNavHref, ROLE_LABELS } from "@/lib/roles";
 import { cn } from "@/lib/utils";
 
@@ -126,6 +130,17 @@ export function Sidebar({
     setFlyoutHref(null);
   }, [pathname, collapsed]);
 
+  useEffect(() => {
+    const onPrepare = (event: Event) => {
+      const { expandNav } = (event as CustomEvent<UsageGuideStepPrepareDetail>).detail;
+      if (expandNav) {
+        setExpanded((prev) => ({ ...prev, [expandNav]: true }));
+      }
+    };
+    window.addEventListener(USAGE_GUIDE_PREPARE_STEP_EVENT, onPrepare);
+    return () => window.removeEventListener(USAGE_GUIDE_PREPARE_STEP_EVENT, onPrepare);
+  }, []);
+
   const narrow = collapsed && !mobileOpen;
 
   const handleLogout = () => {
@@ -144,6 +159,7 @@ export function Sidebar({
 
   return (
     <aside
+      data-tour-target="sidebar"
       className={cn(
         "flex shrink-0 flex-col border-r border-cloud bg-white",
         "fixed inset-y-0 left-0 z-50 transition-[width,transform] duration-300 ease-[var(--ease-out-expo)] lg:static lg:translate-x-0",
@@ -255,6 +271,7 @@ export function Sidebar({
                     <button
                       type="button"
                       title={item.label}
+                      data-tour-target={item.href}
                       aria-expanded={flyoutHref === item.href}
                       onClick={() =>
                         setFlyoutHref((v) => (v === item.href ? null : item.href))
@@ -290,6 +307,7 @@ export function Sidebar({
                               <Link
                                 key={href}
                                 href={href}
+                                data-tour-target={href}
                                 onClick={() => {
                                   setFlyoutHref(null);
                                   onNavigate?.();
@@ -317,6 +335,7 @@ export function Sidebar({
                 <div key={item.href}>
                   <button
                     type="button"
+                    data-tour-target={item.href}
                     onClick={() =>
                       setExpanded((prev) => ({
                         ...prev,
@@ -352,6 +371,7 @@ export function Sidebar({
                           <Link
                             key={href}
                             href={href}
+                            data-tour-target={href}
                             onClick={onNavigate}
                             className={cn(
                               "flex items-center gap-2.5 rounded-[var(--radius-card)] px-2.5 py-2 text-[12.5px] font-medium transition-all duration-[var(--duration-fast)]",
@@ -374,6 +394,7 @@ export function Sidebar({
               <Link
                 key={item.href}
                 href={item.defaultChild ?? item.href}
+                data-tour-target={item.href}
                 onClick={onNavigate}
                 title={narrow ? item.label : undefined}
                 className={navLinkClass(active)}

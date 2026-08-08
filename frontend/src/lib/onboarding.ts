@@ -1,4 +1,4 @@
-const ONBOARDING_VERSION = "v1";
+const ONBOARDING_VERSION = "v3";
 
 function storageKey(userId: number): string {
   return `suiviimpact-onboarding-${ONBOARDING_VERSION}-${userId}`;
@@ -26,4 +26,27 @@ export const USAGE_GUIDE_OPEN_EVENT = "suiviimpact:open-usage-guide";
 export function openUsageGuide(): void {
   if (typeof window === "undefined") return;
   window.dispatchEvent(new CustomEvent(USAGE_GUIDE_OPEN_EVENT));
+}
+
+export const USAGE_GUIDE_ACTIVE_EVENT = "suiviimpact:usage-guide-active";
+
+export function dispatchUsageGuideActive(active: boolean): void {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(
+    new CustomEvent(USAGE_GUIDE_ACTIVE_EVENT, { detail: { active } }),
+  );
+}
+
+export type UsageGuideStepPrepareDetail = {
+  expandNav?: string;
+  openMobileSidebar?: boolean;
+};
+
+export const USAGE_GUIDE_PREPARE_STEP_EVENT = "suiviimpact:usage-guide-prepare-step";
+
+export function dispatchUsageGuidePrepareStep(detail: UsageGuideStepPrepareDetail): void {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(
+    new CustomEvent(USAGE_GUIDE_PREPARE_STEP_EVENT, { detail }),
+  );
 }

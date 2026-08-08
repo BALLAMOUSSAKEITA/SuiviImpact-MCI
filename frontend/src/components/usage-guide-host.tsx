@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useAuth } from "@/components/auth-provider";
 import { UsageGuideModal } from "@/components/usage-guide-modal";
@@ -27,11 +27,17 @@ export function UsageGuideHost() {
     return () => window.removeEventListener(USAGE_GUIDE_OPEN_EVENT, onOpen);
   }, []);
 
-  if (!user) return null;
+  const guideContext = useMemo(() => {
+    if (!user) return null;
+    return { role: user.role, typeAcces: user.type_acces };
+  }, [user]);
+
+  if (!user || !guideContext) return null;
 
   return (
     <UsageGuideModal
       open={open}
+      guideContext={guideContext}
       onClose={() => setOpen(false)}
       onFinished={() => markOnboardingCompleted(user.id)}
     />
