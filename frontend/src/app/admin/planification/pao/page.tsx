@@ -9,6 +9,7 @@ import { useAuth } from "@/components/auth-provider";
 import { FileUploadField } from "@/components/file-upload-field";
 import {
   DetailDrawer,
+  DetailDrawerActions,
   DetailDrawerRows,
   DetailRow,
   StoredDocumentMenu,
@@ -534,7 +535,8 @@ function PlanificationPaoContent() {
       <DetailDrawer
         open={selected !== null}
         title={selected?.description ?? ""}
-        subtitle={selected ? `Code ${selected.code}` : undefined}
+        eyebrow="Activité PAO"
+        subtitle={selected ? selected.code : undefined}
         onClose={() => setSelected(null)}
       >
         {selected && (
@@ -559,7 +561,7 @@ function PlanificationPaoContent() {
                   {selected.taches.map((t) => (
                     <li
                       key={t.tache_plan_id}
-                      className="rounded-[var(--radius-card)] bg-veil/80 px-3 py-2 text-sm"
+                      className="rounded-[var(--radius-sm)] bg-white/80 px-3 py-2.5 ring-1 ring-cloud/50"
                     >
                       <span className="font-medium">{t.tache_plan_code}</span>
                       <span className="text-slate"> — {t.tache_plan_description}</span>
@@ -583,7 +585,7 @@ function PlanificationPaoContent() {
               )}
             </DetailRow>
             {canWrite && (
-              <div className="pt-4">
+              <DetailDrawerActions>
                 <Button
                   type="button"
                   variant="outline"
@@ -593,7 +595,7 @@ function PlanificationPaoContent() {
                   <Pencil className="h-4 w-4" />
                   Modifier cette activité
                 </Button>
-              </div>
+              </DetailDrawerActions>
             )}
           </DetailDrawerRows>
         )}

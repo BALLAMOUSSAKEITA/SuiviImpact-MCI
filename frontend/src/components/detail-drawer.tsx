@@ -1,10 +1,9 @@
 "use client";
 
-import { Download, ExternalLink, FileText, Loader2 } from "lucide-react";
+import { Download, ExternalLink, FileText, Loader2, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
 import {
   downloadStoredDocument,
   openStoredDocument,
@@ -71,24 +70,24 @@ export function StoredDocumentMenu({
           e.stopPropagation();
           setOpen((v) => !v);
         }}
-        className="inline-flex max-w-[200px] items-center gap-1.5 truncate rounded-[var(--radius-card)] px-2 py-1 text-left text-sm font-medium text-forest-ink underline-offset-2 hover:bg-forest-ink/5 hover:underline"
+        className="inline-flex max-w-full items-center gap-2 rounded-[var(--radius-pill)] bg-forest-ink/8 px-3 py-1.5 text-left text-sm font-medium text-forest-ink transition-colors hover:bg-forest-ink/12"
         title={label}
       >
-        <FileText className="h-3.5 w-3.5 shrink-0" />
+        <FileText className="h-4 w-4 shrink-0" strokeWidth={1.75} />
         <span className="truncate">{label}</span>
       </button>
 
       {open && (
         <div
           role="menu"
-          className="absolute left-0 top-full z-50 mt-1 min-w-[180px] rounded-[var(--radius-card)] border border-cloud bg-white py-1 shadow-[var(--shadow-elevated)]"
+          className="absolute left-0 top-full z-50 mt-1.5 min-w-[180px] overflow-hidden rounded-[var(--radius-card)] border border-cloud/80 bg-white py-1 shadow-[var(--shadow-elevated)]"
           onClick={(e) => e.stopPropagation()}
         >
           <button
             type="button"
             role="menuitem"
             disabled={busy !== null}
-            className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-graphite hover:bg-veil disabled:opacity-50"
+            className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm text-graphite hover:bg-veil disabled:opacity-50"
             onClick={() => run("open")}
           >
             {busy === "open" ? (
@@ -102,7 +101,7 @@ export function StoredDocumentMenu({
             type="button"
             role="menuitem"
             disabled={busy !== null}
-            className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-graphite hover:bg-veil disabled:opacity-50"
+            className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm text-graphite hover:bg-veil disabled:opacity-50"
             onClick={() => run("download")}
           >
             {busy === "download" ? (
@@ -122,11 +121,22 @@ interface DetailDrawerProps {
   open: boolean;
   title: string;
   subtitle?: string;
+  eyebrow?: string;
   onClose: () => void;
   children: React.ReactNode;
+  /** Panneau plus large pour contenus riches (ex. plan projet). */
+  size?: "default" | "wide";
 }
 
-export function DetailDrawer({ open, title, subtitle, onClose, children }: DetailDrawerProps) {
+export function DetailDrawer({
+  open,
+  title,
+  subtitle,
+  eyebrow,
+  onClose,
+  children,
+  size = "default",
+}: DetailDrawerProps) {
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -136,51 +146,119 @@ export function DetailDrawer({ open, title, subtitle, onClose, children }: Detai
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
+
   if (!open) return null;
 
   return (
-    <>
+    <div className="fixed inset-0 z-[90] flex items-end justify-center p-0 sm:items-center sm:p-4 md:p-6 animate-fade-in">
       <button
         type="button"
         aria-label="Fermer le détail"
-        className="fixed inset-0 z-[90] bg-obsidian/30"
+        className="absolute inset-0 bg-obsidian/40 backdrop-blur-[3px]"
         onClick={onClose}
       />
-      <aside
+      <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="detail-drawer-title"
-        className="fixed inset-y-0 right-0 z-[91] flex w-full max-w-md flex-col border-l border-cloud/80 bg-white shadow-[var(--shadow-elevated)] animate-slide-in-right"
+        className={cn(
+          "relative flex max-h-[92vh] w-full flex-col overflow-hidden rounded-t-[1.25rem] border border-cloud/70 bg-white shadow-[0_24px_80px_-12px_rgba(15,23,42,0.22)] sm:max-h-[min(88vh,780px)] sm:rounded-[var(--radius-card)] animate-scale-in",
+          size === "wide" ? "sm:max-w-2xl" : "sm:max-w-xl",
+        )}
       >
-        <header className="flex items-start justify-between gap-3 border-b border-cloud/60 px-5 py-4">
-          <div className="min-w-0">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-fog">Détail</p>
-            <h2 id="detail-drawer-title" className="mt-1 text-lg font-bold text-graphite">
+        <div
+          className="h-1 shrink-0 bg-gradient-to-r from-forest-ink via-emerald-600/90 to-forest-ink/70"
+          aria-hidden
+        />
+
+        <header className="relative shrink-0 px-5 pb-4 pt-5 sm:px-6 sm:pt-6">
+          <button
+            type="button"
+            aria-label="Fermer"
+            className="absolute right-3 top-3 rounded-full p-2 text-ash transition-colors hover:bg-veil hover:text-graphite sm:right-4 sm:top-4"
+            onClick={onClose}
+          >
+            <X className="h-5 w-5" strokeWidth={1.75} />
+          </button>
+
+          <div className="pr-10">
+            {eyebrow && (
+              <p className="text-xs font-medium tracking-wide text-fog">{eyebrow}</p>
+            )}
+            <div className="mt-1 flex flex-wrap items-center gap-2">
+              {subtitle && (
+                <span className="inline-flex rounded-[var(--radius-pill)] bg-forest-ink/10 px-2.5 py-0.5 text-xs font-semibold text-forest-ink">
+                  {subtitle}
+                </span>
+              )}
+            </div>
+            <h2
+              id="detail-drawer-title"
+              className="mt-3 font-display text-xl font-semibold leading-snug text-graphite sm:text-[1.35rem]"
+            >
               {title}
             </h2>
-            {subtitle && <p className="mt-0.5 text-sm text-slate">{subtitle}</p>}
           </div>
-          <Button type="button" variant="ghost" size="sm" onClick={onClose}>
-            Fermer
-          </Button>
         </header>
-        <div className="flex-1 overflow-y-auto px-5 py-4">{children}</div>
-      </aside>
-    </>
+
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-5 sm:px-6 sm:pb-6">
+          {children}
+        </div>
+      </div>
+    </div>
   );
 }
 
-function DetailRow({ label, children }: { label: string; children: React.ReactNode }) {
+interface DetailRowProps {
+  label: string;
+  children: React.ReactNode;
+  className?: string;
+}
+
+function DetailRow({ label, children, className }: DetailRowProps) {
   return (
-    <div className="border-b border-cloud/50 py-3 last:border-0">
-      <dt className="text-[11px] font-semibold uppercase tracking-wide text-fog">{label}</dt>
-      <dd className="mt-1 text-sm text-graphite">{children}</dd>
+    <div
+      className={cn(
+        "rounded-[var(--radius-card)] border border-cloud/60 bg-gradient-to-b from-paper/90 to-white px-4 py-3.5",
+        className,
+      )}
+    >
+      <p className="text-xs font-medium text-slate">{label}</p>
+      <div className="mt-1.5 text-sm leading-relaxed text-graphite [&_ul]:mt-0">{children}</div>
     </div>
   );
 }
 
 export function DetailDrawerRows({ children }: { children: React.ReactNode }) {
-  return <dl className="divide-y divide-cloud/50">{children}</dl>;
+  return <div className="flex flex-col gap-2.5">{children}</div>;
+}
+
+/** Zone d’actions en bas du détail (ex. bouton Modifier). */
+export function DetailDrawerActions({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "mt-4 border-t border-cloud/50 pt-4",
+        className,
+      )}
+    >
+      {children}
+    </div>
+  );
 }
 
 export { DetailRow };

@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/components/auth-provider";
 import {
   DetailDrawer,
+  DetailDrawerActions,
   DetailDrawerRows,
   DetailRow,
 } from "@/components/detail-drawer";
@@ -607,8 +608,10 @@ function PlanificationProjetContent() {
 
       <DetailDrawer
         open={selected !== null}
+        size="wide"
         title={selected?.projet_description ?? ""}
-        subtitle={selected ? `Réf. ${selected.projet_code}` : undefined}
+        eyebrow="Planification projet"
+        subtitle={selected?.projet_code}
         onClose={() => setSelected(null)}
       >
         {selected && (
@@ -643,7 +646,7 @@ function PlanificationProjetContent() {
                   {selected.composantes.map((c) => (
                     <div
                       key={c.id}
-                      className="rounded-[var(--radius-card)] border border-cloud/70 bg-veil/50 p-3"
+                      className="rounded-[var(--radius-card)] border border-cloud/50 bg-white/70 p-3.5 shadow-sm"
                     >
                       <p className="text-sm font-semibold text-forest-ink">
                         {c.libelle?.trim() || `Composante ${c.ordre}`}
@@ -665,7 +668,7 @@ function PlanificationProjetContent() {
               )}
             </DetailRow>
             {canWrite && (
-              <div className="pt-4">
+              <DetailDrawerActions>
                 <Button
                   type="button"
                   variant="outline"
@@ -675,7 +678,7 @@ function PlanificationProjetContent() {
                   <Pencil className="h-4 w-4" />
                   Modifier cette planification
                 </Button>
-              </div>
+              </DetailDrawerActions>
             )}
           </DetailDrawerRows>
         )}
