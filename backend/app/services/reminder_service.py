@@ -19,6 +19,7 @@ from app.services.email_service import (
     build_activite_retard_email,
     email_configured,
     get_bsd_cc_emails,
+    get_email_status,
     send_email,
 )
 
@@ -104,10 +105,12 @@ async def check_activite_delays_and_notify(
     today: date | None = None,
     force: bool = False,
     send_email_fn: SendEmailFn = send_email,
-) -> dict[str, int]:
+) -> dict[str, int | str | None]:
     """Repère les activités en retard et envoie un rappel au ministre, au directeur et le BSD en copie."""
     reference = today or date.today()
     activites_notifiees = 0
+    activites_eligibles = 0
+    activites_deja_notifiees = 0
     emails_envoyes = 0
     emails_simules = 0
     emails_echec = 0
@@ -137,7 +140,10 @@ async def check_activite_delays_and_notify(
         if not taches_non_validees:
             continue
 
+        activites_eligibles += 1
+
         if not force and await _already_notified_today(db, activite.id, reference):
+            activites_deja_notifiees += 1
             continue
 
         destinataires: dict[str, str] = {}
@@ -239,9 +245,28 @@ async def check_activite_delays_and_notify(
 
     await db.commit()
 
+    status = get_email_status()
+    message = str(status["message"])
+    if (
+        activites_notifiees == 0
+        and activites_eligibles > 0
+        and activites_deja_notifiees == activites_eligibles
+        and not force
+    ):
+        message = (
+            "Rappel déjà envoyé aujourd'hui pour toutes les activités éligibles. "
+            "Utilisez « Forcer l'envoi » pour relancer."
+        )
+    elif emails_echec > 0:
+        message = f"{emails_echec} e-mail(s) en échec. {message}"
+
     return {
         "activites_notifiees": activites_notifiees,
+        "activites_eligibles": activites_eligibles,
+        "activites_deja_notifiees": activites_deja_notifiees,
         "emails_envoyes": emails_envoyes,
         "emails_simules": emails_simules,
         "emails_echec": emails_echec,
+        "provider": status["provider"],
+        "message": message,
     }

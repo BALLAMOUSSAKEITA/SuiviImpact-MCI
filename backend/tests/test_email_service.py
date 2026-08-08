@@ -21,6 +21,26 @@ def test_resolve_email_provider_smtp_only(monkeypatch):
     assert email_service.resolve_email_provider() == "smtp"
 
 
+def test_resolve_email_provider_skips_smtp_on_railway(monkeypatch):
+    monkeypatch.setattr(settings, "EMAIL_PROVIDER", "auto")
+    monkeypatch.setattr(settings, "RESEND_API_KEY", "")
+    monkeypatch.setattr(settings, "SMTP_HOST", "smtp.gmail.com")
+    monkeypatch.setenv("RAILWAY_ENVIRONMENT", "production")
+    assert email_service.resolve_email_provider() is None
+    monkeypatch.delenv("RAILWAY_ENVIRONMENT", raising=False)
+
+
+def test_get_email_status_warns_on_railway_without_resend(monkeypatch):
+    monkeypatch.setattr(settings, "RESEND_API_KEY", "")
+    monkeypatch.setattr(settings, "SMTP_HOST", "smtp.gmail.com")
+    monkeypatch.setenv("RAILWAY_PROJECT_ID", "proj")
+    status = email_service.get_email_status()
+    assert status["configured"] is False
+    assert status["railway"] is True
+    assert "RESEND_API_KEY" in str(status["message"])
+    monkeypatch.delenv("RAILWAY_PROJECT_ID", raising=False)
+
+
 @pytest.mark.asyncio
 async def test_send_email_via_resend(monkeypatch):
     monkeypatch.setattr(settings, "EMAIL_PROVIDER", "resend")

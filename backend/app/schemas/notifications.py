@@ -19,6 +19,19 @@ class NotificationEmailRead(BaseModel):
 
 class RappelActivitesStats(BaseModel):
     activites_notifiees: int
+    activites_eligibles: int = 0
+    activites_deja_notifiees: int = 0
     emails_envoyes: int
     emails_simules: int
     emails_echec: int
+    provider: str | None = None
+    message: str = ""
+
+
+class EmailConfigRead(BaseModel):
+    provider: str | None
+    configured: bool
+    railway: bool
+    resend_configured: bool
+    smtp_configured: bool
+    message: str

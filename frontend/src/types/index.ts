@@ -706,9 +706,22 @@ export interface NotificationEmailItem {
 
 export interface RappelActivitesStats {
   activites_notifiees: number;
+  activites_eligibles: number;
+  activites_deja_notifiees: number;
   emails_envoyes: number;
   emails_simules: number;
   emails_echec: number;
+  provider: string | null;
+  message: string;
+}
+
+export interface EmailConfig {
+  provider: string | null;
+  configured: boolean;
+  railway: boolean;
+  resend_configured: boolean;
+  smtp_configured: boolean;
+  message: string;
 }
 
 export const NOTIFICATION_STATUT_LABELS: Record<string, string> = {

@@ -4,7 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.deps import require_write_access
 from app.core.database import get_db
 from app.models.user import User
-from app.schemas.notifications import NotificationEmailRead, RappelActivitesStats
+from app.schemas.notifications import EmailConfigRead, NotificationEmailRead, RappelActivitesStats
+from app.services.email_service import get_email_status
 from app.services.notification_service import list_notification_emails
 from app.services.reminder_service import check_activite_delays_and_notify
 
@@ -18,6 +19,13 @@ async def get_notifications(
     _: User = Depends(require_write_access),
 ) -> list[NotificationEmailRead]:
     return await list_notification_emails(db, limit=limit)
+
+
+@router.get("/notifications/email-config", response_model=EmailConfigRead)
+async def get_email_config(
+    _: User = Depends(require_write_access),
+) -> EmailConfigRead:
+    return EmailConfigRead.model_validate(get_email_status())
 
 
 @router.post("/notifications/rappels-activites", response_model=RappelActivitesStats)

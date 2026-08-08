@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -15,6 +16,14 @@ from app.core.config import settings
 logger = logging.getLogger(__name__)
 
 RESEND_API_URL = "https://api.resend.com/emails"
+
+
+def running_on_railway() -> bool:
+    return bool(
+        os.environ.get("RAILWAY_ENVIRONMENT")
+        or os.environ.get("RAILWAY_PROJECT_ID")
+        or os.environ.get("RAILWAY_SERVICE_ID")
+    )
 
 
 def smtp_configured() -> bool:
@@ -36,13 +45,46 @@ def resolve_email_provider() -> str | None:
     if provider == "resend":
         return "resend" if resend_configured() else None
     if provider == "smtp":
+        if running_on_railway():
+            logger.warning(
+                "SMTP explicitement demandé sur Railway — la connexion sortante est "
+                "souvent bloquée."
+            )
         return "smtp" if smtp_configured() else None
 
     if resend_configured():
         return "resend"
-    if smtp_configured():
+    if smtp_configured() and not running_on_railway():
         return "smtp"
     return None
+
+
+def get_email_status() -> dict[str, str | bool | None]:
+    provider = resolve_email_provider()
+    railway = running_on_railway()
+
+    if provider == "resend":
+        message = "Envoi via Resend (HTTPS)."
+    elif provider == "smtp":
+        message = "Envoi via SMTP."
+    elif railway and smtp_configured() and not resend_configured():
+        message = (
+            "Railway bloque le SMTP sortant. Supprimez SMTP_HOST et ajoutez "
+            "EMAIL_PROVIDER=resend avec RESEND_API_KEY."
+        )
+    elif railway:
+        message = "Configurez EMAIL_PROVIDER=resend et RESEND_API_KEY sur Railway."
+    else:
+        message = "Aucun canal e-mail configuré — envois simulés."
+
+    return {
+        "provider": provider,
+        "configured": provider is not None,
+        "railway": railway,
+        "resend_configured": resend_configured(),
+        "smtp_configured": smtp_configured(),
+        "message": message,
+    }
 
 
 def get_bsd_cc_emails() -> list[str]:

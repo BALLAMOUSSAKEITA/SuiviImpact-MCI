@@ -9,7 +9,7 @@ import { PageHeader } from "@/components/page-header";
 import { useAuth } from "@/components/auth-provider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { listNotificationEmails, triggerActiviteReminders } from "@/lib/api";
+import { getEmailConfig, listNotificationEmails, triggerActiviteReminders } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { NOTIFICATION_STATUT_LABELS, type NotificationEmailItem } from "@/types";
 
@@ -31,6 +31,12 @@ export default function NotificationsPage() {
   const queryClient = useQueryClient();
   const [confirmForce, setConfirmForce] = useState(false);
 
+  const { data: emailConfig } = useQuery({
+    queryKey: ["notifications-email-config"],
+    queryFn: getEmailConfig,
+    enabled: canWrite,
+  });
+
   const { data: notifications = [], isLoading } = useQuery({
     queryKey: ["notifications-email"],
     queryFn: () => listNotificationEmails(150),
@@ -40,9 +46,15 @@ export default function NotificationsPage() {
   const triggerMutation = useMutation({
     mutationFn: (force: boolean) => triggerActiviteReminders(force),
     onSuccess: (stats) => {
-      toast.success(
-        `${stats.activites_notifiees} activité(s) notifiée(s) — ${stats.emails_envoyes} e-mail(s) envoyé(s), ${stats.emails_simules} simulé(s)`,
-      );
+      if (stats.emails_echec > 0) {
+        toast.error(stats.message || `${stats.emails_echec} e-mail(s) en échec`);
+      } else if (stats.activites_notifiees === 0) {
+        toast.info(stats.message || "Aucune activité notifiée");
+      } else {
+        toast.success(
+          `${stats.activites_notifiees} activité(s) — ${stats.emails_envoyes} e-mail(s) envoyé(s) via ${stats.provider ?? "simulation"}`,
+        );
+      }
       void queryClient.invalidateQueries({ queryKey: ["notifications-email"] });
       setConfirmForce(false);
     },
@@ -84,14 +96,35 @@ export default function NotificationsPage() {
         }
       />
 
-      <Card className="mb-6 border-veil bg-veil/40">
+      <Card
+        className={cn(
+          "mb-6 border-veil",
+          emailConfig && !emailConfig.configured
+            ? "border-amber-200 bg-amber-50/80"
+            : "bg-veil/40",
+        )}
+      >
         <CardContent className="p-4 text-sm leading-relaxed text-slate">
-          Les rappels sont envoyés automatiquement chaque jour à 8h (Conakry) lorsqu'une
-          activité PAO a dépassé sa date de fin avec des tâches non validées par le BSD.
-          Destinataires : directeur responsable et ministre, avec le BSD en copie (
-          <code className="text-xs">SMTP_BSD_CC</code>). Sur Railway, le SMTP sortant est
-          bloqué : configurez <code className="text-xs">RESEND_API_KEY</code> et{" "}
-          <code className="text-xs">EMAIL_PROVIDER=resend</code>.
+          {emailConfig ? (
+            <>
+              <p className="font-medium text-graphite">
+                Canal e-mail :{" "}
+                {emailConfig.configured
+                  ? emailConfig.provider === "resend"
+                    ? "Resend (HTTPS)"
+                    : "SMTP"
+                  : "Non configuré"}
+                {emailConfig.railway ? " · Railway" : ""}
+              </p>
+              <p className="mt-2">{emailConfig.message}</p>
+            </>
+          ) : (
+            <p>Chargement de la configuration e-mail…</p>
+          )}
+          <p className="mt-3 text-xs text-ash">
+            Rappels automatiques à 8h (Conakry). Destinataires : directeur + ministre, BSD en
+            copie (<code className="text-xs">SMTP_BSD_CC</code>).
+          </p>
         </CardContent>
       </Card>
 

@@ -1740,7 +1740,11 @@ export async function performWorkflowAction(
 
 /* ─── Notifications e-mail ─── */
 
-import type { NotificationEmailItem, RappelActivitesStats } from "@/types";
+import type { EmailConfig, NotificationEmailItem, RappelActivitesStats } from "@/types";
+
+export async function getEmailConfig(): Promise<EmailConfig> {
+  return apiFetch<EmailConfig>("/api/v1/notifications/email-config");
+}
 
 export async function listNotificationEmails(
   limit = 100,
