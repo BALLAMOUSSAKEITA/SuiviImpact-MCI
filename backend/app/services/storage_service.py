@@ -1,9 +1,30 @@
+"""Stockage des fichiers uploadés (chemins relatifs POSIX depuis UPLOAD_DIR).
+
+Règles de migration (ne pas casser les fichiers existants) :
+- Les colonnes `chemin_stockage` / `*_chemin` en base sont des chemins relatifs stables ;
+  ne jamais les renommer, tronquer ou réécrire sans script de migration de données.
+- Ne pas changer UPLOAD_DIR sur un déploiement qui réutilise la même base sans déplacer
+  physiquement le répertoire correspondant.
+- Les nouvelles migrations Alembic ne doivent pas modifier le format des chemins enregistrés.
+  Voir backend/docs/STOCKAGE_FICHIERS.md.
+"""
+
 import uuid
 from pathlib import Path
 
 from fastapi import HTTPException, UploadFile, status
 
 from app.core.config import settings
+
+# Colonnes SQL contenant des chemins relatifs vers UPLOAD_DIR (référence migrations).
+STORAGE_PATH_COLUMNS = (
+    "fichiers_archive.chemin_stockage",
+    "tache_fichiers.chemin_stockage",
+    "activites.tdr_chemin",
+    "planification_projet_activites.rapport_chemin",
+    "taches.fichier_path",
+    "workflow_actions.file_path",
+)
 
 
 class StorageService:
@@ -48,6 +69,17 @@ class StorageService:
     def delete_file(self, relative_path: str) -> None:
         path = self.resolve_path(relative_path)
         path.unlink(missing_ok=True)
+
+    def try_delete_file(self, relative_path: str) -> bool:
+        """Supprime le fichier s'il existe ; ignore les entrées orphelines (absent du disque)."""
+        normalized = relative_path.replace("\\", "/")
+        full = (self.base_dir / normalized).resolve()
+        if not str(full).startswith(str(self.base_dir.resolve())):
+            return False
+        if not full.exists():
+            return False
+        full.unlink(missing_ok=True)
+        return True
 
 
 storage_service = StorageService()

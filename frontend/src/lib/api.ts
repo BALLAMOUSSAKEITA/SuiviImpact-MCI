@@ -12,6 +12,8 @@ import type {
 
   DossierContent,
 
+  DossierDeletePreview,
+
   ExecutionStats,
 
   ExportType,
@@ -1645,6 +1647,22 @@ export async function deleteDossier(dossierId: number): Promise<void> {
     method: "DELETE",
 
   });
+
+}
+
+
+
+export async function getDossierDeletePreview(
+
+  dossierId: number,
+
+): Promise<DossierDeletePreview> {
+
+  return apiFetch<DossierDeletePreview>(
+
+    `/api/v1/archive/dossiers/${dossierId}/delete-preview`,
+
+  );
 
 }
 

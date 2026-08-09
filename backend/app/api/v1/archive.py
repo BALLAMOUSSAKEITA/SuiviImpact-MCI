@@ -9,6 +9,7 @@ from app.schemas.archive import (
     ArchiveRootRead,
     DossierContentRead,
     DossierCreate,
+    DossierDeletePreview,
     DossierRead,
     DossierRename,
     FichierArchiveRead,
@@ -57,6 +58,18 @@ async def rename_dossier(
     db: AsyncSession = Depends(get_db),
 ) -> DossierRead:
     return await service.rename_dossier(db, dossier_id, body.nom)
+
+
+@router.get(
+    "/archive/dossiers/{dossier_id}/delete-preview",
+    response_model=DossierDeletePreview,
+)
+async def get_dossier_delete_preview(
+    dossier_id: int,
+    _: User = Depends(require_write_access),
+    db: AsyncSession = Depends(get_db),
+) -> DossierDeletePreview:
+    return await service.get_dossier_delete_preview(db, dossier_id)
 
 
 @router.delete("/archive/dossiers/{dossier_id}", status_code=status.HTTP_204_NO_CONTENT)

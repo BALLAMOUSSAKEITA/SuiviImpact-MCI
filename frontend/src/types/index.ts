@@ -630,6 +630,15 @@ export interface DossierContent {
   fichiers: FichierArchive[];
 }
 
+export interface DossierDeletePreview {
+  nom: string;
+  est_vide: boolean;
+  sous_dossiers_directs: number;
+  sous_dossiers_total: number;
+  fichiers_directs: number;
+  fichiers_total: number;
+}
+
 export type ExecutionStatutFilter = "non_demare" | "en_cours" | "termine" | null;
 
 export const TACHE_STATUT_LABELS: Record<TacheStatut, string> = {

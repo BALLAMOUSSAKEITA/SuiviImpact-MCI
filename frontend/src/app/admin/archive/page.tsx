@@ -16,11 +16,18 @@ import {
   deleteArchiveFile,
   deleteDossier,
   getArchiveRoot,
+  getDossierDeletePreview,
   uploadArchiveFile,
 } from "@/lib/api";
+import {
+  dossierDeleteDialogDescription,
+  dossierDeleteDialogTitle,
+} from "@/lib/archive-delete";
+
+import type { DossierDeletePreview } from "@/types";
 
 type ArchiveDeleteTarget =
-  | { kind: "folder"; id: number; name: string }
+  | { kind: "folder"; id: number; name: string; preview: DossierDeletePreview }
   | { kind: "file"; id: number }
   | null;
 
@@ -34,6 +41,7 @@ function ArchiveContent() {
   const [newFolderName, setNewFolderName] = useState("");
   const [showNewFolder, setShowNewFolder] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<ArchiveDeleteTarget>(null);
+  const [deletePreviewLoading, setDeletePreviewLoading] = useState(false);
 
   const queryKey = ["archive-root"];
 
@@ -83,6 +91,18 @@ function ArchiveContent() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  const handleDeleteFolderClick = async (id: number, name: string) => {
+    setDeletePreviewLoading(true);
+    try {
+      const preview = await getDossierDeletePreview(id);
+      setDeleteTarget({ kind: "folder", id, name, preview });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Impossible de préparer la suppression");
+    } finally {
+      setDeletePreviewLoading(false);
+    }
+  };
 
   const formatSize = (bytes: number) => {
     if (bytes < 1024) return `${bytes} o`;
@@ -167,9 +187,8 @@ function ArchiveContent() {
                   <Button
                     variant="ghost"
                     className="h-8 px-3 text-xs text-red-600"
-                    onClick={() =>
-                      setDeleteTarget({ kind: "folder", id: d.id, name: d.nom })
-                    }
+                    disabled={deletePreviewLoading}
+                    onClick={() => handleDeleteFolderClick(d.id, d.nom)}
                   >
                     Supprimer
                   </Button>
@@ -211,12 +230,18 @@ function ArchiveContent() {
       <ConfirmDialog
         open={deleteTarget !== null}
         title={
-          deleteTarget?.kind === "folder" ? "Supprimer le dossier" : "Supprimer le fichier"
+          deleteTarget?.kind === "folder" && deleteTarget.preview
+            ? dossierDeleteDialogTitle(deleteTarget.preview)
+            : deleteTarget?.kind === "folder"
+              ? "Supprimer le dossier"
+              : "Supprimer le fichier"
         }
         description={
-          deleteTarget?.kind === "folder"
-            ? `Supprimer le dossier « ${deleteTarget.name} » et son contenu ?`
-            : "Ce fichier sera définitivement supprimé."
+          deleteTarget?.kind === "folder" && deleteTarget.preview
+            ? dossierDeleteDialogDescription(deleteTarget.name, deleteTarget.preview)
+            : deleteTarget?.kind === "folder"
+              ? `Supprimer le dossier « ${deleteTarget.name} » ?`
+              : "Ce fichier sera définitivement supprimé."
         }
         confirmLabel="Supprimer"
         variant="destructive"

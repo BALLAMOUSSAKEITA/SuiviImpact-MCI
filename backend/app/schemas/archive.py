@@ -48,3 +48,12 @@ class DossierContentRead(BaseModel):
     breadcrumb: list[BreadcrumbItem]
     sous_dossiers: list[DossierRead]
     fichiers: list[FichierArchiveRead]
+
+
+class DossierDeletePreview(BaseModel):
+    nom: str
+    est_vide: bool
+    sous_dossiers_directs: int
+    sous_dossiers_total: int
+    fichiers_directs: int
+    fichiers_total: int

@@ -1,5 +1,5 @@
 from fastapi import HTTPException, UploadFile, status
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.archive import Dossier, FichierArchive
@@ -7,10 +7,24 @@ from app.schemas.archive import (
     ArchiveRootRead,
     BreadcrumbItem,
     DossierContentRead,
+    DossierDeletePreview,
     DossierRead,
     FichierArchiveRead,
 )
 from app.services.storage_service import storage_service
+
+
+async def _collect_descendant_dossier_ids(db: AsyncSession, root_id: int) -> list[int]:
+    ids = {root_id}
+    queue = [root_id]
+    while queue:
+        current = queue.pop()
+        result = await db.execute(select(Dossier.id).where(Dossier.parent_id == current))
+        for child_id in result.scalars():
+            if child_id not in ids:
+                ids.add(child_id)
+                queue.append(child_id)
+    return list(ids)
 
 
 async def _build_breadcrumb(db: AsyncSession, dossier: Dossier) -> list[BreadcrumbItem]:
@@ -87,18 +101,73 @@ async def rename_dossier(db: AsyncSession, dossier_id: int, nom: str) -> Dossier
     return DossierRead.model_validate(dossier)
 
 
+async def get_dossier_delete_preview(
+    db: AsyncSession, dossier_id: int
+) -> DossierDeletePreview:
+    dossier = await db.get(Dossier, dossier_id)
+    if dossier is None:
+        raise HTTPException(status_code=404, detail="Dossier introuvable")
+
+    dossier_ids = await _collect_descendant_dossier_ids(db, dossier_id)
+    sous_total = len(dossier_ids) - 1
+
+    direct_sous = await db.scalar(
+        select(func.count()).select_from(Dossier).where(Dossier.parent_id == dossier_id)
+    )
+    fichiers_directs = await db.scalar(
+        select(func.count())
+        .select_from(FichierArchive)
+        .where(FichierArchive.dossier_id == dossier_id)
+    )
+    fichiers_total = await db.scalar(
+        select(func.count())
+        .select_from(FichierArchive)
+        .where(FichierArchive.dossier_id.in_(dossier_ids))
+    )
+
+    sous_dossiers_directs = direct_sous or 0
+    fichiers_directs_count = fichiers_directs or 0
+    fichiers_total_count = fichiers_total or 0
+
+    return DossierDeletePreview(
+        nom=dossier.nom,
+        est_vide=sous_total == 0 and fichiers_total_count == 0,
+        sous_dossiers_directs=sous_dossiers_directs,
+        sous_dossiers_total=sous_total,
+        fichiers_directs=fichiers_directs_count,
+        fichiers_total=fichiers_total_count,
+    )
+
+
 async def delete_dossier(db: AsyncSession, dossier_id: int) -> None:
     dossier = await db.get(Dossier, dossier_id)
     if dossier is None:
         raise HTTPException(status_code=404, detail="Dossier introuvable")
 
+    dossier_ids = await _collect_descendant_dossier_ids(db, dossier_id)
     fichiers_result = await db.execute(
-        select(FichierArchive).where(FichierArchive.dossier_id == dossier_id)
+        select(FichierArchive).where(FichierArchive.dossier_id.in_(dossier_ids))
     )
     for fichier in fichiers_result.scalars().all():
-        storage_service.delete_file(fichier.chemin_stockage)
+        storage_service.try_delete_file(fichier.chemin_stockage)
 
-    await db.delete(dossier)
+    remaining = set(dossier_ids)
+    while remaining:
+        leaf_ids: list[int] = []
+        for did in remaining:
+            child_count = await db.scalar(
+                select(func.count())
+                .select_from(Dossier)
+                .where(Dossier.parent_id == did, Dossier.id.in_(remaining))
+            )
+            if not child_count:
+                leaf_ids.append(did)
+        for lid in leaf_ids:
+            to_delete = await db.get(Dossier, lid)
+            if to_delete is not None:
+                await db.delete(to_delete)
+            remaining.remove(lid)
+
     await db.commit()
 
 
@@ -137,6 +206,6 @@ async def get_fichier_archive(db: AsyncSession, fichier_id: int) -> FichierArchi
 
 async def delete_fichier_archive(db: AsyncSession, fichier_id: int) -> None:
     fichier = await get_fichier_archive(db, fichier_id)
-    storage_service.delete_file(fichier.chemin_stockage)
+    storage_service.try_delete_file(fichier.chemin_stockage)
     await db.delete(fichier)
     await db.commit()
