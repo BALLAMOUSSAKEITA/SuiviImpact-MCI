@@ -1,7 +1,7 @@
 """Workflow API endpoints."""
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user
@@ -83,3 +83,13 @@ async def perform_action(
 ) -> WorkflowRead:
     body = WorkflowActionCreate.model_validate_json(payload)
     return await service.perform_action(db, workflow_id, step_id, body, user, fichier)
+
+
+@router.delete("/workflows/{workflow_id}", status_code=204)
+async def delete_workflow(
+    workflow_id: int,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> Response:
+    await service.delete_workflow(db, workflow_id, user)
+    return Response(status_code=204)

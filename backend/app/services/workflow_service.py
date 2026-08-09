@@ -28,6 +28,7 @@ from app.schemas.workflow import (
 from app.core.workflow_access import (
     assert_can_act_on_step,
     assert_can_create_workflow,
+    assert_can_delete_workflow,
     step_has_attached_file,
 )
 from app.services.storage_service import storage_service
@@ -261,3 +262,24 @@ async def perform_action(
 async def get_workflow(db: AsyncSession, workflow_id: int) -> WorkflowRead:
     wf = await _load_workflow(db, workflow_id)
     return _workflow_to_read(wf)
+
+
+def _delete_action_file(file_path: str | None) -> None:
+    if not file_path:
+        return
+    try:
+        storage_service.delete_file(file_path)
+    except HTTPException:
+        pass
+
+
+async def delete_workflow(db: AsyncSession, workflow_id: int, user: User) -> None:
+    assert_can_delete_workflow(user)
+    wf = await _load_workflow(db, workflow_id)
+
+    for step in wf.steps:
+        for action in step.actions:
+            _delete_action_file(action.file_path)
+
+    await db.delete(wf)
+    await db.commit()

@@ -1738,6 +1738,10 @@ export async function performWorkflowAction(
   );
 }
 
+export async function deleteWorkflow(id: number): Promise<void> {
+  await apiFetch<void>(`/api/v1/workflows/${id}`, { method: "DELETE" });
+}
+
 /* ─── Notifications e-mail ─── */
 
 import type { EmailConfig, NotificationEmailItem, RappelActivitesStats } from "@/types";

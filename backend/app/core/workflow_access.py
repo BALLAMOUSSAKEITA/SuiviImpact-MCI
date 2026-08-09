@@ -45,5 +45,18 @@ def assert_can_act_on_step(user: User, step_role: WorkflowStepRole) -> None:
         )
 
 
+def can_delete_workflow(user: User) -> bool:
+    """Seul le BSD (rôle user) peut supprimer un workflow."""
+    return user.role == UserRole.USER
+
+
+def assert_can_delete_workflow(user: User) -> None:
+    if not can_delete_workflow(user):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Seul le BSD peut supprimer un workflow",
+        )
+
+
 def step_has_attached_file(step) -> bool:
     return any(a.file_path for a in step.actions)

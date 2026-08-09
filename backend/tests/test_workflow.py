@@ -63,3 +63,37 @@ async def test_validate_only_own_step(
     assert done_step["status"] == "done"
     bsd_step = next(s for s in updated["steps"] if s["role"] == "bsd")
     assert bsd_step["status"] == "active"
+
+
+@pytest.mark.asyncio
+async def test_only_bsd_can_delete_workflow(
+    client: AsyncClient,
+    directeur_headers: dict[str, str],
+    auth_headers: dict[str, str],
+):
+    create = await client.post(
+        "/api/v1/workflows",
+        headers=directeur_headers,
+        data={"payload": json.dumps({"title": "À supprimer", "type": "test"})},
+        files={"fichier": ("doc.pdf", b"%PDF-1.4", "application/pdf")},
+    )
+    assert create.status_code == 201
+    wf_id = create.json()["id"]
+
+    denied_directeur = await client.delete(
+        f"/api/v1/workflows/{wf_id}",
+        headers=directeur_headers,
+    )
+    assert denied_directeur.status_code == 403
+
+    deleted = await client.delete(
+        f"/api/v1/workflows/{wf_id}",
+        headers=auth_headers,
+    )
+    assert deleted.status_code == 204
+
+    missing = await client.get(
+        f"/api/v1/workflows/{wf_id}",
+        headers=auth_headers,
+    )
+    assert missing.status_code == 404
