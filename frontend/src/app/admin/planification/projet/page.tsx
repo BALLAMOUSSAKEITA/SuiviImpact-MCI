@@ -16,11 +16,16 @@ import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import {
   createPlanificationProjet,
+  getMinistreParametrage,
   listDirections,
   listPlanificationProjet,
   listProjets,
   updatePlanificationProjet,
 } from "@/lib/api";
+import {
+  handlePlanificationDirectionChange,
+  PLANIFICATION_EMAIL_HINT,
+} from "@/lib/planification-emails";
 import { cn } from "@/lib/utils";
 import type {
   PlanificationProjetComposanteInput,
@@ -68,6 +73,11 @@ function PlanificationProjetContent() {
   const { data: directions = [] } = useQuery({
     queryKey: ["directions"],
     queryFn: () => listDirections(),
+  });
+
+  const { data: ministre } = useQuery({
+    queryKey: ["ministre-parametrage"],
+    queryFn: getMinistreParametrage,
   });
 
   const [showForm, setShowForm] = useState(false);
@@ -221,6 +231,14 @@ function PlanificationProjetContent() {
     );
   };
 
+  const onDirectionChange = (value: string) => {
+    handlePlanificationDirectionChange(value, directions, ministre, {
+      setDirectionId,
+      setEmailResponsable,
+      setEmailMinistre,
+    });
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!projetId || !directionId) return;
@@ -372,7 +390,7 @@ function PlanificationProjetContent() {
                 <select
                   required
                   value={directionId}
-                  onChange={(e) => setDirectionId(e.target.value)}
+                  onChange={(e) => onDirectionChange(e.target.value)}
                   className="input-grain"
                 >
                   <option value="">Choisir une direction…</option>
@@ -393,6 +411,7 @@ function PlanificationProjetContent() {
                   onChange={(e) => setEmailResponsable(e.target.value)}
                   className="input-grain"
                 />
+                <p className="mt-1 text-xs text-ash">{PLANIFICATION_EMAIL_HINT}</p>
               </div>
 
               <div>

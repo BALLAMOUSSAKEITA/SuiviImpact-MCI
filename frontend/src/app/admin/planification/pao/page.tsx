@@ -18,6 +18,7 @@ import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import {
   createPlanificationPao,
+  getMinistreParametrage,
   listDirections,
   listObjectifs,
   listPlanificationPao,
@@ -25,6 +26,10 @@ import {
   updatePlanificationPao,
 } from "@/lib/api";
 import { fetchPlanificationPaoTdr } from "@/lib/stored-documents";
+import {
+  handlePlanificationDirectionChange,
+  PLANIFICATION_EMAIL_HINT,
+} from "@/lib/planification-emails";
 import type { PlanificationPaoActivite, PlanificationPaoCreate, PlanificationPaoTacheItem } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -68,6 +73,11 @@ function PlanificationPaoContent() {
   const { data: directions = [] } = useQuery({
     queryKey: ["directions"],
     queryFn: () => listDirections(),
+  });
+
+  const { data: ministre } = useQuery({
+    queryKey: ["ministre-parametrage"],
+    queryFn: getMinistreParametrage,
   });
 
   const [showForm, setShowForm] = useState(false);
@@ -180,6 +190,14 @@ function PlanificationPaoContent() {
 
   const updateSlot = (key: number, patch: Partial<TacheSlot>) => {
     setSlots((prev) => prev.map((s) => (s.key === key ? { ...s, ...patch } : s)));
+  };
+
+  const onDirectionChange = (value: string) => {
+    handlePlanificationDirectionChange(value, directions, ministre, {
+      setDirectionId,
+      setEmailResponsable,
+      setEmailMinistre,
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -304,7 +322,7 @@ function PlanificationPaoContent() {
                 <select
                   required
                   value={directionId}
-                  onChange={(e) => setDirectionId(e.target.value)}
+                  onChange={(e) => onDirectionChange(e.target.value)}
                   className="input-grain"
                 >
                   <option value="">Choisir une direction…</option>
@@ -326,6 +344,7 @@ function PlanificationPaoContent() {
                   className="input-grain"
                   placeholder="responsable@direction.gn"
                 />
+                <p className="mt-1 text-xs text-ash">{PLANIFICATION_EMAIL_HINT}</p>
               </div>
 
               <div>
