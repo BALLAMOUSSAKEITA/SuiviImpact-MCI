@@ -15,7 +15,6 @@ import {
 import { getStatsProjets } from "@/lib/api";
 import {
   DEFAULT_PROJET_STATS_SCOPE,
-  projetStatsScopeLabel,
   statsProjetsRequest,
   type ProjetStatsScope,
 } from "@/lib/projet-stats-scope";
@@ -38,7 +37,6 @@ function StatsProjetsContent() {
   });
 
   const isSingleProject = projetScope.kind === "projet";
-  const scopeLabel = projetStatsScopeLabel(projetScope);
 
   return (
     <>
@@ -54,14 +52,15 @@ function StatsProjetsContent() {
         state={periodState}
       />
 
-      <div className="mb-4">
-        <ProjetStatsFilter value={projetScope} onChange={setProjetScope} />
-      </div>
+      <ProjetStatsFilter
+        value={projetScope}
+        onChange={setProjetScope}
+        className="mb-4"
+      />
 
       <StatsQueryStatus isLoading={isLoading} isError={isError} error={error}>
         {stats ? (
           <>
-            <p className="mb-3 text-sm text-slate">{scopeLabel}</p>
             <StatGrid>
               <StatCard
                 title={isSingleProject ? "Projet dans le périmètre" : "Total projets"}

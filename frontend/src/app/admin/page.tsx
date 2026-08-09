@@ -19,7 +19,6 @@ import {
   type MetricItem,
 } from "@/components/dashboard/kpi-metric";
 import { DirectionFilter } from "@/components/direction-filter";
-import { ProjetStatsFilter } from "@/components/projet-stats-filter";
 import { PageHeader } from "@/components/page-header";
 import { StatsQueryStatus } from "@/components/stats-query-status";
 import { useStatsPeriodState } from "@/components/stats-period-filter";
@@ -37,6 +36,7 @@ import {
   statsProjetsRequest,
   type ProjetStatsScope,
 } from "@/lib/projet-stats-scope";
+import { ProjetStatsFilter } from "@/components/projet-stats-filter";
 import {
   getStatsActivites,
   getStatsMissions,
@@ -67,9 +67,6 @@ export default function AdminDashboardPage() {
   const [direction, setDirection] = useState<string | null>(null);
   const [trimestreRcc, setTrimestreRcc] = useState<number | undefined>();
   const [trimestreMissions, setTrimestreMissions] = useState<number | undefined>();
-  const [projetScope, setProjetScope] = useState<ProjetStatsScope>(
-    DEFAULT_PROJET_STATS_SCOPE,
-  );
 
   const secondaryFilter =
     currentView === "activites" ? (
@@ -83,12 +80,6 @@ export default function AdminDashboardPage() {
       <TrimestreFilter value={trimestreRcc} onChange={setTrimestreRcc} />
     ) : currentView === "missions" ? (
       <TrimestreFilter value={trimestreMissions} onChange={setTrimestreMissions} />
-    ) : currentView === "projets" || currentView === "synthese" ? (
-      <ProjetStatsFilter
-        value={projetScope}
-        onChange={setProjetScope}
-        compact
-      />
     ) : null;
 
   return (
@@ -108,11 +99,7 @@ export default function AdminDashboardPage() {
       />
 
       {currentView === "synthese" && (
-        <SyntheseView
-          periodState={periodState}
-          projetScope={projetScope}
-          onNavigate={setCurrentView}
-        />
+        <SyntheseView periodState={periodState} onNavigate={setCurrentView} />
       )}
       {currentView === "activites" && (
         <ActivitesView periodState={periodState} direction={direction} />
@@ -124,24 +111,19 @@ export default function AdminDashboardPage() {
         <MissionsView periodState={periodState} trimestre={trimestreMissions} />
       )}
       {currentView === "ppm" && <PpmView periodState={periodState} />}
-      {currentView === "projets" && (
-        <ProjetsView periodState={periodState} projetScope={projetScope} />
-      )}
+      {currentView === "projets" && <ProjetsView periodState={periodState} />}
     </div>
   );
 }
 
 function SyntheseView({
   periodState,
-  projetScope,
   onNavigate,
 }: {
   periodState: StatsPeriodState;
-  projetScope: ProjetStatsScope;
   onNavigate: (view: ViewId) => void;
 }) {
   const { params: period } = periodState;
-  const projetsStatsParams = statsProjetsRequest(projetScope, period);
 
   const results = useQueries({
     queries: [
@@ -162,8 +144,8 @@ function SyntheseView({
         queryFn: () => getStatsPpm(undefined, period),
       },
       {
-        queryKey: ["stats-projets", projetScope, period],
-        queryFn: () => getStatsProjets(projetsStatsParams),
+        queryKey: ["stats-projets", period],
+        queryFn: () => getStatsProjets({ period }),
       },
     ],
   });
@@ -249,7 +231,7 @@ function SyntheseView({
             {
               label: "Projets actifs",
               value: projets?.total ?? 0,
-              hint: projetStatsScopeLabel(projetScope),
+              hint: "Suivi financier et physique",
             },
           ]}
         />
@@ -280,7 +262,7 @@ function SyntheseView({
           {projets && (
             <ChartPanel
               title="Exécution projets"
-              subtitle={projetStatsScopeLabel(projetScope)}
+              subtitle="Moyennes financière et physique"
               action={
                 <button
                   type="button"
@@ -475,14 +457,11 @@ function PpmView({ periodState }: { periodState: StatsPeriodState }) {
   );
 }
 
-function ProjetsView({
-  periodState,
-  projetScope,
-}: {
-  periodState: StatsPeriodState;
-  projetScope: ProjetStatsScope;
-}) {
+function ProjetsView({ periodState }: { periodState: StatsPeriodState }) {
   const { params: period } = periodState;
+  const [projetScope, setProjetScope] = useState<ProjetStatsScope>(
+    DEFAULT_PROJET_STATS_SCOPE,
+  );
   const statsParams = statsProjetsRequest(projetScope, period);
 
   const { data: stats, isLoading, isError, error } = useQuery({
@@ -493,48 +472,54 @@ function ProjetsView({
   const fin = stats ? parseProgress(stats.execution_financiere) : 0;
   const phys = stats ? parseProgress(stats.execution_physique) : 0;
   const ecart = fin - phys;
-  const scopeLabel = projetStatsScopeLabel(projetScope);
   const isSingleProject = projetScope.kind === "projet";
 
   return (
-    <StatsQueryStatus isLoading={isLoading} isError={isError} error={error}>
-      {stats ? (
-        <DashboardSurface>
-          <p className="text-sm text-slate">{scopeLabel}</p>
-          <MetricStrip
-            metrics={[
-              {
-                label: isSingleProject ? "Projet suivi" : "Total projets",
-                value: stats.total,
-              },
-              {
-                label: isSingleProject ? "Exécution financière" : "Exécution financière moyenne",
-                value: `${fin.toFixed(0)} %`,
-              },
-              {
-                label: isSingleProject ? "Exécution physique" : "Exécution physique moyenne",
-                value: `${phys.toFixed(0)} %`,
-              },
-              {
-                label: "Écart financier − physique",
-                value: `${ecart >= 0 ? "+" : ""}${ecart.toFixed(0)} pts`,
-                emphasize: Math.abs(ecart) >= 15,
-              },
-            ]}
-          />
+    <div className="space-y-4">
+      <ProjetStatsFilter value={projetScope} onChange={setProjetScope} />
 
-          <ChartPanel
-            title="Comparaison des exécutions"
-            subtitle={scopeLabel}
-          >
-            <ComparisonBarChart
-              financier={stats.execution_financiere}
-              physique={stats.execution_physique}
-              height={280}
+      <StatsQueryStatus isLoading={isLoading} isError={isError} error={error}>
+        {stats ? (
+          <DashboardSurface>
+            <MetricStrip
+              metrics={[
+                {
+                  label: isSingleProject ? "Projet suivi" : "Total projets",
+                  value: stats.total,
+                },
+                {
+                  label: isSingleProject
+                    ? "Exécution financière"
+                    : "Exécution financière moyenne",
+                  value: `${fin.toFixed(0)} %`,
+                },
+                {
+                  label: isSingleProject
+                    ? "Exécution physique"
+                    : "Exécution physique moyenne",
+                  value: `${phys.toFixed(0)} %`,
+                },
+                {
+                  label: "Écart financier − physique",
+                  value: `${ecart >= 0 ? "+" : ""}${ecart.toFixed(0)} pts`,
+                  emphasize: Math.abs(ecart) >= 15,
+                },
+              ]}
             />
-          </ChartPanel>
-        </DashboardSurface>
-      ) : null}
-    </StatsQueryStatus>
+
+            <ChartPanel
+              title="Comparaison des exécutions"
+              subtitle={projetStatsScopeLabel(projetScope)}
+            >
+              <ComparisonBarChart
+                financier={stats.execution_financiere}
+                physique={stats.execution_physique}
+                height={280}
+              />
+            </ChartPanel>
+          </DashboardSurface>
+        ) : null}
+      </StatsQueryStatus>
+    </div>
   );
 }
