@@ -29,6 +29,7 @@ function ProjetsContent() {
   const queryClient = useQueryClient();
   const [typeFilter, setTypeFilter] = useState<ProjetTypeFilter>("all");
   const [showCreate, setShowCreate] = useState(false);
+  const [code, setCode] = useState("");
   const [nom, setNom] = useState("");
   const [typeProjet, setTypeProjet] = useState<ProjetType>("ordinaire");
   const [editing, setEditing] = useState<Projet | null>(null);
@@ -51,9 +52,14 @@ function ProjetsContent() {
 
   const createMutation = useMutation({
     mutationFn: () =>
-      createProjet({ description: nom.trim(), type_projet: typeProjet }),
+      createProjet({
+        code: code.trim(),
+        description: nom.trim(),
+        type_projet: typeProjet,
+      }),
     onSuccess: (projet) => {
       toast.success(`Projet créé — ${projet.code}`);
+      setCode("");
       setNom("");
       setTypeProjet("ordinaire");
       setShowCreate(false);
@@ -118,7 +124,7 @@ function ProjetsContent() {
       <PageHeader
         eyebrow="Paramétrage"
         title="Projets"
-        description="Référentiel des projets ordinaires et méga-projets Simandou — identifiant généré à la création."
+        description="Référentiel des projets ordinaires et méga-projets Simandou — code saisi à la création."
         actions={
           canWrite && !showCreate ? (
             <Button onClick={() => setShowCreate(true)}>
@@ -153,12 +159,24 @@ function ProjetsContent() {
             className="space-y-4"
             onSubmit={(e) => {
               e.preventDefault();
-              if (!nom.trim()) return;
+              if (!code.trim() || !nom.trim()) return;
               createMutation.mutate();
             }}
           >
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-3">
               <div>
+                <label className="label-grain">Code</label>
+                <input
+                  required
+                  maxLength={32}
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  className="input-grain w-full font-mono"
+                  placeholder="Ex. SIM-01"
+                  autoComplete="off"
+                />
+              </div>
+              <div className="sm:col-span-2">
                 <label className="label-grain">Nom du projet</label>
                 <input
                   required
@@ -168,21 +186,18 @@ function ProjetsContent() {
                   placeholder="Ex. Appui aux MPME de Kindia"
                 />
               </div>
-              <div>
+              <div className="sm:col-span-3">
                 <label className="label-grain">Type de projet</label>
                 <select
                   value={typeProjet}
                   onChange={(e) => setTypeProjet(e.target.value as ProjetType)}
-                  className="input-grain w-full"
+                  className="input-grain w-full sm:max-w-xs"
                 >
                   <option value="ordinaire">{PROJET_TYPE_LABELS.ordinaire}</option>
                   <option value="mega_simandou">{PROJET_TYPE_LABELS.mega_simandou}</option>
                 </select>
               </div>
             </div>
-            <p className="text-[11px] text-ash">
-              L&apos;identifiant (ex. A1B2C3D4) sera généré automatiquement.
-            </p>
             <div className="flex gap-2">
               <Button type="submit" disabled={createMutation.isPending}>
                 Enregistrer
@@ -192,6 +207,7 @@ function ProjetsContent() {
                 variant="ghost"
                 onClick={() => {
                   setShowCreate(false);
+                  setCode("");
                   setNom("");
                   setTypeProjet("ordinaire");
                 }}
@@ -207,7 +223,7 @@ function ProjetsContent() {
         <table className="table-grain">
           <thead>
             <tr>
-              <th className="w-[140px]">Identifiant</th>
+              <th className="w-[140px]">Code</th>
               <th className="w-[200px]">Type</th>
               <th>Nom du projet</th>
               {canWrite && <th className="w-[1%] text-right">Actions</th>}
@@ -287,7 +303,7 @@ function ProjetsContent() {
             </select>
           </div>
           <p className="text-[11px] text-ash">
-            L&apos;identifiant {editing?.code} ne change pas.
+            Le code {editing?.code} ne peut pas être modifié après création.
           </p>
           <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" onClick={closeEdit}>

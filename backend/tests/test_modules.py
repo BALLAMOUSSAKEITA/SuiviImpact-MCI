@@ -136,7 +136,7 @@ async def test_projets_parametrage_crud(client: AsyncClient, auth_headers: dict[
     create = await client.post(
         "/api/v1/projets",
         headers=auth_headers,
-        json={"description": "Projet CRUD test", "type_projet": "mega_simandou"},
+        json={"code": "CRUD-01", "description": "Projet CRUD test", "type_projet": "mega_simandou"},
     )
     assert create.status_code == 201
     item_id = create.json()["id"]
@@ -160,12 +160,12 @@ async def test_projets_filter_by_type(client: AsyncClient, auth_headers: dict[st
     ordinaire = await client.post(
         "/api/v1/projets",
         headers=auth_headers,
-        json={"description": "Projet ordinaire A", "type_projet": "ordinaire"},
+        json={"code": "ORD-A", "description": "Projet ordinaire A", "type_projet": "ordinaire"},
     )
     mega = await client.post(
         "/api/v1/projets",
         headers=auth_headers,
-        json={"description": "Simandou rail", "type_projet": "mega_simandou"},
+        json={"code": "SIM-RAIL", "description": "Simandou rail", "type_projet": "mega_simandou"},
     )
     assert ordinaire.status_code == 201
     assert mega.status_code == 201
@@ -184,3 +184,29 @@ async def test_projets_filter_by_type(client: AsyncClient, auth_headers: dict[st
 
     await client.delete(f"/api/v1/projets/{ordinaire.json()['id']}", headers=auth_headers)
     await client.delete(f"/api/v1/projets/{mega.json()['id']}", headers=auth_headers)
+
+
+@pytest.mark.asyncio
+async def test_projets_code_required_and_unique(client: AsyncClient, auth_headers: dict[str, str]):
+    missing = await client.post(
+        "/api/v1/projets",
+        headers=auth_headers,
+        json={"description": "Sans code"},
+    )
+    assert missing.status_code == 422
+
+    create = await client.post(
+        "/api/v1/projets",
+        headers=auth_headers,
+        json={"code": "UNIQ-99", "description": "Projet unique"},
+    )
+    assert create.status_code == 201
+
+    duplicate = await client.post(
+        "/api/v1/projets",
+        headers=auth_headers,
+        json={"code": "UNIQ-99", "description": "Doublon"},
+    )
+    assert duplicate.status_code == 400
+
+    await client.delete(f"/api/v1/projets/{create.json()['id']}", headers=auth_headers)

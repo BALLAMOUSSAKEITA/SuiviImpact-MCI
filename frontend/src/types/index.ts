@@ -483,6 +483,7 @@ export interface Projet {
 }
 
 export interface ProjetCreate {
+  code: string;
   description: string;
   type_projet?: ProjetType;
   abreviation?: string | null;

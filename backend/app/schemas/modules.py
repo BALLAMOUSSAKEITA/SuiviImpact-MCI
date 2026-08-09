@@ -134,6 +134,7 @@ class PpmRead(BaseModel):
 
 
 class ProjetCreate(BaseModel):
+    code: str = Field(min_length=1, max_length=32, description="Code projet")
     description: str = Field(min_length=1, description="Nom du projet")
     type_projet: ProjetType = ProjetType.ORDINAIRE
 

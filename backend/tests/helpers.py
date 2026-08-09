@@ -46,7 +46,7 @@ async def create_projet_parametrage(client: AsyncClient, headers: dict[str, str]
     response = await client.post(
         "/api/v1/projets",
         headers=headers,
-        json={"description": "Projet paramétrage test"},
+        json={"code": "PRJ-TEST", "description": "Projet paramétrage test"},
     )
     assert response.status_code == 201, response.text
     return response.json()["id"]
