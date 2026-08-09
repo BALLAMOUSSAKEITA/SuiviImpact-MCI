@@ -74,6 +74,8 @@ import type {
 
   ProjetCreate,
 
+  ProjetType,
+
   ProjetStats,
 
   ProjetUpdate,
@@ -1326,12 +1328,15 @@ export async function deletePpm(id: number): Promise<void> {
 
 
 
-export async function listProjets(statut?: string): Promise<Projet[]> {
-
-  const query = statut ? `?statut=${statut}` : "";
-
-  return apiFetch<Projet[]>(`/api/v1/projets${query}`);
-
+export async function listProjets(options?: {
+  statut?: string;
+  type_projet?: ProjetType;
+}): Promise<Projet[]> {
+  const params = new URLSearchParams();
+  if (options?.statut) params.set("statut", options.statut);
+  if (options?.type_projet) params.set("type_projet", options.type_projet);
+  const query = params.toString();
+  return apiFetch<Projet[]>(`/api/v1/projets${query ? `?${query}` : ""}`);
 }
 
 

@@ -27,6 +27,7 @@ from app.schemas.modules import (
     PpmUpdate,
     ProjetCreate,
     ProjetRead,
+    ProjetType,
     ProjetUpdate,
     RecommandationCreate,
     RecommandationRead,
@@ -225,8 +226,11 @@ async def delete_ppm(db: AsyncSession, item: Ppm) -> None:
 async def list_projets(
     db: AsyncSession,
     statut: str | None = None,
+    type_projet: ProjetType | None = None,
 ) -> list[ProjetRead]:
     query = select(Projet).order_by(Projet.id)
+    if type_projet is not None:
+        query = query.where(Projet.type_projet == type_projet)
     if statut is not None:
         execution = Projet.execution_physique
         if statut in ("non_execute", "non_demare"):
@@ -259,7 +263,11 @@ async def _generate_projet_code(db: AsyncSession) -> str:
 
 async def create_projet(db: AsyncSession, data: ProjetCreate) -> ProjetRead:
     code = await _generate_projet_code(db)
-    item = Projet(code=code, description=data.description.strip())
+    item = Projet(
+        code=code,
+        description=data.description.strip(),
+        type_projet=data.type_projet,
+    )
     db.add(item)
     await db.commit()
     await db.refresh(item)

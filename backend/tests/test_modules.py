@@ -136,18 +136,51 @@ async def test_projets_parametrage_crud(client: AsyncClient, auth_headers: dict[
     create = await client.post(
         "/api/v1/projets",
         headers=auth_headers,
-        json={"description": "Projet CRUD test"},
+        json={"description": "Projet CRUD test", "type_projet": "mega_simandou"},
     )
     assert create.status_code == 201
     item_id = create.json()["id"]
     assert create.json()["code"]
+    assert create.json()["type_projet"] == "mega_simandou"
 
     update = await client.put(
         f"/api/v1/projets/{item_id}",
         headers=auth_headers,
-        json={"description": "Projet renommé", "cout": 1000000},
+        json={"description": "Projet renommé", "cout": 1000000, "type_projet": "ordinaire"},
     )
     assert update.status_code == 200
+    assert update.json()["type_projet"] == "ordinaire"
 
     delete = await client.delete(f"/api/v1/projets/{item_id}", headers=auth_headers)
     assert delete.status_code == 204
+
+
+@pytest.mark.asyncio
+async def test_projets_filter_by_type(client: AsyncClient, auth_headers: dict[str, str]):
+    ordinaire = await client.post(
+        "/api/v1/projets",
+        headers=auth_headers,
+        json={"description": "Projet ordinaire A", "type_projet": "ordinaire"},
+    )
+    mega = await client.post(
+        "/api/v1/projets",
+        headers=auth_headers,
+        json={"description": "Simandou rail", "type_projet": "mega_simandou"},
+    )
+    assert ordinaire.status_code == 201
+    assert mega.status_code == 201
+
+    all_items = await client.get("/api/v1/projets", headers=auth_headers)
+    assert all_items.status_code == 200
+    assert len(all_items.json()) >= 2
+
+    mega_only = await client.get(
+        "/api/v1/projets?type_projet=mega_simandou",
+        headers=auth_headers,
+    )
+    assert mega_only.status_code == 200
+    assert all(p["type_projet"] == "mega_simandou" for p in mega_only.json())
+    assert any(p["description"] == "Simandou rail" for p in mega_only.json())
+
+    await client.delete(f"/api/v1/projets/{ordinaire.json()['id']}", headers=auth_headers)
+    await client.delete(f"/api/v1/projets/{mega.json()['id']}", headers=auth_headers)

@@ -14,6 +14,11 @@ class PpmStatut(str, Enum):
     CONTRAT_SIGNE = "contrat_signe"
 
 
+class ProjetType(str, Enum):
+    ORDINAIRE = "ordinaire"
+    MEGA_SIMANDOU = "mega_simandou"
+
+
 class RecommandationCreate(BaseModel):
     trimestre: int = Field(ge=1, le=4)
     annee: int = Field(default=DEFAULT_ANNEE, ge=MIN_ANNEE, le=MAX_ANNEE)
@@ -130,10 +135,12 @@ class PpmRead(BaseModel):
 
 class ProjetCreate(BaseModel):
     description: str = Field(min_length=1, description="Nom du projet")
+    type_projet: ProjetType = ProjetType.ORDINAIRE
 
 
 class ProjetUpdate(BaseModel):
     description: str | None = Field(default=None, min_length=1)
+    type_projet: ProjetType | None = None
     abreviation: str | None = Field(default=None, max_length=20)
     cout: Decimal | None = Field(default=None, ge=0)
     bailleur: str | None = Field(default=None, max_length=50)
@@ -151,6 +158,7 @@ class ProjetRead(BaseModel):
 
     id: int
     code: str
+    type_projet: ProjetType
     description: str
     abreviation: str | None
     cout: Decimal | None

@@ -461,9 +461,12 @@ export interface PpmUpdate {
   observations?: string | null;
 }
 
+export type ProjetType = "ordinaire" | "mega_simandou";
+
 export interface Projet {
   id: number;
   code: string;
+  type_projet: ProjetType;
   description: string;
   abreviation: string | null;
   cout: string | null;
@@ -481,6 +484,7 @@ export interface Projet {
 
 export interface ProjetCreate {
   description: string;
+  type_projet?: ProjetType;
   abreviation?: string | null;
   cout?: number | null;
   bailleur?: string | null;
@@ -495,6 +499,7 @@ export interface ProjetCreate {
 
 export interface ProjetUpdate {
   description?: string;
+  type_projet?: ProjetType;
   abreviation?: string | null;
   cout?: number | null;
   bailleur?: string | null;

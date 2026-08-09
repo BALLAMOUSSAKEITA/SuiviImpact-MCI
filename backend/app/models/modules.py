@@ -26,6 +26,11 @@ class PpmStatut(str, enum.Enum):
     CONTRAT_SIGNE = "contrat_signe"
 
 
+class ProjetType(str, enum.Enum):
+    ORDINAIRE = "ordinaire"
+    MEGA_SIMANDOU = "mega_simandou"
+
+
 class Recommandation(Base):
     __tablename__ = "recommandations"
     __table_args__ = (
@@ -101,6 +106,11 @@ class Projet(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     code: Mapped[str] = mapped_column(String(32), unique=True, nullable=False, index=True)
+    type_projet: Mapped[ProjetType] = mapped_column(
+        pg_enum(ProjetType, "projet_type_enum"),
+        default=ProjetType.ORDINAIRE,
+        nullable=False,
+    )
     description: Mapped[str] = mapped_column(Text, nullable=False)
     abreviation: Mapped[str | None] = mapped_column(String(20))
     cout: Mapped[Decimal | None] = mapped_column(Numeric(15, 2))

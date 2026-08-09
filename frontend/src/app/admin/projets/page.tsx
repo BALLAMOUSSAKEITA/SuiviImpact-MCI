@@ -11,7 +11,14 @@ import { PageHeader } from "@/components/page-header";
 import { TableRowActions } from "@/components/table-row-actions";
 import { Button } from "@/components/ui/button";
 import { createProjet, deleteProjet, listProjets, updateProjet } from "@/lib/api";
-import type { Projet } from "@/types";
+import {
+  PROJET_TYPE_FILTER_OPTIONS,
+  PROJET_TYPE_LABELS,
+  projetTypeBadgeClass,
+  type ProjetTypeFilter,
+} from "@/lib/projet-types";
+import { cn } from "@/lib/utils";
+import type { Projet, ProjetType } from "@/types";
 
 export default function ProjetsPage() {
   return <ProjetsContent />;
@@ -20,27 +27,35 @@ export default function ProjetsPage() {
 function ProjetsContent() {
   const { canWrite } = useAuth();
   const queryClient = useQueryClient();
+  const [typeFilter, setTypeFilter] = useState<ProjetTypeFilter>("all");
   const [showCreate, setShowCreate] = useState(false);
   const [nom, setNom] = useState("");
+  const [typeProjet, setTypeProjet] = useState<ProjetType>("ordinaire");
   const [editing, setEditing] = useState<Projet | null>(null);
   const [editNom, setEditNom] = useState("");
+  const [editType, setEditType] = useState<ProjetType>("ordinaire");
   const [confirmUpdate, setConfirmUpdate] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Projet | null>(null);
 
-  const queryKey = ["projets"];
+  const queryKey = ["projets", typeFilter];
 
   const { data: items = [], isLoading } = useQuery({
     queryKey,
-    queryFn: () => listProjets(),
+    queryFn: () =>
+      listProjets(
+        typeFilter === "all" ? undefined : { type_projet: typeFilter },
+      ),
   });
 
-  const invalidate = () => queryClient.invalidateQueries({ queryKey });
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ["projets"] });
 
   const createMutation = useMutation({
-    mutationFn: () => createProjet({ description: nom.trim() }),
+    mutationFn: () =>
+      createProjet({ description: nom.trim(), type_projet: typeProjet }),
     onSuccess: (projet) => {
       toast.success(`Projet créé — ${projet.code}`);
       setNom("");
+      setTypeProjet("ordinaire");
       setShowCreate(false);
       invalidate();
     },
@@ -48,7 +63,11 @@ function ProjetsContent() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: () => updateProjet(editing!.id, { description: editNom.trim() }),
+    mutationFn: () =>
+      updateProjet(editing!.id, {
+        description: editNom.trim(),
+        type_projet: editType,
+      }),
     onSuccess: () => {
       toast.success("Projet mis à jour");
       setConfirmUpdate(false);
@@ -71,6 +90,7 @@ function ProjetsContent() {
   const openEdit = (item: Projet) => {
     setEditing(item);
     setEditNom(item.description);
+    setEditType(item.type_projet);
     setConfirmUpdate(false);
   };
 
@@ -90,7 +110,7 @@ function ProjetsContent() {
 
   const updateConfirmDescription =
     editing !== null
-      ? `Enregistrer le nom « ${editNom.trim()} » pour le projet ${editing.code} ?`
+      ? `Enregistrer « ${editNom.trim()} » (${PROJET_TYPE_LABELS[editType]}) pour le projet ${editing.code} ?`
       : "";
 
   return (
@@ -98,7 +118,7 @@ function ProjetsContent() {
       <PageHeader
         eyebrow="Paramétrage"
         title="Projets"
-        description="Référentiel des projets — identifiant généré automatiquement à la création."
+        description="Référentiel des projets ordinaires et méga-projets Simandou — identifiant généré à la création."
         actions={
           canWrite && !showCreate ? (
             <Button onClick={() => setShowCreate(true)}>
@@ -109,29 +129,60 @@ function ProjetsContent() {
         }
       />
 
+      <div className="flex flex-wrap gap-2">
+        {PROJET_TYPE_FILTER_OPTIONS.map((option) => (
+          <button
+            key={option.value}
+            type="button"
+            onClick={() => setTypeFilter(option.value)}
+            className={cn(
+              "rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
+              typeFilter === option.value
+                ? "bg-forest-ink text-white"
+                : "bg-veil text-slate hover:bg-cloud hover:text-graphite",
+            )}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
+
       {showCreate && canWrite && (
         <div className="panel-grain">
           <form
-            className="flex flex-col gap-3 sm:flex-row sm:items-end"
+            className="space-y-4"
             onSubmit={(e) => {
               e.preventDefault();
               if (!nom.trim()) return;
               createMutation.mutate();
             }}
           >
-            <div className="flex-1">
-              <label className="label-grain">Nom du projet</label>
-              <input
-                required
-                value={nom}
-                onChange={(e) => setNom(e.target.value)}
-                className="input-grain"
-                placeholder="Ex. Appui aux MPME de Kindia"
-              />
-              <p className="mt-1.5 text-[11px] text-ash">
-                L&apos;identifiant (ex. A1B2C3D4) sera généré automatiquement.
-              </p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label className="label-grain">Nom du projet</label>
+                <input
+                  required
+                  value={nom}
+                  onChange={(e) => setNom(e.target.value)}
+                  className="input-grain w-full"
+                  placeholder="Ex. Appui aux MPME de Kindia"
+                />
+              </div>
+              <div>
+                <label className="label-grain">Type de projet</label>
+                <select
+                  value={typeProjet}
+                  onChange={(e) => setTypeProjet(e.target.value as ProjetType)}
+                  className="input-grain w-full"
+                >
+                  <option value="ordinaire">{PROJET_TYPE_LABELS.ordinaire}</option>
+                  <option value="mega_simandou">{PROJET_TYPE_LABELS.mega_simandou}</option>
+                </select>
+              </div>
             </div>
+            <p className="text-[11px] text-ash">
+              L&apos;identifiant (ex. A1B2C3D4) sera généré automatiquement.
+            </p>
             <div className="flex gap-2">
               <Button type="submit" disabled={createMutation.isPending}>
                 Enregistrer
@@ -142,6 +193,7 @@ function ProjetsContent() {
                 onClick={() => {
                   setShowCreate(false);
                   setNom("");
+                  setTypeProjet("ordinaire");
                 }}
               >
                 Annuler
@@ -156,6 +208,7 @@ function ProjetsContent() {
           <thead>
             <tr>
               <th className="w-[140px]">Identifiant</th>
+              <th className="w-[200px]">Type</th>
               <th>Nom du projet</th>
               {canWrite && <th className="w-[1%] text-right">Actions</th>}
             </tr>
@@ -163,15 +216,15 @@ function ProjetsContent() {
           <tbody>
             {isLoading && (
               <tr>
-                <td colSpan={canWrite ? 3 : 2} className="py-8 text-center text-ash">
+                <td colSpan={canWrite ? 4 : 3} className="py-8 text-center text-ash">
                   Chargement…
                 </td>
               </tr>
             )}
             {!isLoading && items.length === 0 && (
               <tr>
-                <td colSpan={canWrite ? 3 : 2} className="py-8 text-center text-ash">
-                  Aucun projet enregistré.
+                <td colSpan={canWrite ? 4 : 3} className="py-8 text-center text-ash">
+                  Aucun projet pour ce filtre.
                 </td>
               </tr>
             )}
@@ -180,6 +233,16 @@ function ProjetsContent() {
                 <td>
                   <span className="inline-flex rounded-full bg-forest-ink/8 px-2.5 py-0.5 text-xs font-bold text-forest-ink">
                     {item.code}
+                  </span>
+                </td>
+                <td>
+                  <span
+                    className={cn(
+                      "inline-flex rounded-full px-2.5 py-0.5 text-[11px] font-medium",
+                      projetTypeBadgeClass(item.type_projet),
+                    )}
+                  >
+                    {PROJET_TYPE_LABELS[item.type_projet]}
                   </span>
                 </td>
                 <td className="font-medium text-graphite">{item.description}</td>
@@ -209,12 +272,23 @@ function ProjetsContent() {
               required
               value={editNom}
               onChange={(e) => setEditNom(e.target.value)}
-              className="input-grain"
+              className="input-grain w-full"
             />
-            <p className="mt-1.5 text-[11px] text-ash">
-              L&apos;identifiant {editing?.code} ne change pas.
-            </p>
           </div>
+          <div>
+            <label className="label-grain">Type de projet</label>
+            <select
+              value={editType}
+              onChange={(e) => setEditType(e.target.value as ProjetType)}
+              className="input-grain w-full"
+            >
+              <option value="ordinaire">{PROJET_TYPE_LABELS.ordinaire}</option>
+              <option value="mega_simandou">{PROJET_TYPE_LABELS.mega_simandou}</option>
+            </select>
+          </div>
+          <p className="text-[11px] text-ash">
+            L&apos;identifiant {editing?.code} ne change pas.
+          </p>
           <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" onClick={closeEdit}>
               Annuler
