@@ -2,11 +2,14 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  AlertTriangle,
   Check,
-  ChevronRight,
+  ChevronDown,
   FileText,
   Loader2,
   MessageSquare,
+  Minus,
+  Play,
   Plus,
   RotateCcw,
   Trash2,
@@ -16,7 +19,7 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/components/auth-provider";
-import { ConfirmDialog, FormDialog } from "@/components/confirm-dialog";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { MetricStrip } from "@/components/dashboard/kpi-metric";
 import { FileUploadField } from "@/components/file-upload-field";
 import { PageHeader } from "@/components/page-header";
@@ -36,29 +39,13 @@ import {
 import { cn } from "@/lib/utils";
 import {
   WORKFLOW_ROLE_LABELS,
-  type ActionType,
   type StepStatus,
   type WorkflowItem,
   type WorkflowStep,
   type WorkflowStepRole,
 } from "@/types";
 
-const STEP_ROLES: WorkflowStepRole[] = [
-  "directeur",
-  "bsd",
-  "sg",
-  "ministre",
-  "daf",
-];
-
-const WORKFLOW_STATUS_LABELS: Record<
-  WorkflowItem["status"],
-  { label: string; className: string }
-> = {
-  en_cours: { label: "En cours", className: "text-graphite bg-veil" },
-  termine: { label: "Terminé", className: "text-forest-ink bg-mint/60" },
-  rejete: { label: "Retourné", className: "text-amber-700 bg-amber-50" },
-};
+const STEP_ROLES: WorkflowStepRole[] = ["directeur", "bsd", "sg", "ministre", "daf"];
 
 export default function WorkflowPage() {
   const { user } = useAuth();
@@ -67,7 +54,7 @@ export default function WorkflowPage() {
   const [newTitle, setNewTitle] = useState("");
   const [newType, setNewType] = useState("Budget");
   const [newFile, setNewFile] = useState<File | null>(null);
-  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [selected, setSelected] = useState<WorkflowItem | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<WorkflowItem | null>(null);
 
   const { data: workflows = [], isLoading } = useQuery({
@@ -87,12 +74,11 @@ export default function WorkflowPage() {
       if (!newFile) throw new Error("Fichier requis");
       return createWorkflow({ title: newTitle, type: newType }, newFile);
     },
-    onSuccess: (created) => {
-      toast.success("Workflow déclenché");
+    onSuccess: () => {
+      toast.success("Workflow déclenché — fichier transmis au circuit");
       setShowNew(false);
       setNewTitle("");
       setNewFile(null);
-      setSelectedId(created.id);
       queryClient.invalidateQueries({ queryKey: ["workflows"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -103,7 +89,7 @@ export default function WorkflowPage() {
     onSuccess: () => {
       toast.success("Workflow supprimé");
       setDeleteTarget(null);
-      setSelectedId(null);
+      setSelected(null);
       queryClient.invalidateQueries({ queryKey: ["workflows"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -113,16 +99,16 @@ export default function WorkflowPage() {
   const mayDelete = canDeleteWorkflow(user?.role);
 
   return (
-    <div className="mx-auto max-w-[1200px] space-y-4">
+    <>
       <PageHeader
         eyebrow="Processus"
         title="Workflow"
-        description="Circuit Directeur → BSD → SG → Ministre → DAF"
+        description="Circuit de validation des dossiers — Directeur → BSD → SG → Ministre → DAF"
         actions={
           mayCreate ? (
-            <Button onClick={() => setShowNew(true)}>
-              <Plus className="size-4" />
-              Nouveau circuit
+            <Button onClick={() => setShowNew(!showNew)}>
+              <Plus className="h-4 w-4" />
+              Déclencher un workflow
             </Button>
           ) : undefined
         }
@@ -136,85 +122,31 @@ export default function WorkflowPage() {
             { label: "Terminés", value: summary.termines },
             { label: "Retournés", value: summary.retournes },
           ]}
+          className="mb-4"
         />
       )}
 
-      {isLoading ? (
-        <div className="flex items-center justify-center py-16 text-slate">
-          <Loader2 className="size-5 animate-spin" />
-        </div>
-      ) : workflows.length === 0 ? (
-        <div className="rounded-[var(--radius-card)] border border-cloud bg-white px-6 py-14 text-center">
-          <p className="text-sm text-slate">Aucun workflow enregistré.</p>
-          {mayCreate && (
-            <Button
-              className="mt-4"
-              size="sm"
-              variant="outline"
-              onClick={() => setShowNew(true)}
-            >
-              Déclencher un circuit
-            </Button>
-          )}
-        </div>
-      ) : (
-        <div className="overflow-hidden rounded-[var(--radius-card)] border border-cloud bg-white">
-          <ul className="divide-y divide-cloud">
-            {workflows.map((wf) => (
-              <li key={wf.id}>
-                <WorkflowRow
-                  workflow={wf}
-                  expanded={selectedId === wf.id}
-                  onToggle={() =>
-                    setSelectedId(selectedId === wf.id ? null : wf.id)
-                  }
-                />
-                {selectedId === wf.id && (
-                  <WorkflowDetail
-                    workflow={wf}
-                    mayDelete={mayDelete}
-                    onDelete={() => setDeleteTarget(wf)}
-                    onUpdate={(updated) => {
-                      queryClient.setQueryData<WorkflowItem[]>(
-                        ["workflows"],
-                        (prev) =>
-                          prev?.map((w) => (w.id === updated.id ? updated : w)),
-                      );
-                    }}
-                  />
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      <FormDialog
-        open={showNew}
-        title="Déclencher un circuit de validation"
-        onClose={() => setShowNew(false)}
-      >
+      {showNew && (
         <form
           onSubmit={(e) => {
             e.preventDefault();
             createMutation.mutate();
           }}
-          className="space-y-4"
+          className="panel-grain animate-fade-in"
         >
-          <div>
-            <label className="label-grain">Titre du dossier</label>
+          <p className="mb-3 text-[13px] font-medium text-graphite">
+            Déclencher un circuit de validation
+          </p>
+          <div className="grid gap-3 sm:grid-cols-[1fr_180px]">
             <input
-              className="input-grain mt-1"
-              placeholder="Ex. Validation budget trimestriel"
+              className="input-grain"
+              placeholder="Titre du dossier"
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
               required
             />
-          </div>
-          <div>
-            <label className="label-grain">Type</label>
             <select
-              className="input-grain mt-1"
+              className="input-grain"
               value={newType}
               onChange={(e) => setNewType(e.target.value)}
             >
@@ -225,29 +157,68 @@ export default function WorkflowPage() {
               <option>Note de service</option>
             </select>
           </div>
-          <FileUploadField
-            label="Document initial"
-            hint="Transmis au BSD pour lancement du circuit."
-            file={newFile}
-            onFileChange={setNewFile}
-          />
-          <div className="flex justify-end gap-2 border-t border-cloud pt-4">
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => setShowNew(false)}
-            >
-              Annuler
-            </Button>
-            <Button
-              type="submit"
-              disabled={createMutation.isPending || !newFile || !newTitle.trim()}
-            >
-              {createMutation.isPending ? "Envoi…" : "Démarrer"}
-            </Button>
+          <div className="mt-3 grid gap-3">
+            <FileUploadField
+              label="Document initial (obligatoire)"
+              hint="Ce fichier sera visible par tous les valideurs (BSD, SG, ministre, DAF)."
+              file={newFile}
+              onFileChange={setNewFile}
+            />
+          </div>
+          <div className="mt-3 flex items-center justify-between">
+            <p className="text-[11px] text-ash">
+              Directeur → BSD → SG → Ministre → DAF
+            </p>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                onClick={() => setShowNew(false)}
+              >
+                Annuler
+              </Button>
+              <Button type="submit" size="sm" disabled={createMutation.isPending || !newFile}>
+                <Play className="h-3.5 w-3.5" /> Démarrer
+              </Button>
+            </div>
           </div>
         </form>
-      </FormDialog>
+      )}
+
+      {isLoading ? (
+        <div className="flex items-center justify-center py-12 text-ash">
+          <Loader2 className="h-5 w-5 animate-spin" />
+        </div>
+      ) : workflows.length === 0 ? (
+        <div className="panel-grain py-12 text-center text-slate">
+          Aucun workflow en cours.
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {workflows.map((wf) => (
+            <WorkflowCard
+              key={wf.id}
+              workflow={wf}
+              isSelected={selected?.id === wf.id}
+              onSelect={() => setSelected(selected?.id === wf.id ? null : wf)}
+            />
+          ))}
+        </div>
+      )}
+
+      {selected && (
+        <WorkflowDetailPanel
+          workflow={selected}
+          mayDelete={mayDelete}
+          onDelete={() => setDeleteTarget(selected)}
+          onClose={() => setSelected(null)}
+          onUpdate={(updated) => {
+            setSelected(updated);
+            queryClient.invalidateQueries({ queryKey: ["workflows"] });
+          }}
+        />
+      )}
 
       <ConfirmDialog
         open={deleteTarget !== null}
@@ -265,319 +236,218 @@ export default function WorkflowPage() {
           if (deleteTarget) deleteMutation.mutate(deleteTarget.id);
         }}
       />
+    </>
+  );
+}
+
+/* ─── Workflow Card ─── */
+
+function StepNode({ step }: { step: WorkflowStep }) {
+  const statusStyles: Record<StepStatus, string> = {
+    done: "border-forest-ink bg-forest-ink text-white",
+    active: "border-forest-ink bg-white text-forest-ink shadow-[0_0_0_4px_rgba(0,153,89,0.08)]",
+    waiting: "border-mist bg-white text-mist",
+    rejected: "border-amber-500 bg-amber-50 text-amber-600 shadow-[0_0_0_4px_rgba(245,158,11,0.08)]",
+  };
+
+  return (
+    <div className="flex flex-col items-center gap-2">
+      <div
+        className={cn(
+          "flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all",
+          statusStyles[step.status],
+        )}
+      >
+        {step.status === "done" && <Check className="h-4 w-4" strokeWidth={2.5} />}
+        {step.status === "active" && (
+          <Loader2 className="h-4 w-4 animate-[spin_3s_linear_infinite]" />
+        )}
+        {step.status === "waiting" && <Minus className="h-3.5 w-3.5" />}
+        {step.status === "rejected" && <RotateCcw className="h-3.5 w-3.5" />}
+      </div>
+      <div className="w-20 text-center">
+        <p
+          className={cn(
+            "text-[11px] font-semibold leading-tight",
+            step.status === "done" && "text-forest-ink",
+            step.status === "active" && "text-graphite",
+            step.status === "waiting" && "text-ash",
+            step.status === "rejected" && "text-amber-600",
+          )}
+        >
+          {WORKFLOW_ROLE_LABELS[step.role]}
+        </p>
+      </div>
     </div>
   );
 }
 
-/* ─── Liste ─── */
+function Connector({ done }: { done: boolean }) {
+  return (
+    <div className="mt-[20px] flex items-center self-start">
+      <div
+        className={cn("h-[2px] w-10 sm:w-14", done ? "bg-forest-ink" : "bg-mist")}
+      />
+    </div>
+  );
+}
 
-function WorkflowRow({
+function WorkflowCard({
   workflow,
-  expanded,
-  onToggle,
+  isSelected,
+  onSelect,
 }: {
   workflow: WorkflowItem;
-  expanded: boolean;
-  onToggle: () => void;
+  isSelected: boolean;
+  onSelect: () => void;
 }) {
-  const status = WORKFLOW_STATUS_LABELS[workflow.status];
+  const allDone = workflow.steps.every((s) => s.status === "done");
   const activeStep = workflow.steps.find((s) => s.status === "active");
+  const rejectedStep = workflow.steps.find((s) => s.status === "rejected");
   const doneCount = workflow.steps.filter((s) => s.status === "done").length;
 
   return (
-    <button
-      type="button"
-      onClick={onToggle}
+    <div
       className={cn(
-        "grid w-full gap-4 px-5 py-4 text-left transition-colors hover:bg-veil/50 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_auto_auto]",
-        expanded && "bg-veil/40",
+        "cursor-pointer overflow-hidden rounded-[var(--radius-card)] bg-white transition-shadow",
+        isSelected ? "shadow-[var(--shadow-subtle)] ring-1 ring-graphite/15" : "hover:bg-veil/50",
       )}
+      onClick={onSelect}
     >
-      <div className="min-w-0">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-medium tabular-nums text-slate">
-            {workflow.ref}
-          </span>
-          <span
-            className={cn(
-              "rounded-[var(--radius-pill)] px-2 py-0.5 text-[11px] font-medium",
-              status.className,
-            )}
-          >
-            {status.label}
-          </span>
-          <span className="text-[11px] text-slate">{workflow.type}</span>
-        </div>
-        <p className="mt-1 truncate text-sm font-medium text-graphite">
-          {workflow.title}
-        </p>
-        {activeStep && (
-          <p className="mt-1 text-xs text-slate">
-            En attente de {WORKFLOW_ROLE_LABELS[activeStep.role]}
-          </p>
-        )}
-      </div>
-
-      <div className="hidden md:flex md:items-center">
-        <PipelineCompact steps={workflow.steps} />
-      </div>
-
-      <div className="hidden text-right text-xs tabular-nums text-slate md:block">
-        {doneCount}/{workflow.steps.length}
-      </div>
-
-      <ChevronRight
-        className={cn(
-          "size-4 shrink-0 self-center text-slate transition-transform",
-          expanded && "rotate-90",
-        )}
-      />
-    </button>
-  );
-}
-
-function PipelineCompact({ steps }: { steps: WorkflowStep[] }) {
-  return (
-    <div className="flex w-full max-w-md items-center">
-      {steps.map((step, i) => (
-        <div key={step.id} className="flex flex-1 items-center">
-          <div className="flex flex-col items-center gap-1">
-            <StepDot status={step.status} />
-            <span className="hidden text-[10px] text-slate xl:block">
-              {WORKFLOW_ROLE_LABELS[step.role]}
+      <div className="flex items-center justify-between gap-4 border-b border-cloud px-5 py-3">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <span className="shrink-0 rounded-[var(--radius-pill)] bg-veil px-2 py-0.5 text-xs font-semibold text-graphite">
+              {workflow.ref}
             </span>
+            <span className="shrink-0 rounded-[var(--radius-pill)] bg-veil px-2 py-0.5 text-xs font-medium text-slate">
+              {workflow.type}
+            </span>
+            {workflow.status === "rejete" && (
+              <span className="shrink-0 rounded-[var(--radius-pill)] bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-600">
+                Retourné
+              </span>
+            )}
           </div>
-          {i < steps.length - 1 && (
-            <div
-              className={cn(
-                "mx-0.5 h-px flex-1",
-                step.status === "done" ? "bg-forest-ink" : "bg-cloud",
-              )}
-            />
-          )}
+          <p className="mt-1 truncate text-[13px] font-medium text-graphite">
+            {workflow.title}
+          </p>
         </div>
-      ))}
+        <div className="flex items-center gap-3">
+          {allDone ? (
+            <span className="text-[12px] font-medium text-forest-ink">
+              Terminé ✓
+            </span>
+          ) : (
+            <span className="text-[11px] text-fog">
+              {doneCount}/{workflow.steps.length}
+            </span>
+          )}
+          <ChevronDown
+            className={cn(
+              "h-4 w-4 text-ash transition-transform",
+              isSelected && "rotate-180",
+            )}
+          />
+        </div>
+      </div>
+
+      <div className="overflow-x-auto px-5 py-5 sm:px-8">
+        <div className="flex items-start justify-center">
+          {workflow.steps.map((step, i) => (
+            <div key={step.id} className="flex items-start">
+              <StepNode step={step} />
+              {i < workflow.steps.length - 1 && (
+                <Connector done={step.status === "done"} />
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {(activeStep || rejectedStep) && (
+        <div className="border-t border-cloud bg-veil px-5 py-2.5">
+          {rejectedStep ? (
+            <p className="text-[11px] text-amber-600">
+              <AlertTriangle className="mr-1 inline h-3 w-3" />
+              Document retourné à{" "}
+              <span className="font-medium">
+                {WORKFLOW_ROLE_LABELS[rejectedStep.role]}
+              </span>
+            </p>
+          ) : activeStep ? (
+            <p className="text-[11px] text-fog">
+              En attente de validation par{" "}
+              <span className="font-medium text-graphite">
+                {WORKFLOW_ROLE_LABELS[activeStep.role]}
+              </span>
+            </p>
+          ) : null}
+        </div>
+      )}
     </div>
   );
 }
 
-function StepDot({ status }: { status: StepStatus }) {
-  return (
-    <span
-      className={cn(
-        "block size-2.5 rounded-full",
-        status === "done" && "bg-forest-ink",
-        status === "active" && "bg-white ring-2 ring-forest-ink",
-        status === "waiting" && "bg-cloud",
-        status === "rejected" && "bg-amber-500",
-      )}
-    />
-  );
-}
+/* ─── Detail Panel ─── */
 
-/* ─── Détail ─── */
-
-function WorkflowFileLink({
-  actionId,
-  fileName,
-}: {
-  actionId: number;
-  fileName: string;
-}) {
+function WorkflowFileButton({ actionId, fileName }: { actionId: number; fileName: string }) {
   const [loading, setLoading] = useState(false);
+
+  const openFile = async () => {
+    setLoading(true);
+    try {
+      const blob = await downloadWorkflowFile(actionId);
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank", "noopener,noreferrer");
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Impossible d'ouvrir le fichier");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <button
       type="button"
-      onClick={async () => {
-        setLoading(true);
-        try {
-          const blob = await downloadWorkflowFile(actionId);
-          const url = URL.createObjectURL(blob);
-          window.open(url, "_blank", "noopener,noreferrer");
-          setTimeout(() => URL.revokeObjectURL(url), 60_000);
-        } catch (e) {
-          toast.error(
-            e instanceof Error ? e.message : "Impossible d'ouvrir le fichier",
-          );
-        } finally {
-          setLoading(false);
-        }
-      }}
+      onClick={() => void openFile()}
       disabled={loading}
-      className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-graphite hover:underline"
+      className="mt-0.5 flex items-center gap-1 text-xs font-medium text-graphite hover:underline"
     >
-      <FileText className="size-3" />
+      <FileText className="h-3 w-3" />
       {loading ? "Ouverture…" : fileName}
     </button>
   );
 }
 
-function WorkflowDetail({
+function WorkflowDetailPanel({
   workflow,
   mayDelete,
   onDelete,
+  onClose,
   onUpdate,
 }: {
   workflow: WorkflowItem;
   mayDelete: boolean;
   onDelete: () => void;
+  onClose: () => void;
   onUpdate: (wf: WorkflowItem) => void;
 }) {
   const { user } = useAuth();
   const activeStep = workflow.steps.find((s) => s.status === "active");
   const canAct =
     activeStep != null && canActOnWorkflowStep(user?.role, activeStep.role);
+  const stepHasFile = activeStep?.actions.some((a) => Boolean(a.file_name)) ?? false;
 
-  return (
-    <div className="border-t border-cloud bg-veil/30 px-5 py-5">
-      <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <p className="text-xs text-slate">
-            {workflow.ref} · {workflow.type} · initié par {workflow.creator_prenom}
-          </p>
-          <p className="mt-1 text-sm text-graphite">
-            Circuit de validation en {workflow.steps.length} étapes
-          </p>
-        </div>
-        {mayDelete && (
-          <Button
-            type="button"
-            size="sm"
-            variant="destructive"
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete();
-            }}
-          >
-            <Trash2 className="size-3.5" />
-            Supprimer
-          </Button>
-        )}
-      </div>
-
-      <div className="mb-5 md:hidden">
-        <PipelineCompact steps={workflow.steps} />
-      </div>
-
-      <ol className="space-y-3">
-        {workflow.steps.map((step) => (
-          <StepTimelineCard key={step.id} step={step} />
-        ))}
-      </ol>
-
-      {activeStep && (
-        <WorkflowActions
-          workflow={workflow}
-          activeStep={activeStep}
-          canAct={canAct}
-          onUpdate={onUpdate}
-        />
-      )}
-    </div>
-  );
-}
-
-function StepTimelineCard({ step }: { step: WorkflowStep }) {
-  return (
-    <li
-      className={cn(
-        "rounded-[var(--radius-sm)] border bg-white px-4 py-3",
-        step.status === "active" && "border-graphite/20",
-        step.status === "rejected" && "border-amber-200",
-        step.status === "waiting" && "border-cloud opacity-70",
-        step.status === "done" && "border-cloud",
-      )}
-    >
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2.5">
-          <StepDot status={step.status} />
-          <span className="text-sm font-medium text-graphite">
-            {WORKFLOW_ROLE_LABELS[step.role]}
-          </span>
-        </div>
-        {step.validated_at && (
-          <time className="text-[11px] tabular-nums text-slate">
-            {new Date(step.validated_at).toLocaleDateString("fr-FR")}
-          </time>
-        )}
-      </div>
-
-      {step.actions.length > 0 && (
-        <ul className="mt-3 space-y-2 border-t border-cloud/80 pt-3">
-          {step.actions.map((action) => (
-            <li key={action.id} className="flex gap-2 text-sm">
-              <ActionIcon type={action.action_type} />
-              <div className="min-w-0 flex-1">
-                <p className="text-graphite">
-                  <span className="font-medium">{action.user_prenom}</span>
-                  {actionLabel(action.action_type, action.target_role)}
-                </p>
-                {action.comment && (
-                  <p className="mt-0.5 text-xs text-slate italic">
-                    « {action.comment} »
-                  </p>
-                )}
-                {action.file_name && action.id != null && (
-                  <WorkflowFileLink
-                    actionId={action.id}
-                    fileName={action.file_name}
-                  />
-                )}
-                <p className="mt-0.5 text-[10px] text-slate">
-                  {new Date(action.created_at).toLocaleString("fr-FR")}
-                </p>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-    </li>
-  );
-}
-
-function ActionIcon({ type }: { type: ActionType }) {
-  const cls = "mt-0.5 size-3.5 shrink-0 text-slate";
-  if (type === "validate") return <Check className={cn(cls, "text-forest-ink")} />;
-  if (type === "reject") return <RotateCcw className={cn(cls, "text-amber-600")} />;
-  if (type === "upload") return <Upload className={cls} />;
-  return <MessageSquare className={cls} />;
-}
-
-function actionLabel(type: ActionType, targetRole?: WorkflowStepRole | null) {
-  if (type === "validate") return " a validé";
-  if (type === "comment") return " a commenté";
-  if (type === "upload") return " a joint un fichier";
-  if (type === "reject") {
-    return ` a retourné à ${targetRole ? WORKFLOW_ROLE_LABELS[targetRole] : "—"}`;
-  }
-  return "";
-}
-
-function WorkflowActions({
-  workflow,
-  activeStep,
-  canAct,
-  onUpdate,
-}: {
-  workflow: WorkflowItem;
-  activeStep: WorkflowStep;
-  canAct: boolean;
-  onUpdate: (wf: WorkflowItem) => void;
-}) {
-  const [actionMode, setActionMode] = useState<
-    "validate" | "reject" | "comment" | null
-  >(null);
+  const [actionMode, setActionMode] = useState<"validate" | "reject" | "comment" | null>(null);
   const [comment, setComment] = useState("");
   const [fichier, setFichier] = useState<File | null>(null);
   const [targetRole, setTargetRole] = useState<WorkflowStepRole>("directeur");
 
-  const stepHasFile =
-    activeStep.actions.some((a) => Boolean(a.file_name)) ?? false;
-
   const mutation = useMutation({
     mutationFn: () => {
-      if (!actionMode) throw new Error("Action invalide");
+      if (!activeStep || !actionMode) throw new Error("Action invalide");
       return performWorkflowAction(
         workflow.id,
         activeStep.id,
@@ -590,7 +460,12 @@ function WorkflowActions({
       );
     },
     onSuccess: (updated) => {
-      toast.success("Action enregistrée");
+      const messages: Record<string, string> = {
+        validate: "Document validé — étape suivante activée",
+        reject: "Document retourné avec commentaire",
+        comment: "Commentaire ajouté",
+      };
+      toast.success(messages[actionMode!] || "Action effectuée");
       setActionMode(null);
       setComment("");
       setFichier(null);
@@ -599,114 +474,243 @@ function WorkflowActions({
     onError: (e: Error) => toast.error(e.message),
   });
 
-  if (!canAct) {
-    return (
-      <p className="mt-5 border-t border-cloud pt-4 text-sm text-slate">
-        En attente de{" "}
-        <span className="font-medium text-graphite">
-          {WORKFLOW_ROLE_LABELS[activeStep.role]}
-        </span>
-        .
-      </p>
-    );
-  }
-
   return (
-    <div className="mt-5 border-t border-cloud pt-4">
-      <p className="text-sm font-medium text-graphite">
-        Votre action — {WORKFLOW_ROLE_LABELS[activeStep.role]}
-      </p>
-
-      {!actionMode ? (
-        <div className="mt-3 flex flex-wrap gap-2">
-          <Button size="sm" onClick={() => setActionMode("validate")}>
-            Valider
-          </Button>
-          <Button size="sm" variant="outline" onClick={() => setActionMode("comment")}>
-            Commenter
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => setActionMode("reject")}
-          >
-            Retourner
+    <div className="panel-grain mt-6 animate-fade-in">
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <div>
+          <h3 className="font-display text-lg text-graphite">{workflow.title}</h3>
+          <p className="text-sm text-fog">
+            {workflow.ref} · {workflow.type} · par {workflow.creator_prenom}
+          </p>
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          {mayDelete && (
+            <Button
+              type="button"
+              size="sm"
+              variant="destructive"
+              onClick={onDelete}
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              Supprimer
+            </Button>
+          )}
+          <Button variant="ghost" size="sm" onClick={onClose}>
+            Fermer
           </Button>
         </div>
-      ) : (
-        <div className="mt-3 space-y-3 rounded-[var(--radius-sm)] border border-cloud bg-white p-4">
-          {actionMode === "reject" && (
-            <div>
-              <label className="label-grain">Retourner à</label>
-              <select
-                className="input-grain mt-1"
-                value={targetRole}
-                onChange={(e) =>
-                  setTargetRole(e.target.value as WorkflowStepRole)
-                }
-              >
-                {STEP_ROLES.filter(
-                  (r) =>
-                    STEP_ROLES.indexOf(r) <
-                    STEP_ROLES.indexOf(activeStep.role),
-                ).map((r) => (
-                  <option key={r} value={r}>
-                    {WORKFLOW_ROLE_LABELS[r]}
-                  </option>
+      </div>
+
+      <div className="space-y-4">
+        {workflow.steps.map((step) => (
+          <div
+            key={step.id}
+            className={cn(
+              "rounded-[var(--radius-sm)] p-4",
+              step.status === "active" && "bg-veil ring-1 ring-cloud",
+              step.status === "done" && "bg-white ring-1 ring-cloud",
+              step.status === "waiting" && "bg-white opacity-60 ring-1 ring-cloud",
+              step.status === "rejected" && "bg-amber-50/80 ring-1 ring-amber-200",
+            )}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span
+                  className={cn(
+                    "flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold",
+                    step.status === "done" && "bg-forest-ink text-white",
+                    step.status === "active" && "bg-forest-ink/10 text-forest-ink",
+                    step.status === "waiting" && "bg-mist/50 text-ash",
+                    step.status === "rejected" && "bg-amber-100 text-amber-600",
+                  )}
+                >
+                  {step.ordre}
+                </span>
+                <span className="text-sm font-semibold text-graphite">
+                  {WORKFLOW_ROLE_LABELS[step.role]}
+                </span>
+              </div>
+              {step.validated_at && (
+                <span className="text-[10px] text-ash">
+                  {new Date(step.validated_at).toLocaleDateString("fr-FR")}
+                </span>
+              )}
+            </div>
+
+            {step.actions.length > 0 && (
+              <div className="mt-3 space-y-2 border-t border-cloud/60 pt-3">
+                {step.actions.map((action) => (
+                  <div key={action.id} className="flex items-start gap-2">
+                    {action.action_type === "validate" && (
+                      <Check className="mt-0.5 h-3.5 w-3.5 text-forest-ink" />
+                    )}
+                    {action.action_type === "reject" && (
+                      <RotateCcw className="mt-0.5 h-3.5 w-3.5 text-amber-500" />
+                    )}
+                    {action.action_type === "comment" && (
+                      <MessageSquare className="mt-0.5 h-3.5 w-3.5 text-slate" />
+                    )}
+                    {action.action_type === "upload" && (
+                      <Upload className="mt-0.5 h-3.5 w-3.5 text-ice-blue" />
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[12px] text-graphite">
+                        <span className="font-medium">{action.user_prenom}</span>
+                        {action.action_type === "validate" && " a validé"}
+                        {action.action_type === "reject" && (
+                          <>
+                            {" "}a retourné à{" "}
+                            <span className="font-medium text-amber-600">
+                              {action.target_role
+                                ? WORKFLOW_ROLE_LABELS[action.target_role]
+                                : "—"}
+                            </span>
+                          </>
+                        )}
+                        {action.action_type === "comment" && " a commenté"}
+                        {action.action_type === "upload" && " a joint un fichier"}
+                      </p>
+                      {action.comment && (
+                        <p className="mt-0.5 text-[12px] italic text-fog">
+                          « {action.comment} »
+                        </p>
+                      )}
+                      {action.file_name && action.id && (
+                        <WorkflowFileButton actionId={action.id} fileName={action.file_name} />
+                      )}
+                      <p className="text-[10px] text-ash">
+                        {new Date(action.created_at).toLocaleString("fr-FR")}
+                      </p>
+                    </div>
+                  </div>
                 ))}
-              </select>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {activeStep && !canAct && (
+        <p className="mt-6 border-t border-cloud pt-5 text-sm text-slate">
+          En attente de{" "}
+          <span className="font-medium text-graphite">
+            {WORKFLOW_ROLE_LABELS[activeStep.role]}
+          </span>
+          . Vous pouvez consulter l&apos;historique et les fichiers, sans valider cette étape.
+        </p>
+      )}
+
+      {activeStep && canAct && (
+        <div className="mt-6 border-t border-cloud pt-5">
+          <p className="mb-3 text-sm font-medium text-graphite">
+            Actions — {WORKFLOW_ROLE_LABELS[activeStep.role]}
+          </p>
+
+          {!actionMode && (
+            <div className="flex flex-wrap gap-2">
+              <Button size="sm" onClick={() => setActionMode("validate")}>
+                <Check className="h-3.5 w-3.5" /> Valider
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => setActionMode("comment")}>
+                <MessageSquare className="h-3.5 w-3.5" /> Commenter
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                className="border-amber-300 text-amber-600 hover:bg-amber-50"
+                onClick={() => setActionMode("reject")}
+              >
+                <RotateCcw className="h-3.5 w-3.5" /> Retourner
+              </Button>
             </div>
           )}
 
-          <div>
-            <label className="label-grain">
-              {actionMode === "reject" ? "Motif du retour" : "Commentaire"}
-              {actionMode !== "validate" && " *"}
-            </label>
-            <textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              rows={3}
-              className="input-grain mt-1"
-              required={actionMode !== "validate"}
-            />
-          </div>
+          {actionMode && (
+            <div className="mt-3 space-y-3 rounded-[var(--radius-sm)] bg-veil p-4">
+              {actionMode === "reject" && (
+                <div>
+                  <label className="mb-1 block text-sm text-slate">Retourner à</label>
+                  <select
+                    className="input-grain"
+                    value={targetRole}
+                    onChange={(e) =>
+                      setTargetRole(e.target.value as WorkflowStepRole)
+                    }
+                  >
+                    {STEP_ROLES.filter(
+                      (r) =>
+                        STEP_ROLES.indexOf(r) <
+                        STEP_ROLES.indexOf(activeStep.role),
+                    ).map((r) => (
+                      <option key={r} value={r}>
+                        {WORKFLOW_ROLE_LABELS[r]}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
-          <FileUploadField
-            label={
-              actionMode === "validate" && !stepHasFile
-                ? "Document à transmettre *"
-                : "Joindre un fichier (optionnel)"
-            }
-            file={fichier}
-            onFileChange={setFichier}
-          />
+              <div>
+                <label className="mb-1 block text-sm text-slate">
+                  {actionMode === "validate"
+                    ? "Commentaire (optionnel)"
+                    : "Commentaire"}
+                </label>
+                <textarea
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  rows={3}
+                  className="input-grain"
+                  placeholder={
+                    actionMode === "reject"
+                      ? "Expliquez la raison du retour..."
+                      : "Votre remarque..."
+                  }
+                />
+              </div>
 
-          <div className="flex gap-2">
-            <Button
-              size="sm"
-              onClick={() => mutation.mutate()}
-              disabled={
-                mutation.isPending ||
-                (actionMode === "reject" && !comment.trim()) ||
-                (actionMode === "comment" && !comment.trim()) ||
-                (actionMode === "validate" && !stepHasFile && !fichier)
-              }
-            >
-              {mutation.isPending ? "Envoi…" : "Confirmer"}
-            </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => {
-                setActionMode(null);
-                setComment("");
-                setFichier(null);
-              }}
-            >
-              Annuler
-            </Button>
-          </div>
+              <FileUploadField
+                label={
+                  actionMode === "validate"
+                    ? stepHasFile
+                      ? "Joindre une nouvelle version (optionnel)"
+                      : "Document à transmettre (obligatoire)"
+                    : "Joindre un fichier (optionnel)"
+                }
+                file={fichier}
+                onFileChange={setFichier}
+              />
+
+              <div className="flex gap-2 pt-1">
+                <Button
+                  size="sm"
+                  onClick={() => mutation.mutate()}
+                  disabled={
+                    mutation.isPending ||
+                    (actionMode === "reject" && !comment) ||
+                    (actionMode === "comment" && !comment) ||
+                    (actionMode === "validate" && !stepHasFile && !fichier)
+                  }
+                >
+                  {mutation.isPending && (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  )}
+                  Confirmer
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    setActionMode(null);
+                    setComment("");
+                    setFichier(null);
+                  }}
+                >
+                  Annuler
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
