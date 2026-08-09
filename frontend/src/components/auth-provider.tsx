@@ -17,7 +17,7 @@ import {
   login as apiLogin,
   logout as apiLogout,
 } from "@/lib/api";
-import { canWritePlatform } from "@/lib/roles";
+import { canWritePlatform, canAccessNotifications, defaultHomeForRole } from "@/lib/roles";
 import type { LoginRequest, User } from "@/types";
 
 interface AuthContextValue {
@@ -26,6 +26,7 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   isAdmin: boolean;
   canWrite: boolean;
+  canAccessNotifications: boolean;
   login: (data: LoginRequest) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
@@ -94,7 +95,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await apiLogin(data);
       const profile = await getMe();
       setUser(profile);
-      router.push("/admin");
+      router.push(defaultHomeForRole(profile.role));
     },
     [router],
   );
@@ -112,6 +113,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isAuthenticated: !!user,
       isAdmin: user?.role === "admin",
       canWrite: canWritePlatform(user?.role, user?.type_acces),
+      canAccessNotifications: canAccessNotifications(user?.role),
       login,
       logout,
       refreshUser,

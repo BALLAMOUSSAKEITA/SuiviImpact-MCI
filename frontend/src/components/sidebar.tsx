@@ -44,7 +44,7 @@ interface NavItem {
   icon: typeof LayoutDashboard;
   defaultChild?: string;
   adminOnly?: boolean;
-  writeOnly?: boolean;
+  developerOnly?: boolean;
   children?: NavItem[];
 }
 
@@ -90,7 +90,7 @@ const navItems: NavItem[] = [
     href: "/admin/notifications",
     label: "Notifications",
     icon: Mail,
-    writeOnly: true,
+    developerOnly: true,
   },
   { href: "/admin/archive", label: "Archive", icon: FolderArchive },
   { href: "/admin/profil", label: "Mon profil", icon: UserCircle },
@@ -111,7 +111,7 @@ export function Sidebar({
   onNavigate,
 }: SidebarProps) {
   const pathname = usePathname();
-  const { user, logout, canWrite } = useAuth();
+  const { user, logout, canAccessNotifications: mayAccessNotifications } = useAuth();
 
   const isActive = (href: string) => {
     if (href === "/admin") return pathname === "/admin";
@@ -254,7 +254,7 @@ export function Sidebar({
         {navItems
           .filter((item) => {
             if (item.adminOnly && user?.role !== "admin") return false;
-            if (item.writeOnly && !canWrite) return false;
+            if (item.developerOnly && !mayAccessNotifications) return false;
             if (item.children) {
               const childHrefs = item.children.map((c) => c.href);
               return canSeeNavGroup(user?.role, item.href, childHrefs, item.adminOnly);

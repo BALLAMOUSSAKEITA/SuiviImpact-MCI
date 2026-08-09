@@ -17,7 +17,7 @@ import { createUser } from "@/lib/api";
 import { ROLE_LABELS } from "@/lib/roles";
 import type { UserRole } from "@/types";
 
-const ROLES = ["user", "admin", "directeur", "sg", "ministre", "daf"] as const satisfies readonly UserRole[];
+const ROLES = ["admin", "developpeur", "directeur", "sg", "ministre", "daf"] as const satisfies readonly UserRole[];
 
 const schema = z.object({
   prenom: z.string().min(1, "Prénom requis"),
@@ -51,11 +51,12 @@ function NouveauCompteContent() {
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { type_acces: "ecriture", role: "user", nom: "" },
+    defaultValues: { type_acces: "ecriture", role: "admin", nom: "" },
   });
 
   const role = useWatch({ control, name: "role" });
   const isInstitution = INSTITUTION_ROLES.includes(role);
+  const isDeveloper = role === "developpeur";
 
   const mutation = useMutation({
     mutationFn: createUser,
@@ -101,7 +102,7 @@ function NouveauCompteContent() {
           onSubmit={handleSubmit((data) =>
             mutation.mutate({
               ...data,
-              type_acces: isInstitution ? "lecture" : data.type_acces,
+              type_acces: isInstitution ? "lecture" : isDeveloper ? "ecriture" : data.type_acces,
             }),
           )}
           className="space-y-4"
@@ -129,6 +130,11 @@ function NouveauCompteContent() {
               Ce rôle a un accès <strong>lecture seule</strong> : workflow, archives
               {role === "directeur" ? ", vue d'ensemble et planification PAO" : ", vue d'ensemble et statistiques"}
               . Pas d&apos;accès au suivi ni à l&apos;édition des données.
+            </p>
+          ) : isDeveloper ? (
+            <p className="rounded-[var(--radius-sm)] bg-veil px-3 py-2 text-xs text-slate">
+              Accès exclusif à l&apos;onglet <strong>Notifications</strong> (configuration e-mail,
+              historique et rappels d&apos;activités). Aucun accès aux modules métier.
             </p>
           ) : (
             <Field label="Type d'accès" error={errors.type_acces?.message}>

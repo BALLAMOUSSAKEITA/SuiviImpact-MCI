@@ -59,6 +59,15 @@ async def require_admin(user: User = Depends(get_current_user)) -> User:
     return user
 
 
+async def require_developer(user: User = Depends(get_current_user)) -> User:
+    if user.role != UserRole.DEVELOPPEUR:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Accès réservé aux développeurs",
+        )
+    return user
+
+
 async def require_write_access(user: User = Depends(get_current_user)) -> User:
     if not effective_can_write(user):
         raise HTTPException(

@@ -15,6 +15,7 @@ class AccessType(str, enum.Enum):
 class UserRole(str, enum.Enum):
     USER = "user"
     ADMIN = "admin"
+    DEVELOPPEUR = "developpeur"
     DIRECTEUR = "directeur"
     SG = "sg"
     MINISTRE = "ministre"

@@ -21,6 +21,7 @@ export type UsageGuideStep = {
 /** Profil métier pour les textes du guide (BSD scindé lecture / écriture). */
 export type GuideProfile =
   | "admin"
+  | "developpeur"
   | "bsd-ecriture"
   | "bsd-lecture"
   | "directeur"
@@ -29,7 +30,10 @@ export type GuideProfile =
   | "daf";
 
 export function toGuideProfile(ctx: UsageGuideContext): GuideProfile {
-  if (ctx.role === "admin") return "admin";
+  if (ctx.role === "developpeur") return "developpeur";
+  if (ctx.role === "admin") {
+    return ctx.typeAcces === "lecture" ? "bsd-lecture" : "admin";
+  }
   if (ctx.role === "user") {
     return ctx.typeAcces === "lecture" ? "bsd-lecture" : "bsd-ecriture";
   }
@@ -37,9 +41,9 @@ export function toGuideProfile(ctx: UsageGuideContext): GuideProfile {
 }
 
 function profileLabel(ctx: UsageGuideContext): string {
-  if (ctx.role === "user") {
+  if (ctx.role === "admin" || ctx.role === "user") {
     const mode = ctx.typeAcces === "lecture" ? " — consultation" : " — saisie";
-    return `${ROLE_LABELS.user}${mode}`;
+    return `${ROLE_LABELS[ctx.role]}${mode}`;
   }
   return ROLE_LABELS[ctx.role];
 }
@@ -239,7 +243,8 @@ type CopyTable = Partial<Record<GuideProfile, string>>;
 
 const STEP_COPY: Record<string, CopyTable> = {
   welcome: {
-    admin: `Visite adaptée au profil « ${ROLE_LABELS.admin} » : vous verrez l’ensemble des modules et la gestion des comptes. Relancez ce guide depuis Mon profil à tout moment.`,
+    developpeur: `Visite pour un compte ${ROLE_LABELS.developpeur} : accès exclusif aux notifications e-mail (historique, configuration SMTP et rappels d'activités).`,
+    admin: `Visite pour le super administrateur (${BRAND.bureauShort}) : accès complet, gestion des comptes, étape workflow BSD et suppression des dossiers.`,
     "bsd-ecriture": `Visite pour un compte ${ROLE_LABELS.user} avec droits de saisie : paramétrage, planification, suivi, exports et statistiques du ${BRAND.bureauShort}.`,
     "bsd-lecture": `Visite pour un compte ${ROLE_LABELS.user} en lecture seule : vous parcourez les mêmes écrans pour consulter les données, sans modifier les fiches métier.`,
     directeur: `Visite pour un compte ${ROLE_LABELS.directeur} : planification PAO de votre direction, workflow documentaire et archive.`,
@@ -248,7 +253,7 @@ const STEP_COPY: Record<string, CopyTable> = {
     daf: `Visite pour un compte ${ROLE_LABELS.daf} : étapes workflow qui vous concernent, statistiques et archive.`,
   },
   sidebar: {
-    admin: "Seules les entrées utiles à votre rôle sont listées ici. En tant qu’administrateur, vous disposez de l’accès complet, y compris Comptes.",
+    admin: "Accès complet au menu BSD et à l’administration (Comptes). Seules les entrées utiles à votre rôle sont listées ici.",
     "bsd-ecriture":
       "Menu complet du BSD opérationnel : référentiels, plans trimestriels, suivi et reporting. Les sections absentes ne font pas partie de votre périmètre.",
     "bsd-lecture":
@@ -340,7 +345,7 @@ const STEP_COPY: Record<string, CopyTable> = {
     daf: "Statistiques utiles au contrôle financier et au pilotage.",
   },
   workflow: {
-    admin: "Supervision des circuits de validation entre rôles institutionnels.",
+    admin: "Supervision des circuits de validation ; vous traitez l’étape BSD et pouvez supprimer les dossiers.",
     "bsd-ecriture": "Suivi des dossiers en circulation ; la saisie des étapes releve surtout des rôles institutionnels.",
     "bsd-lecture": "Consultation des dossiers et de l’état des validations.",
     directeur:
@@ -364,9 +369,10 @@ const STEP_COPY: Record<string, CopyTable> = {
   },
   comptes: {
     admin:
-      "Création de comptes (mot de passe généré automatiquement), activation, rôles BSD ou institutionnels.",
+      "Création de comptes (mot de passe généré automatiquement), activation, super administrateur, développeur ou rôles institutionnels.",
   },
   done: {
+    developpeur: "Vous connaissez l'onglet Notifications. Bonne configuration !",
     admin: "Vous avez parcouru les modules visibles pour un administrateur. Bonne utilisation !",
     "bsd-ecriture": "Vous connaissez le parcours BSD opérationnel. Bonne saisie sur la plateforme !",
     "bsd-lecture": "Vous savez où consulter l’information. Contactez l’équipe BSD pour toute modification.",

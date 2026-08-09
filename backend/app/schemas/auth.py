@@ -12,6 +12,7 @@ class AccessType(str, Enum):
 class UserRole(str, Enum):
     USER = "user"
     ADMIN = "admin"
+    DEVELOPPEUR = "developpeur"
     DIRECTEUR = "directeur"
     SG = "sg"
     MINISTRE = "ministre"
@@ -39,7 +40,7 @@ class UserCreate(BaseModel):
     prenom: str = Field(min_length=1, max_length=100)
     nom: str = Field(default="", max_length=100)
     type_acces: AccessType = AccessType.LECTURE
-    role: UserRole = UserRole.USER
+    role: UserRole = UserRole.ADMIN
 
     @field_validator("password")
     @classmethod

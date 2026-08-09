@@ -17,11 +17,11 @@ async def test_admin_create_and_manage_user(
             "password": "secret123",
             "prenom": "Nouveau",
             "type_acces": "lecture",
-            "role": "user",
+            "role": "directeur",
         },
     )
     assert create.status_code == 201
-    user_id = create.json()["id"]
+    user_id = create.json()["user"]["id"]
 
     duplicate = await client.post(
         "/api/v1/users",
@@ -31,7 +31,7 @@ async def test_admin_create_and_manage_user(
             "password": "secret123",
             "prenom": "Autre",
             "type_acces": "lecture",
-            "role": "user",
+            "role": "directeur",
         },
     )
     assert duplicate.status_code == 400

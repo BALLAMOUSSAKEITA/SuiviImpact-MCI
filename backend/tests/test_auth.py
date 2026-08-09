@@ -124,12 +124,36 @@ async def test_admin_can_create_user(client: AsyncClient):
             "password": "password123",
             "prenom": "Nouveau",
             "type_acces": "lecture",
-            "role": "user",
+            "role": "directeur",
         },
     )
     assert response.status_code == 201
     data = response.json()
     assert data["user"]["username"] == "nouveau"
+
+
+@pytest.mark.asyncio
+async def test_admin_cannot_create_legacy_bsd_user(client: AsyncClient):
+    login = await client.post(
+        "/api/v1/auth/login",
+        json={"username": "admin", "password": "admin123"},
+    )
+    token = login.json()["access_token"]
+    headers = {"Authorization": f"Bearer {token}"}
+
+    response = await client.post(
+        "/api/v1/users",
+        headers=headers,
+        json={
+            "username": "bsd_legacy",
+            "password": "password123",
+            "prenom": "Legacy",
+            "type_acces": "ecriture",
+            "role": "user",
+        },
+    )
+    assert response.status_code == 400
+    assert "super administrateur" in response.json()["detail"].lower()
 
 
 @pytest.mark.asyncio
@@ -148,7 +172,7 @@ async def test_admin_create_user_generates_password(client: AsyncClient):
             "username": "auto_pwd",
             "prenom": "Auto",
             "type_acces": "lecture",
-            "role": "user",
+            "role": "directeur",
         },
     )
     assert response.status_code == 201

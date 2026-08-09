@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import require_write_access
+from app.api.deps import require_developer
 from app.core.database import get_db
 from app.models.user import User
 from app.schemas.notifications import EmailConfigRead, NotificationEmailRead, RappelActivitesStats
@@ -16,14 +16,14 @@ router = APIRouter()
 async def get_notifications(
     limit: int = Query(default=100, ge=1, le=500),
     db: AsyncSession = Depends(get_db),
-    _: User = Depends(require_write_access),
+    _: User = Depends(require_developer),
 ) -> list[NotificationEmailRead]:
     return await list_notification_emails(db, limit=limit)
 
 
 @router.get("/notifications/email-config", response_model=EmailConfigRead)
 async def get_email_config(
-    _: User = Depends(require_write_access),
+    _: User = Depends(require_developer),
 ) -> EmailConfigRead:
     return EmailConfigRead.model_validate(get_email_status())
 
@@ -35,7 +35,7 @@ async def envoyer_rappels_activites(
         description="Ignorer la limite d'un rappel par activité et par jour",
     ),
     db: AsyncSession = Depends(get_db),
-    _: User = Depends(require_write_access),
+    _: User = Depends(require_developer),
 ) -> RappelActivitesStats:
     stats = await check_activite_delays_and_notify(db, force=force)
     return RappelActivitesStats(**stats)

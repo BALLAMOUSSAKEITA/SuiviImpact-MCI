@@ -1,5 +1,5 @@
 export type AccessType = "lecture" | "ecriture";
-export type UserRole = "user" | "admin" | "directeur" | "sg" | "ministre" | "daf";
+export type UserRole = "user" | "admin" | "developpeur" | "directeur" | "sg" | "ministre" | "daf";
 
 export interface User {
   id: number;

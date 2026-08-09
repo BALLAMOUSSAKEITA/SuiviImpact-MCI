@@ -6,7 +6,7 @@ from app.api.deps import require_admin
 from app.core.database import get_db
 from app.core.security import hash_password
 from app.models.user import User
-from app.core.roles import normalize_role_for_create
+from app.core.roles import assert_role_allowed_for_create, normalize_role_for_create
 from app.schemas.auth import UserCreate, UserCreateResponse, UserRead, user_to_read
 from app.core.passwords import generate_temporary_password
 
@@ -32,6 +32,7 @@ async def create_user(
     if existing.scalar_one_or_none():
         raise HTTPException(status_code=400, detail="Nom d'utilisateur déjà utilisé")
 
+    assert_role_allowed_for_create(body.role)
     type_acces = normalize_role_for_create(body.role, body.type_acces)
 
     generated: str | None = None

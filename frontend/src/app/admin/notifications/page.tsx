@@ -27,20 +27,20 @@ function statutClass(statut: string): string {
 }
 
 export default function NotificationsPage() {
-  const { canWrite } = useAuth();
+  const { canAccessNotifications } = useAuth();
   const queryClient = useQueryClient();
   const [confirmForce, setConfirmForce] = useState(false);
 
   const { data: emailConfig } = useQuery({
     queryKey: ["notifications-email-config"],
     queryFn: getEmailConfig,
-    enabled: canWrite,
+    enabled: canAccessNotifications,
   });
 
   const { data: notifications = [], isLoading } = useQuery({
     queryKey: ["notifications-email"],
     queryFn: () => listNotificationEmails(150),
-    enabled: canWrite,
+    enabled: canAccessNotifications,
   });
 
   const triggerMutation = useMutation({
@@ -61,12 +61,12 @@ export default function NotificationsPage() {
     onError: (error: Error) => toast.error(error.message),
   });
 
-  if (!canWrite) {
+  if (!canAccessNotifications) {
     return (
       <PageHeader
         eyebrow="Administration"
         title="Notifications e-mail"
-        description="Accès réservé aux comptes BSD disposant des droits d'écriture."
+        description="Accès réservé aux comptes développeur."
       />
     );
   }
