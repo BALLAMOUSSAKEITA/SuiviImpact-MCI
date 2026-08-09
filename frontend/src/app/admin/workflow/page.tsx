@@ -128,7 +128,7 @@ export default function WorkflowPage() {
         }
       />
 
-      {!isLoading && workflows.length > 0 && (
+      {!isLoading && (
         <MetricStrip
           metrics={[
             { label: "Circuits", value: summary.total },

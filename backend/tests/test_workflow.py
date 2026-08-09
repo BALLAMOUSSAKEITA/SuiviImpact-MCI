@@ -66,15 +66,16 @@ async def test_validate_only_own_step(
 
 
 @pytest.mark.asyncio
-async def test_only_bsd_can_delete_workflow(
+async def test_bsd_and_admin_can_delete_workflow(
     client: AsyncClient,
     directeur_headers: dict[str, str],
     auth_headers: dict[str, str],
+    admin_headers: dict[str, str],
 ):
     create = await client.post(
         "/api/v1/workflows",
         headers=directeur_headers,
-        data={"payload": json.dumps({"title": "À supprimer", "type": "test"})},
+        data={"payload": json.dumps({"title": "À supprimer BSD", "type": "test"})},
         files={"fichier": ("doc.pdf", b"%PDF-1.4", "application/pdf")},
     )
     assert create.status_code == 201
@@ -86,14 +87,23 @@ async def test_only_bsd_can_delete_workflow(
     )
     assert denied_directeur.status_code == 403
 
-    deleted = await client.delete(
+    deleted_bsd = await client.delete(
         f"/api/v1/workflows/{wf_id}",
         headers=auth_headers,
     )
-    assert deleted.status_code == 204
+    assert deleted_bsd.status_code == 204
 
-    missing = await client.get(
-        f"/api/v1/workflows/{wf_id}",
-        headers=auth_headers,
+    create_admin = await client.post(
+        "/api/v1/workflows",
+        headers=directeur_headers,
+        data={"payload": json.dumps({"title": "À supprimer admin", "type": "test"})},
+        files={"fichier": ("doc2.pdf", b"%PDF-1.4", "application/pdf")},
     )
-    assert missing.status_code == 404
+    assert create_admin.status_code == 201
+    wf_admin_id = create_admin.json()["id"]
+
+    deleted_admin = await client.delete(
+        f"/api/v1/workflows/{wf_admin_id}",
+        headers=admin_headers,
+    )
+    assert deleted_admin.status_code == 204

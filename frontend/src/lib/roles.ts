@@ -125,7 +125,7 @@ export function canActOnWorkflowStep(
   return userWorkflowStepRole(userRole) === stepRole;
 }
 
-/** Suppression d'un workflow — réservée au BSD (rôle user). */
+/** Suppression d'un workflow — BSD et super administrateur. */
 export function canDeleteWorkflow(role: UserRole | undefined): boolean {
-  return role === "user";
+  return role === "user" || role === "admin";
 }
