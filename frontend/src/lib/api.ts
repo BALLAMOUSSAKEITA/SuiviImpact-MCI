@@ -1708,17 +1708,33 @@ export async function createWorkflow(
   return apiFetchFormData<WorkflowItem>("/api/v1/workflows", formData, "POST");
 }
 
-export async function downloadWorkflowFile(actionId: number): Promise<Blob> {
+export async function downloadWorkflowFile(
+  actionId: number,
+  inline = false,
+): Promise<{ blob: Blob; filename: string }> {
   const headers = buildAuthHeaders({});
-  const response = await fetch(
-    `${API_BASE_URL}/api/v1/workflows/fichiers/${actionId}/download`,
-    { headers },
-  );
+  const url = `${API_BASE_URL}/api/v1/workflows/fichiers/${actionId}/download?inline=${inline ? "true" : "false"}`;
+
+  let response = await fetch(url, { headers });
+
+  if (response.status === 401) {
+    const newToken = await refreshAccessToken();
+    if (newToken) {
+      headers.set("Authorization", `Bearer ${newToken}`);
+      response = await fetch(url, { headers });
+    }
+  }
+
   if (!response.ok) {
     const error = (await response.json().catch(() => ({}))) as Record<string, unknown>;
     throw new Error(messageFromFailedResponse(error, response.status));
   }
-  return response.blob();
+
+  const disposition = response.headers.get("Content-Disposition") ?? "";
+  const match = disposition.match(/filename="?([^";\n]+)"?/);
+  const filename = match?.[1] ?? "document";
+  const blob = await response.blob();
+  return { blob, filename };
 }
 
 export async function performWorkflowAction(

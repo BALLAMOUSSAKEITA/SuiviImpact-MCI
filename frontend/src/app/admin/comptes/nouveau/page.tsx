@@ -14,7 +14,7 @@ import { FormDialog } from "@/components/confirm-dialog";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { createUser } from "@/lib/api";
-import { ROLE_LABELS } from "@/lib/roles";
+import { INSTITUTION_ROLES, ROLE_LABELS } from "@/lib/roles";
 import type { UserRole } from "@/types";
 
 const ROLES = ["admin", "developpeur", "directeur", "sg", "ministre", "daf"] as const satisfies readonly UserRole[];
@@ -28,8 +28,6 @@ const schema = z.object({
 });
 
 type FormData = z.infer<typeof schema>;
-
-const INSTITUTION_ROLES: UserRole[] = ["directeur", "sg", "ministre"];
 
 export default function NouveauComptePage() {
   return (

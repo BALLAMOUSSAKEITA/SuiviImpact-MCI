@@ -28,7 +28,38 @@ async def test_only_directeur_can_create_workflow(
     body = create.json()
     assert body["title"] == "Circuit test"
     directeur_step = next(s for s in body["steps"] if s["role"] == "directeur")
+    assert any(a.get("file_path") for a in directeur_step["actions"])
     assert any(a.get("file_name") for a in directeur_step["actions"])
+
+
+@pytest.mark.asyncio
+async def test_workflow_file_downloadable_by_any_participant(
+    client: AsyncClient,
+    directeur_headers: dict[str, str],
+    auth_headers: dict[str, str],
+    admin_headers: dict[str, str],
+):
+    pdf_content = b"%PDF-1.4 workflow test content"
+    create = await client.post(
+        "/api/v1/workflows",
+        headers=directeur_headers,
+        data={"payload": json.dumps({"title": "Fichier test", "type": "test"})},
+        files={"fichier": ("budget.pdf", pdf_content, "application/pdf")},
+    )
+    assert create.status_code == 201, create.text
+    wf = create.json()
+    directeur_step = next(s for s in wf["steps"] if s["role"] == "directeur")
+    upload_action = next(a for a in directeur_step["actions"] if a.get("file_path"))
+    action_id = upload_action["id"]
+
+    for headers in (auth_headers, admin_headers, directeur_headers):
+        response = await client.get(
+            f"/api/v1/workflows/fichiers/{action_id}/download",
+            headers=headers,
+        )
+        assert response.status_code == 200, response.text
+        assert response.content == pdf_content
+        assert "application/pdf" in (response.headers.get("content-type") or "")
 
 
 @pytest.mark.asyncio

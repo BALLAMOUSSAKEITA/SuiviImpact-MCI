@@ -259,6 +259,22 @@ async def perform_action(
     return _workflow_to_read(await _load_workflow(db, wf.id))
 
 
+async def get_workflow_action_file(
+    db: AsyncSession, action_id: int
+) -> WorkflowAction:
+    from app.models.workflow import WorkflowAction
+
+    result = await db.execute(
+        select(WorkflowAction)
+        .where(WorkflowAction.id == action_id)
+        .options(selectinload(WorkflowAction.step))
+    )
+    action = result.scalar_one_or_none()
+    if action is None or not action.file_path:
+        raise HTTPException(status_code=404, detail="Fichier introuvable")
+    return action
+
+
 async def get_workflow(db: AsyncSession, workflow_id: int) -> WorkflowRead:
     wf = await _load_workflow(db, workflow_id)
     return _workflow_to_read(wf)

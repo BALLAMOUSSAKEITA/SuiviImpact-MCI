@@ -59,5 +59,25 @@ def assert_can_delete_workflow(user: User) -> None:
         )
 
 
+def can_view_workflow_files(user: User) -> bool:
+    """Tout participant au circuit (ou BSD / super admin) peut consulter les pièces jointes."""
+    return user.role in (
+        UserRole.ADMIN,
+        UserRole.USER,
+        UserRole.DIRECTEUR,
+        UserRole.SG,
+        UserRole.MINISTRE,
+        UserRole.DAF,
+    )
+
+
+def assert_can_view_workflow_files(user: User) -> None:
+    if not can_view_workflow_files(user):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Accès non autorisé aux fichiers du workflow",
+        )
+
+
 def step_has_attached_file(step) -> bool:
     return any(a.file_path for a in step.actions)

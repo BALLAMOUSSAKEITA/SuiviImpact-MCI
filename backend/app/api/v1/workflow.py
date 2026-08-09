@@ -1,11 +1,13 @@
 """Workflow API endpoints."""
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
 from fastapi.responses import FileResponse, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user
 from app.core.database import get_db
+from app.core.media_types import guess_document_media_type
+from app.core.workflow_access import assert_can_view_workflow_files
 from app.models.user import User
 from app.schemas.workflow import WorkflowActionCreate, WorkflowCreate, WorkflowRead
 from app.services import workflow_service as service
@@ -25,19 +27,24 @@ async def list_workflows(
 @router.get("/workflows/fichiers/{action_id}/download")
 async def download_workflow_file(
     action_id: int,
-    _: User = Depends(get_current_user),
+    inline: bool = Query(
+        default=False,
+        description="Afficher dans le navigateur si le format le permet",
+    ),
+    user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> FileResponse:
-    from app.models.workflow import WorkflowAction
-
-    action = await db.get(WorkflowAction, action_id)
-    if action is None or not action.file_path:
-        raise HTTPException(status_code=404, detail="Fichier introuvable")
+    assert_can_view_workflow_files(user)
+    action = await service.get_workflow_action_file(db, action_id)
     path = storage_service.resolve_path(action.file_path)
+    filename = action.file_name or path.name
+    media_type = guess_document_media_type(filename)
+    disposition = "inline" if inline else "attachment"
     return FileResponse(
         path=path,
-        filename=action.file_name or "document",
-        media_type="application/octet-stream",
+        filename=filename,
+        media_type=media_type,
+        content_disposition_type=disposition,
     )
 
 

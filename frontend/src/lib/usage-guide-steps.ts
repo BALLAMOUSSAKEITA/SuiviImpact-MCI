@@ -250,7 +250,7 @@ const STEP_COPY: Record<string, CopyTable> = {
     directeur: `Visite pour un compte ${ROLE_LABELS.directeur} : planification PAO de votre direction, workflow documentaire et archive.`,
     sg: `Visite pour un compte ${ROLE_LABELS.sg} : validation au workflow, statistiques de pilotage et archive institutionnelle.`,
     ministre: `Visite pour un compte ${ROLE_LABELS.ministre} : suivi des validations, indicateurs agrégés et documents archivés.`,
-    daf: `Visite pour un compte ${ROLE_LABELS.daf} : étapes workflow qui vous concernent, statistiques et archive.`,
+    daf: `Visite pour un compte ${ROLE_LABELS.daf} : mêmes onglets que le ministre (statistiques, workflow, archive).`,
   },
   sidebar: {
     admin: "Accès complet au menu BSD et à l’administration (Comptes). Seules les entrées utiles à votre rôle sont listées ici.",
@@ -262,7 +262,7 @@ const STEP_COPY: Record<string, CopyTable> = {
       "Menu réduit au périmètre directeur : accueil, planification PAO, workflow, archive et profil.",
     sg: "Menu institutionnel : accueil, statistiques, workflow, archive et profil.",
     ministre: "Menu institutionnel : accueil, statistiques, workflow, archive et profil.",
-    daf: "Menu institutionnel : accueil, statistiques, workflow, archive et profil.",
+    daf: "Menu identique au ministre : accueil, statistiques, workflow, archive et profil.",
   },
   home: {
     directeur: "Point d’entrée : synthèse et liens vers vos modules (PAO, validations, archive).",
@@ -342,7 +342,7 @@ const STEP_COPY: Record<string, CopyTable> = {
     "bsd-lecture": "Tableaux de bord en lecture pour le reporting.",
     sg: "Indicateurs agrégés pour le pilotage au niveau SG.",
     ministre: "Vision consolidée pour le suivi ministériel.",
-    daf: "Statistiques utiles au contrôle financier et au pilotage.",
+    daf: "Vision consolidée pour le suivi et le contrôle (mêmes tableaux que le ministre).",
   },
   workflow: {
     admin: "Supervision des circuits de validation ; vous traitez l’étape BSD et pouvez supprimer les dossiers.",
@@ -363,7 +363,7 @@ const STEP_COPY: Record<string, CopyTable> = {
     directeur: "Dépôt et consultation des dossiers documentaires de votre périmètre.",
     sg: "Consultation et gestion des archives institutionnelles.",
     ministre: "Accès aux dossiers archivés pour décision et traçabilité.",
-    daf: "Archives utiles au contrôle et à la justification.",
+    daf: "Accès aux dossiers archivés pour traçabilité (comme le ministre).",
     "bsd-ecriture": "Dossiers et pièces jointes centralisés.",
     "bsd-lecture": "Consultation des dossiers archivés.",
   },
@@ -379,7 +379,7 @@ const STEP_COPY: Record<string, CopyTable> = {
     directeur: "Vous connaissez vos modules directeur (PAO, workflow, archive). Bon pilotage !",
     sg: "Vous connaissez vos modules SG. Bonne validation !",
     ministre: "Vous connaissez vos modules ministériels. Bon suivi !",
-    daf: "Vous connaissez vos modules DAF. Bon contrôle !",
+    daf: "Vous connaissez les mêmes modules que le ministre. Bon contrôle !",
   },
 };
 

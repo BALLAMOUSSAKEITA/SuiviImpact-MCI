@@ -5,6 +5,7 @@ import {
   AlertTriangle,
   Check,
   ChevronDown,
+  Download,
   FileText,
   Loader2,
   MessageSquare,
@@ -31,6 +32,11 @@ import {
   listWorkflows,
   performWorkflowAction,
 } from "@/lib/api";
+import {
+  downloadBlob,
+  isInlineViewable,
+  openBlobInNewTab,
+} from "@/lib/stored-documents";
 import {
   canActOnWorkflowStep,
   canCreateWorkflow,
@@ -417,32 +423,72 @@ function WorkflowCard({
 /* ─── Detail Panel ─── */
 
 function WorkflowFileButton({ actionId, fileName }: { actionId: number; fileName: string }) {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<"open" | "download" | null>(null);
+
+  const fetchDoc = async (inline: boolean) => {
+    const doc = await downloadWorkflowFile(actionId, inline);
+    const mime =
+      doc.blob.type && doc.blob.type !== "application/octet-stream"
+        ? doc.blob.type
+        : isInlineViewable(doc.filename)
+          ? "application/pdf"
+          : doc.blob.type;
+    const blob = mime && mime !== doc.blob.type ? new Blob([doc.blob], { type: mime }) : doc.blob;
+    return { blob, filename: doc.filename || fileName };
+  };
 
   const openFile = async () => {
-    setLoading(true);
+    setLoading("open");
     try {
-      const blob = await downloadWorkflowFile(actionId);
-      const url = URL.createObjectURL(blob);
-      window.open(url, "_blank", "noopener,noreferrer");
-      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      const doc = await fetchDoc(true);
+      if (!isInlineViewable(doc.filename, doc.blob.type)) {
+        downloadBlob(doc.blob, doc.filename);
+        toast.message("Ouverture directe indisponible — téléchargement lancé.");
+        return;
+      }
+      openBlobInNewTab(doc.blob, doc.filename);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Impossible d'ouvrir le fichier");
     } finally {
-      setLoading(false);
+      setLoading(null);
+    }
+  };
+
+  const saveFile = async () => {
+    setLoading("download");
+    try {
+      const doc = await fetchDoc(false);
+      downloadBlob(doc.blob, doc.filename);
+      toast.success("Téléchargement lancé");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Impossible de télécharger le fichier");
+    } finally {
+      setLoading(null);
     }
   };
 
   return (
-    <button
-      type="button"
-      onClick={() => void openFile()}
-      disabled={loading}
-      className="mt-0.5 flex items-center gap-1 text-xs font-medium text-graphite hover:underline"
-    >
-      <FileText className="h-3 w-3" />
-      {loading ? "Ouverture…" : fileName}
-    </button>
+    <div className="mt-0.5 flex flex-wrap items-center gap-2">
+      <button
+        type="button"
+        onClick={() => void openFile()}
+        disabled={loading !== null}
+        className="flex items-center gap-1 text-xs font-medium text-graphite hover:underline"
+      >
+        <FileText className="h-3 w-3" />
+        {loading === "open" ? "Ouverture…" : fileName}
+      </button>
+      <button
+        type="button"
+        onClick={() => void saveFile()}
+        disabled={loading !== null}
+        className="flex items-center gap-1 text-xs font-medium text-slate hover:text-graphite"
+        title="Télécharger"
+      >
+        <Download className="h-3 w-3" />
+        {loading === "download" ? "…" : "Télécharger"}
+      </button>
+    </div>
   );
 }
 
@@ -582,8 +628,11 @@ function WorkflowDetailPanel({
                           « {action.comment} »
                         </p>
                       )}
-                      {action.file_name && action.id && (
-                        <WorkflowFileButton actionId={action.id} fileName={action.file_name} />
+                      {(action.file_name || action.file_path) && action.id && (
+                        <WorkflowFileButton
+                          actionId={action.id}
+                          fileName={action.file_name || "Document joint"}
+                        />
                       )}
                       <p className="text-[10px] text-ash">
                         {new Date(action.created_at).toLocaleString("fr-FR")}

@@ -33,10 +33,12 @@ class StorageService:
             raise HTTPException(status_code=400, detail="Fichier trop volumineux")
 
         path.write_bytes(content)
-        return str(path.relative_to(self.base_dir)), file.filename or stored_name, len(content)
+        relative = path.relative_to(self.base_dir).as_posix()
+        return relative, file.filename or stored_name, len(content)
 
     def resolve_path(self, relative_path: str) -> Path:
-        full = (self.base_dir / relative_path).resolve()
+        normalized = relative_path.replace("\\", "/")
+        full = (self.base_dir / normalized).resolve()
         if not str(full).startswith(str(self.base_dir.resolve())):
             raise HTTPException(status_code=400, detail="Chemin invalide")
         if not full.exists():
