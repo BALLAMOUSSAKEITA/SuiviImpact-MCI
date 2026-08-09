@@ -19,7 +19,7 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/components/auth-provider";
-import { ConfirmDialog } from "@/components/confirm-dialog";
+import { ConfirmDialog, FormDialog } from "@/components/confirm-dialog";
 import { MetricStrip } from "@/components/dashboard/kpi-metric";
 import { FileUploadField } from "@/components/file-upload-field";
 import { PageHeader } from "@/components/page-header";
@@ -54,13 +54,15 @@ export default function WorkflowPage() {
   const [newTitle, setNewTitle] = useState("");
   const [newType, setNewType] = useState("Budget");
   const [newFile, setNewFile] = useState<File | null>(null);
-  const [selected, setSelected] = useState<WorkflowItem | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<WorkflowItem | null>(null);
 
   const { data: workflows = [], isLoading } = useQuery({
     queryKey: ["workflows"],
     queryFn: listWorkflows,
   });
+
+  const selected = workflows.find((w) => w.id === selectedId) ?? null;
 
   const summary = useMemo(() => {
     const enCours = workflows.filter((w) => w.status === "en_cours").length;
@@ -89,7 +91,7 @@ export default function WorkflowPage() {
     onSuccess: () => {
       toast.success("Workflow supprimé");
       setDeleteTarget(null);
-      setSelected(null);
+      setSelectedId(null);
       queryClient.invalidateQueries({ queryKey: ["workflows"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -200,25 +202,48 @@ export default function WorkflowPage() {
             <WorkflowCard
               key={wf.id}
               workflow={wf}
-              isSelected={selected?.id === wf.id}
-              onSelect={() => setSelected(selected?.id === wf.id ? null : wf)}
+              isSelected={selectedId === wf.id}
+              onSelect={() => setSelectedId(wf.id)}
             />
           ))}
         </div>
       )}
 
-      {selected && (
-        <WorkflowDetailPanel
-          workflow={selected}
-          mayDelete={mayDelete}
-          onDelete={() => setDeleteTarget(selected)}
-          onClose={() => setSelected(null)}
-          onUpdate={(updated) => {
-            setSelected(updated);
-            queryClient.invalidateQueries({ queryKey: ["workflows"] });
-          }}
-        />
-      )}
+      <FormDialog
+        open={selected !== null}
+        title={selected?.title ?? "Workflow"}
+        subtitle={
+          selected
+            ? `${selected.ref} · ${selected.type} · par ${selected.creator_prenom}`
+            : undefined
+        }
+        size="large"
+        onClose={() => setSelectedId(null)}
+        headerActions={
+          mayDelete && selected ? (
+            <Button
+              type="button"
+              size="sm"
+              variant="destructive"
+              onClick={() => setDeleteTarget(selected)}
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              Supprimer
+            </Button>
+          ) : undefined
+        }
+      >
+        {selected && (
+          <WorkflowDetailPanel
+            workflow={selected}
+            onUpdate={(updated) => {
+              queryClient.setQueryData<WorkflowItem[]>(["workflows"], (prev) =>
+                prev?.map((w) => (w.id === updated.id ? updated : w)),
+              );
+            }}
+          />
+        )}
+      </FormDialog>
 
       <ConfirmDialog
         open={deleteTarget !== null}
@@ -423,15 +448,9 @@ function WorkflowFileButton({ actionId, fileName }: { actionId: number; fileName
 
 function WorkflowDetailPanel({
   workflow,
-  mayDelete,
-  onDelete,
-  onClose,
   onUpdate,
 }: {
   workflow: WorkflowItem;
-  mayDelete: boolean;
-  onDelete: () => void;
-  onClose: () => void;
   onUpdate: (wf: WorkflowItem) => void;
 }) {
   const { user } = useAuth();
@@ -475,29 +494,17 @@ function WorkflowDetailPanel({
   });
 
   return (
-    <div className="panel-grain mt-6 animate-fade-in">
-      <div className="mb-6 flex items-start justify-between gap-4">
-        <div>
-          <h3 className="font-display text-lg text-graphite">{workflow.title}</h3>
-          <p className="text-sm text-fog">
-            {workflow.ref} · {workflow.type} · par {workflow.creator_prenom}
-          </p>
-        </div>
-        <div className="flex shrink-0 items-center gap-2">
-          {mayDelete && (
-            <Button
-              type="button"
-              size="sm"
-              variant="destructive"
-              onClick={onDelete}
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-              Supprimer
-            </Button>
-          )}
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            Fermer
-          </Button>
+    <div>
+      <div className="mb-5 overflow-x-auto pb-2">
+        <div className="flex min-w-max items-start justify-center">
+          {workflow.steps.map((step, i) => (
+            <div key={step.id} className="flex items-start">
+              <StepNode step={step} />
+              {i < workflow.steps.length - 1 && (
+                <Connector done={step.status === "done"} />
+              )}
+            </div>
+          ))}
         </div>
       </div>
 
