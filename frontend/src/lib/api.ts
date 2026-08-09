@@ -1502,12 +1502,16 @@ export async function getStatsPpm(
 
 
 export async function getStatsProjets(
-  projetId?: number,
-  period?: StatsPeriodParams,
+  options?: {
+    projetId?: number;
+    typeProjet?: ProjetType;
+    period?: StatsPeriodParams;
+  },
 ): Promise<ProjetStats> {
   const search = new URLSearchParams();
-  if (projetId) search.set("projet_id", String(projetId));
-  if (period) appendStatsPeriodToSearch(search, period);
+  if (options?.projetId) search.set("projet_id", String(options.projetId));
+  if (options?.typeProjet) search.set("type_projet", options.typeProjet);
+  if (options?.period) appendStatsPeriodToSearch(search, options.period);
   const query = search.toString() ? `?${search.toString()}` : "";
   return apiFetch<ProjetStats>(`/api/v1/stats/projets${query}`);
 }

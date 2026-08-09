@@ -9,6 +9,7 @@ from app.api.period_params import PeriodQuery, period_query_params, stats_with_p
 from app.core.database import get_db
 from app.models.user import User
 from app.schemas.stats import ActiviteStats, ExecutionStats, PpmStats, ProjetStats
+from app.schemas.modules import ProjetType
 from app.services import stats_service as service
 
 router = APIRouter()
@@ -78,6 +79,7 @@ async def stats_ppm(
 async def stats_projets(
     period: Annotated[PeriodQuery, Depends(period_query_params)],
     projet_id: int | None = Query(default=None),
+    type_projet: ProjetType | None = Query(default=None),
     _: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> ProjetStats:
@@ -86,4 +88,5 @@ async def stats_projets(
         service.stats_projets,
         period,
         projet_id=projet_id,
+        type_projet=type_projet,
     )

@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.models.direction import Direction
-from app.models.modules import Mission, Ppm, PpmStatut, Projet, Recommandation
+from app.models.modules import Mission, Ppm, PpmStatut, Projet, ProjetType, Recommandation
 from app.models.plan_action import Activite, ActiviteDirection
 from app.models.tache import Tache, TacheStatut
 from app.schemas.stats import ActiviteStats, ExecutionStats, PpmStats, ProjetStats
@@ -217,6 +217,7 @@ async def stats_ppm(
 async def stats_projets(
     db: AsyncSession,
     projet_id: int | None = None,
+    type_projet: ProjetType | None = None,
     *,
     mode: PeriodMode = "annee",
     annee: int = 2026,
@@ -236,6 +237,8 @@ async def stats_projets(
     query = select(Projet).where(Projet.date_debut.isnot(None), date_cond)
     if projet_id is not None:
         query = query.where(Projet.id == projet_id)
+    elif type_projet is not None:
+        query = query.where(Projet.type_projet == type_projet)
     result = await db.execute(query)
     projets = list(result.scalars().all())
 
