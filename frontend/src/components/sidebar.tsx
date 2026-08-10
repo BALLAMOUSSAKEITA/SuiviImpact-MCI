@@ -68,6 +68,7 @@ const navItems: NavItem[] = [
     children: [
       { href: "/admin/planification/pao", label: "PAO", icon: ClipboardList },
       { href: "/admin/planification/projet", label: "Projet", icon: FolderKanban },
+      { href: "/admin/planification/indicateurs", label: "Indicateurs", icon: BarChart3 },
     ],
   },
   {

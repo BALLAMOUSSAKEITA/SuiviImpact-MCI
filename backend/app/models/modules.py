@@ -136,7 +136,11 @@ class Indicateur(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     code: Mapped[str] = mapped_column(String(20), nullable=False)
     libelle: Mapped[str] = mapped_column(Text, nullable=False)
-    reference: Mapped[str | None] = mapped_column(String(100))
+    nombre_unites: Mapped[Decimal | None] = mapped_column(Numeric(10, 2))
+    direction_id: Mapped[int | None] = mapped_column(
+        ForeignKey("directions.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+    reference: Mapped[Decimal | None] = mapped_column(Numeric(10, 2))
     cible: Mapped[Decimal | None] = mapped_column(Numeric(10, 2))
     realise: Mapped[Decimal] = mapped_column(Numeric(10, 2), default=0)
     created_at: Mapped[datetime] = mapped_column(

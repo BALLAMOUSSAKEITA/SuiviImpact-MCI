@@ -5,6 +5,7 @@ from fastapi import HTTPException
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.models.direction import Direction
 from app.models.modules import (
     Indicateur,
     Mission,
@@ -283,31 +284,83 @@ async def delete_projet(db: AsyncSession, item: Projet) -> None:
     await db.commit()
 
 
+def _to_indicateur_read(
+    item: Indicateur, direction: Direction | None = None
+) -> IndicateurRead:
+    return IndicateurRead(
+        id=item.id,
+        code=item.code,
+        libelle=item.libelle,
+        nombre_unites=item.nombre_unites,
+        direction_id=item.direction_id,
+        direction_code=direction.code if direction else None,
+        direction_libelle=direction.libelle if direction else None,
+        reference=item.reference,
+        cible=item.cible,
+        realise=item.realise,
+        created_at=item.created_at,
+        updated_at=item.updated_at,
+    )
+
+
+async def _get_direction(
+    db: AsyncSession, direction_id: int | None
+) -> Direction | None:
+    if direction_id is None:
+        return None
+    direction = await db.get(Direction, direction_id)
+    if direction is None:
+        raise HTTPException(status_code=404, detail="Direction introuvable")
+    return direction
+
+
 async def list_indicateurs(db: AsyncSession) -> list[IndicateurRead]:
-    result = await db.execute(select(Indicateur).order_by(Indicateur.code))
-    return [IndicateurRead.model_validate(i) for i in result.scalars().all()]
+    result = await db.execute(
+        select(Indicateur, Direction)
+        .outerjoin(Direction, Indicateur.direction_id == Direction.id)
+        .order_by(Indicateur.code)
+    )
+    return [_to_indicateur_read(item, direction) for item, direction in result.all()]
 
 
 async def get_indicateur(db: AsyncSession, item_id: int) -> Indicateur | None:
     return await db.get(Indicateur, item_id)
 
 
+async def get_indicateur_read(db: AsyncSession, item_id: int) -> IndicateurRead | None:
+    result = await db.execute(
+        select(Indicateur, Direction)
+        .outerjoin(Direction, Indicateur.direction_id == Direction.id)
+        .where(Indicateur.id == item_id)
+    )
+    row = result.first()
+    if row is None:
+        return None
+    item, direction = row
+    return _to_indicateur_read(item, direction)
+
+
 async def create_indicateur(db: AsyncSession, data: IndicateurCreate) -> IndicateurRead:
+    direction = await _get_direction(db, data.direction_id)
     item = Indicateur(**data.model_dump())
     db.add(item)
     await db.commit()
     await db.refresh(item)
-    return IndicateurRead.model_validate(item)
+    return _to_indicateur_read(item, direction)
 
 
 async def update_indicateur(
     db: AsyncSession, item: Indicateur, data: IndicateurUpdate
 ) -> IndicateurRead:
-    for field, value in data.model_dump(exclude_unset=True).items():
+    payload = data.model_dump(exclude_unset=True)
+    if "direction_id" in payload:
+        await _get_direction(db, payload["direction_id"])
+    for field, value in payload.items():
         setattr(item, field, value)
     await db.commit()
     await db.refresh(item)
-    return IndicateurRead.model_validate(item)
+    direction = await _get_direction(db, item.direction_id)
+    return _to_indicateur_read(item, direction)
 
 
 async def delete_indicateur(db: AsyncSession, item: Indicateur) -> None:

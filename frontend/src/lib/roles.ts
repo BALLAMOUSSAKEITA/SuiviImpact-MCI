@@ -103,7 +103,14 @@ export function canSeeNavHref(role: UserRole | undefined, href: string, adminOnl
   if (href.startsWith("/admin/taches") && !href.includes("planification")) return false;
   if (href.startsWith("/admin/projets") && !href.includes("planification") && !href.includes("suivi")) return false;
   if (href.startsWith("/admin/directions")) return false;
-  if (href === "/admin/planification" || href === "/admin/planification/projet") return false;
+  if (
+    href === "/admin/planification" ||
+    href === "/admin/planification/projet" ||
+    href === "/admin/planification/indicateurs" ||
+    href.startsWith("/admin/planification/indicateurs/")
+  ) {
+    return false;
+  }
   if (href.startsWith("/admin/suivi")) return false;
   if (href.startsWith("/admin/export")) return false;
 

@@ -106,18 +106,30 @@ async def test_ppm_crud(client: AsyncClient, auth_headers: dict[str, str]):
 
 @pytest.mark.asyncio
 async def test_indicateurs_crud(client: AsyncClient, auth_headers: dict[str, str]):
+    directions = await client.get("/api/v1/directions", headers=auth_headers)
+    assert directions.status_code == 200
+    direction_id = directions.json()[0]["id"] if directions.json() else None
+
     create = await client.post(
         "/api/v1/indicateurs",
         headers=auth_headers,
         json={
             "code": "IND1",
             "libelle": "Indicateur test",
+            "nombre_unites": 12,
+            "direction_id": direction_id,
+            "reference": 40,
             "cible": 100,
             "realise": 10,
         },
     )
     assert create.status_code == 201
-    item_id = create.json()["id"]
+    body = create.json()
+    item_id = body["id"]
+    assert float(body["reference"]) == 40.0
+    assert float(body["nombre_unites"]) == 12.0
+    if direction_id is not None:
+        assert body["direction_id"] == direction_id
 
     update = await client.put(
         f"/api/v1/indicateurs/{item_id}",
@@ -126,6 +138,7 @@ async def test_indicateurs_crud(client: AsyncClient, auth_headers: dict[str, str
     )
     assert update.status_code == 200
     assert float(update.json()["realise"]) == 50.0
+    assert float(update.json()["cible"]) == 100.0
 
     delete = await client.delete(f"/api/v1/indicateurs/{item_id}", headers=auth_headers)
     assert delete.status_code == 204

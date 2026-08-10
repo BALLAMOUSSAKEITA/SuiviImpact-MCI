@@ -133,6 +133,14 @@ const BASE_STEPS: UsageGuideStep[] = [
     body: "",
   },
   {
+    id: "plan-indicateurs",
+    target: "/admin/planification/indicateurs",
+    navHref: "/admin/planification/indicateurs",
+    expandNav: "/admin/planification",
+    title: "Planification indicateurs",
+    body: "",
+  },
+  {
     id: "suivi",
     target: "/admin/suivi",
     navHref: "/admin/suivi/pao",
@@ -293,9 +301,9 @@ const STEP_COPY: Record<string, CopyTable> = {
     "bsd-lecture": "Consultation de la structure des directions.",
   },
   planification: {
-    admin: "Deux volets : PAO (plan d’action opérationnel) et plan projet, par trimestre.",
-    "bsd-ecriture": "Construisez les plans trimestriels PAO et projet avant le suivi en cours d’année.",
-    "bsd-lecture": "Consultation des plans trimestriels PAO et projet.",
+    admin: "Trois volets : PAO, plan projet et indicateurs.",
+    "bsd-ecriture": "Construisez les plans PAO, projet et indicateurs avant le suivi en cours d’année.",
+    "bsd-lecture": "Consultation des plans PAO, projet et indicateurs.",
   },
   "plan-pao": {
     directeur:
@@ -306,6 +314,11 @@ const STEP_COPY: Record<string, CopyTable> = {
   "plan-projet": {
     "bsd-ecriture": "Planification des actions projet sur la période choisie.",
     "bsd-lecture": "Consultation du plan projet.",
+  },
+  "plan-indicateurs": {
+    "bsd-ecriture":
+      "Définition des indicateurs : code, libellé, unités, direction, référence et cible.",
+    "bsd-lecture": "Consultation des indicateurs planifiés.",
   },
   suivi: {
     admin: "Hub de saisie de l’exécution réelle (PAO, RCC, missions, PPM, projets, indicateurs).",
@@ -333,8 +346,8 @@ const STEP_COPY: Record<string, CopyTable> = {
     "bsd-lecture": "Consultation du PPM.",
   },
   "suivi-indicateurs": {
-    "bsd-ecriture": "Saisie des valeurs d’indicateurs de performance.",
-    "bsd-lecture": "Consultation des indicateurs.",
+    "bsd-ecriture": "Saisie du réalisé par rapport à la cible pour chaque indicateur.",
+    "bsd-lecture": "Consultation de la cible et du réalisé des indicateurs.",
   },
   stats: {
     admin: "Tableaux de bord par domaine avec filtres de période.",
@@ -391,16 +404,17 @@ const DEFAULT_COPY: Partial<Record<string, string>> = {
   taches: "Catalogue des tâches rattachées aux objectifs.",
   "projets-ref": "Projets institutionnels et fiches associées.",
   directions: "Structure organisationnelle pour le pilotage.",
-  planification: "Plans d’action par trimestre (PAO et projet).",
+  planification: "Plans d’action (PAO, projet et indicateurs).",
   "plan-pao": "Trimestre, activités et tâches du plan d’action opérationnel.",
   "plan-projet": "Planification du volet projets.",
+  "plan-indicateurs": "Définition des indicateurs (référence et cible).",
   suivi: "Mise à jour de l’avancement réel sur l’ensemble des volets.",
   "suivi-pao": "Exécution trimestrielle du PAO.",
   "suivi-projet": "Avancement des actions projet.",
   "suivi-rcc": "Recommandations RCC par trimestre.",
   "suivi-missions": "Missions de terrain et reporting.",
   "suivi-ppm": "Plan de passation des marchés.",
-  "suivi-indicateurs": "Indicateurs de performance du programme.",
+  "suivi-indicateurs": "Suivi du réalisé des indicateurs planifiés.",
   stats: "Tableaux de bord par domaine avec filtres de période.",
   workflow: "Circuits de validation documentaire entre les rôles.",
   export: "Extractions Excel pour reporting.",

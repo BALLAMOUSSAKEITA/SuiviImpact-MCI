@@ -24,10 +24,10 @@ async def get_indicateur(
     _: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> IndicateurRead:
-    item = await service.get_indicateur(db, item_id)
+    item = await service.get_indicateur_read(db, item_id)
     if item is None:
         raise HTTPException(status_code=404, detail="Indicateur introuvable")
-    return IndicateurRead.model_validate(item)
+    return item
 
 
 @router.post(
