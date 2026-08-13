@@ -26,7 +26,7 @@ import {
   Users,
   Wallet,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useAuth } from "@/components/auth-provider";
 import { Button } from "@/components/ui/button";
@@ -99,6 +99,18 @@ const navItems: NavItem[] = [
   { href: "/admin/comptes", label: "Comptes", icon: Users, adminOnly: true },
 ];
 
+function pathBelongsToGroup(path: string, item: NavItem): boolean {
+  return (
+    item.children?.some(
+      (child) => path === child.href || path.startsWith(`${child.href}/`),
+    ) ?? false
+  );
+}
+
+function groupHrefForPath(path: string): string | null {
+  return navItems.find((item) => pathBelongsToGroup(path, item))?.href ?? null;
+}
+
 interface SidebarProps {
   mobileOpen?: boolean;
   collapsed?: boolean;
@@ -120,20 +132,16 @@ export function Sidebar({
     return pathname === href || pathname.startsWith(`${href}/`);
   };
 
-  const isGroupActive = (item: NavItem) => {
-    if (!item.children?.length) return false;
-    return item.children.some((c) => isActive(c.href));
-  };
-
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [expandedHref, setExpandedHref] = useState<string | null>(() =>
+    groupHrefForPath(pathname),
+  );
   const [flyoutHref, setFlyoutHref] = useState<string | null>(null);
+  const previousPathname = useRef(pathname);
 
   useEffect(() => {
-    navItems.forEach((item) => {
-      if (item.children && isGroupActive(item)) {
-        setExpanded((prev) => ({ ...prev, [item.href]: true }));
-      }
-    });
+    if (previousPathname.current === pathname) return;
+    previousPathname.current = pathname;
+    setExpandedHref(groupHrefForPath(pathname));
   }, [pathname]);
 
   useEffect(() => {
@@ -144,7 +152,7 @@ export function Sidebar({
     const onPrepare = (event: Event) => {
       const { expandNav } = (event as CustomEvent<UsageGuideStepPrepareDetail>).detail;
       if (expandNav) {
-        setExpanded((prev) => ({ ...prev, [expandNav]: true }));
+        setExpandedHref(expandNav);
       }
     };
     window.addEventListener(USAGE_GUIDE_PREPARE_STEP_EVENT, onPrepare);
@@ -205,7 +213,7 @@ export function Sidebar({
 
             if (children?.length) {
               const sectionActive = children.some((c) => isActive(c.href));
-              const isOpen = expanded[item.href] ?? sectionActive;
+              const isOpen = expandedHref === item.href;
 
               if (narrow) {
                 return (
@@ -278,11 +286,9 @@ export function Sidebar({
                   <button
                     type="button"
                     data-tour-target={item.href}
+                    aria-expanded={isOpen}
                     onClick={() =>
-                      setExpanded((prev) => ({
-                        ...prev,
-                        [item.href]: !(prev[item.href] ?? sectionActive),
-                      }))
+                      setExpandedHref((current) => (current === item.href ? null : item.href))
                     }
                     className={cn(navLinkClass(sectionActive), "w-full")}
                   >
@@ -337,7 +343,10 @@ export function Sidebar({
                 key={item.href}
                 href={item.defaultChild ?? item.href}
                 data-tour-target={item.href}
-                onClick={onNavigate}
+                onClick={() => {
+                  setExpandedHref(null);
+                  onNavigate?.();
+                }}
                 title={narrow ? item.label : undefined}
                 className={navLinkClass(active)}
               >

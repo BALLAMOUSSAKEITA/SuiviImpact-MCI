@@ -63,7 +63,7 @@ function PlanificationIndicateursContent() {
       createIndicateur({
         code: form.code.trim(),
         libelle: form.libelle.trim(),
-        nombre_unites: form.nombre_unites ? parseFloat(form.nombre_unites) : null,
+        nombre_unites: form.nombre_unites.trim() || null,
         direction_id: form.direction_id ? Number(form.direction_id) : null,
         reference: form.reference ? parseFloat(form.reference) : null,
         cible: form.cible ? parseFloat(form.cible) : null,
@@ -82,7 +82,7 @@ function PlanificationIndicateursContent() {
       updateIndicateur(editing!.id, {
         code: form.code.trim(),
         libelle: form.libelle.trim(),
-        nombre_unites: form.nombre_unites ? parseFloat(form.nombre_unites) : null,
+        nombre_unites: form.nombre_unites.trim() || null,
         direction_id: form.direction_id ? Number(form.direction_id) : null,
         reference: form.reference ? parseFloat(form.reference) : null,
         cible: form.cible ? parseFloat(form.cible) : null,
@@ -165,9 +165,8 @@ function PlanificationIndicateursContent() {
             <div>
               <label className="mb-1 block text-sm text-slate">Nombre d&apos;unités</label>
               <input
-                type="number"
-                min="0"
-                step="any"
+                type="text"
+                maxLength={100}
                 value={form.nombre_unites}
                 onChange={(e) =>
                   setForm((f) => ({ ...f, nombre_unites: e.target.value }))

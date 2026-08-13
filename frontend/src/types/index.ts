@@ -538,7 +538,7 @@ export interface Indicateur {
 export interface IndicateurCreate {
   code: string;
   libelle: string;
-  nombre_unites?: number | null;
+  nombre_unites?: string | null;
   direction_id?: number | null;
   reference?: number | null;
   cible?: number | null;
@@ -548,7 +548,7 @@ export interface IndicateurCreate {
 export interface IndicateurUpdate {
   code?: string;
   libelle?: string;
-  nombre_unites?: number | null;
+  nombre_unites?: string | null;
   direction_id?: number | null;
   reference?: number | null;
   cible?: number | null;

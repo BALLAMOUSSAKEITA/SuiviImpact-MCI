@@ -116,7 +116,7 @@ async def test_indicateurs_crud(client: AsyncClient, auth_headers: dict[str, str
         json={
             "code": "IND1",
             "libelle": "Indicateur test",
-            "nombre_unites": 12,
+            "nombre_unites": "personnes",
             "direction_id": direction_id,
             "reference": 40,
             "cible": 100,
@@ -127,7 +127,7 @@ async def test_indicateurs_crud(client: AsyncClient, auth_headers: dict[str, str
     body = create.json()
     item_id = body["id"]
     assert float(body["reference"]) == 40.0
-    assert float(body["nombre_unites"]) == 12.0
+    assert body["nombre_unites"] == "personnes"
     if direction_id is not None:
         assert body["direction_id"] == direction_id
 

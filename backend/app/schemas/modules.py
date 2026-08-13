@@ -168,7 +168,7 @@ class ProjetRead(BaseModel):
 class IndicateurCreate(BaseModel):
     code: str = Field(min_length=1, max_length=20)
     libelle: str = Field(min_length=1)
-    nombre_unites: Decimal | None = Field(default=None, ge=0)
+    nombre_unites: str | None = Field(default=None, max_length=100)
     direction_id: int | None = None
     reference: Decimal | None = None
     cible: Decimal | None = None
@@ -178,7 +178,7 @@ class IndicateurCreate(BaseModel):
 class IndicateurUpdate(BaseModel):
     code: str | None = Field(default=None, min_length=1, max_length=20)
     libelle: str | None = Field(default=None, min_length=1)
-    nombre_unites: Decimal | None = Field(default=None, ge=0)
+    nombre_unites: str | None = Field(default=None, max_length=100)
     direction_id: int | None = None
     reference: Decimal | None = None
     cible: Decimal | None = None
@@ -191,7 +191,7 @@ class IndicateurRead(BaseModel):
     id: int
     code: str
     libelle: str
-    nombre_unites: Decimal | None
+    nombre_unites: str | None
     direction_id: int | None
     direction_code: str | None = None
     direction_libelle: str | None = None
