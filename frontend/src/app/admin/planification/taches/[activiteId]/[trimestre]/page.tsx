@@ -333,14 +333,14 @@ function TachesContent() {
                     <div className="flex gap-2">
                       <Button
                         variant="outline"
-                        className="h-8 px-3 text-xs"
+                        size="sm"
                         onClick={() => startEdit(tache)}
                       >
                         Modifier
                       </Button>
                       <Button
-                        variant="ghost"
-                        className="h-8 px-3 text-xs text-red-600"
+                        variant="destructive"
+                        size="sm"
                         onClick={() => setDeleteTacheId(tache.id)}
                       >
                         Supprimer

@@ -71,7 +71,7 @@ export function InstitutionalMasthead({
             <p className="font-display text-[1.15rem] font-semibold leading-none text-forest-ink">
               {BRAND.appName}
             </p>
-            <p className="mt-0.5 truncate text-[11px] text-slate">Espace agents</p>
+            <p className="mt-0.5 truncate text-[11px] text-slate">{BRAND.spaceLabel}</p>
           </div>
         </div>
 

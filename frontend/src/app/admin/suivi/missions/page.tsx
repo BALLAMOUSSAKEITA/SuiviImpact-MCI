@@ -271,7 +271,7 @@ function SuiviMissionsContent() {
                     <div className="flex flex-wrap justify-end gap-1 sm:gap-2">
                       <Button
                         variant="outline"
-                        className="h-8 px-3 text-xs"
+                        size="sm"
                         onClick={() => startEdit(item)}
                       >
                         Modifier
@@ -279,15 +279,15 @@ function SuiviMissionsContent() {
                       {parseFloat(item.execution) < 100 && (
                         <Button
                           variant="outline"
-                          className="h-8 px-3 text-xs"
+                          size="sm"
                           onClick={() => finaliserMutation.mutate(item.id)}
                         >
                           Finaliser
                         </Button>
                       )}
                       <Button
-                        variant="ghost"
-                        className="h-8 px-3 text-xs text-red-600"
+                        variant="destructive"
+                        size="sm"
                         onClick={() => setDeleteId(item.id)}
                       >
                         Supprimer

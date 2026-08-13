@@ -16,4 +16,5 @@ export const BRAND = {
   loginSubtitle:
     "Accès réservé aux agents du Ministère de l'Industrie et du Commerce et aux partenaires habilités du BSD.",
   motto: "Travail · Justice · Solidarité",
+  spaceLabel: "Espace Utilisateurs",
 } as const;

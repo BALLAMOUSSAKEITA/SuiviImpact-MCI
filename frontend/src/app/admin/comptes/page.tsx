@@ -129,8 +129,7 @@ function ComptesContent() {
                       {user.etat ? (
                         <Button
                           variant="outline"
-                          size="default"
-                          className="h-8 px-3 text-xs"
+                          size="sm"
                           onClick={() => deactivateMutation.mutate(user.id)}
                         >
                           Désactiver
@@ -138,17 +137,15 @@ function ComptesContent() {
                       ) : (
                         <Button
                           variant="outline"
-                          size="default"
-                          className="h-8 px-3 text-xs"
+                          size="sm"
                           onClick={() => activateMutation.mutate(user.id)}
                         >
                           Activer
                         </Button>
                       )}
                       <Button
-                        variant="ghost"
-                        size="default"
-                        className="h-8 px-3 text-xs text-red-600 hover:text-red-700"
+                        variant="destructive"
+                        size="sm"
                         onClick={() => handleDelete(user.id, user.prenom)}
                       >
                         Supprimer

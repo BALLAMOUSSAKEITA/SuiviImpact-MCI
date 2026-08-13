@@ -108,7 +108,7 @@ export function LoginPage() {
       <section className="login-banner">
         <div className="login-wrap py-10 sm:py-14">
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/70">
-            Espace agents — {BRAND.bureauShort}
+            {BRAND.spaceLabel} — {BRAND.bureauShort}
           </p>
           <h1 className="login-serif mt-3 text-[2.15rem] font-semibold leading-[1.15] text-white sm:text-[2.75rem]">
             {BRAND.appName}

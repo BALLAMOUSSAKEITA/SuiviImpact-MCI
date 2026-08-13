@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface TableRowActionsProps {
@@ -18,29 +19,14 @@ export function TableRowActions({
   className,
 }: TableRowActionsProps) {
   return (
-    <div className={cn("table-row-actions inline-flex items-center gap-3", className)}>
-      <button
-        type="button"
-        onClick={onEdit}
-        title={editLabel}
-        className="text-[13px] font-semibold text-[#0d4f38] hover:underline"
-      >
+    <div className={cn("table-row-actions inline-flex items-center justify-end gap-2", className)}>
+      <Button type="button" variant="outline" size="sm" onClick={onEdit}>
         {editLabel}
-      </button>
+      </Button>
       {onDelete && (
-        <>
-          <span className="text-hairline" aria-hidden>
-            |
-          </span>
-          <button
-            type="button"
-            onClick={onDelete}
-            title={deleteLabel}
-            className="text-[13px] font-semibold text-[#ce1126] hover:underline"
-          >
-            {deleteLabel}
-          </button>
-        </>
+        <Button type="button" variant="destructive" size="sm" onClick={onDelete}>
+          {deleteLabel}
+        </Button>
       )}
     </div>
   );

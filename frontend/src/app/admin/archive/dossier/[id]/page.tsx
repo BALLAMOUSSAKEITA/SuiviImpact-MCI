@@ -254,8 +254,8 @@ function DossierContent() {
                 </Link>
                 {canWrite && (
                   <Button
-                    variant="ghost"
-                    className="h-8 px-3 text-xs text-red-600"
+                    variant="destructive"
+                    size="sm"
                     disabled={deletePreviewLoading}
                     onClick={() => handleDeleteFolderClick(d.id, d.nom)}
                   >
@@ -278,8 +278,8 @@ function DossierContent() {
                 </div>
                 {canWrite && (
                   <Button
-                    variant="ghost"
-                    className="h-8 px-3 text-xs text-red-600"
+                    variant="destructive"
+                    size="sm"
                     onClick={() => setDeleteTarget({ kind: "file", id: f.id })}
                   >
                     Supprimer

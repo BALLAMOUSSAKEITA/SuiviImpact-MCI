@@ -271,13 +271,13 @@ function ActivitesContent() {
                   {canWrite && (
                     <td className="px-3 py-3 text-right">
                       <Link href={`/admin/activites/${activite.id}/modifier`}>
-                        <Button variant="outline" className="mr-2 h-8 px-3 text-xs">
+                        <Button variant="outline" size="sm" className="mr-2">
                           Modifier
                         </Button>
                       </Link>
                       <Button
-                        variant="ghost"
-                        className="h-8 px-3 text-xs text-red-600"
+                        variant="destructive"
+                        size="sm"
                         onClick={() => setDeleteActiviteId(activite.id)}
                       >
                         Supprimer
