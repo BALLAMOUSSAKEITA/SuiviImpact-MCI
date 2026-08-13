@@ -174,13 +174,15 @@ function FinancesView() {
               subtitle="Taux globaux"
               className="lg:col-span-4"
             >
-              <div className="space-y-8">
-                <ExecutionGauge
+              <div className="grid gap-4">
+                <RadialStat
                   value={stats.tauxEngagement}
+                  size={132}
                   label="Base engagement (2)/(1)"
                 />
-                <ExecutionGauge
+                <RadialStat
                   value={stats.tauxCaisse}
+                  size={132}
                   label="Base caisse (3)/(1)"
                 />
               </div>
