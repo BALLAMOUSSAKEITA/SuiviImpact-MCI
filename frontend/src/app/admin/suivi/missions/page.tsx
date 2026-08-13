@@ -63,7 +63,6 @@ function SuiviMissionsContent() {
   const createMutation = useMutation({
     mutationFn: () =>
       createMission({
-        annee: DEFAULT_ANNEE,
         date_mission: form.date_mission,
         description: form.description,
         responsable: form.responsable,

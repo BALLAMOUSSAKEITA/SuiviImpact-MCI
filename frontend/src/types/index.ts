@@ -376,8 +376,6 @@ export interface Recommandation {
 }
 
 export interface RecommandationCreate {
-  trimestre?: number;
-  annee?: number;
   date_recommandation: string;
   description: string;
   responsable: string;
@@ -386,8 +384,6 @@ export interface RecommandationCreate {
 }
 
 export interface RecommandationUpdate {
-  trimestre?: number;
-  annee?: number;
   date_recommandation?: string;
   description?: string;
   responsable?: string;
@@ -409,8 +405,6 @@ export interface Mission {
 }
 
 export interface MissionCreate {
-  trimestre?: number;
-  annee?: number;
   date_mission: string;
   description: string;
   responsable: string;
@@ -419,8 +413,6 @@ export interface MissionCreate {
 }
 
 export interface MissionUpdate {
-  trimestre?: number;
-  annee?: number;
   date_mission?: string;
   description?: string;
   responsable?: string;

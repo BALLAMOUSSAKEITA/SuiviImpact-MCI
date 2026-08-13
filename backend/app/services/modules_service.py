@@ -1,3 +1,4 @@
+from datetime import date
 from decimal import Decimal
 from typing import Any, TypeVar
 
@@ -5,6 +6,7 @@ from fastapi import HTTPException
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.years import MAX_ANNEE, MIN_ANNEE
 from app.models.direction import Direction
 from app.models.modules import (
     Indicateur,
@@ -35,6 +37,15 @@ from app.schemas.modules import (
 )
 
 T = TypeVar("T")
+
+
+def _period_from_date(d: date) -> tuple[int, int]:
+    if d.year < MIN_ANNEE or d.year > MAX_ANNEE:
+        raise HTTPException(
+            status_code=400,
+            detail=f"L'année doit être entre {MIN_ANNEE} et {MAX_ANNEE}",
+        )
+    return d.year, (d.month - 1) // 3 + 1
 
 
 def _execution_statut_filter(model: type, statut: str):
@@ -103,7 +114,9 @@ async def get_recommandation(db: AsyncSession, item_id: int) -> Recommandation |
 async def create_recommandation(
     db: AsyncSession, data: RecommandationCreate
 ) -> RecommandationRead:
-    item = Recommandation(**data.model_dump())
+    payload = data.model_dump()
+    payload["annee"], payload["trimestre"] = _period_from_date(data.date_recommandation)
+    item = Recommandation(**payload)
     db.add(item)
     await db.commit()
     await db.refresh(item)
@@ -113,7 +126,12 @@ async def create_recommandation(
 async def update_recommandation(
     db: AsyncSession, item: Recommandation, data: RecommandationUpdate
 ) -> RecommandationRead:
-    for field, value in data.model_dump(exclude_unset=True).items():
+    payload = data.model_dump(exclude_unset=True)
+    if "date_recommandation" in payload:
+        payload["annee"], payload["trimestre"] = _period_from_date(
+            payload["date_recommandation"]
+        )
+    for field, value in payload.items():
         setattr(item, field, value)
     await db.commit()
     await db.refresh(item)
@@ -155,7 +173,9 @@ async def get_mission(db: AsyncSession, item_id: int) -> Mission | None:
 
 
 async def create_mission(db: AsyncSession, data: MissionCreate) -> MissionRead:
-    item = Mission(**data.model_dump())
+    payload = data.model_dump()
+    payload["annee"], payload["trimestre"] = _period_from_date(data.date_mission)
+    item = Mission(**payload)
     db.add(item)
     await db.commit()
     await db.refresh(item)
@@ -165,7 +185,10 @@ async def create_mission(db: AsyncSession, data: MissionCreate) -> MissionRead:
 async def update_mission(
     db: AsyncSession, item: Mission, data: MissionUpdate
 ) -> MissionRead:
-    for field, value in data.model_dump(exclude_unset=True).items():
+    payload = data.model_dump(exclude_unset=True)
+    if "date_mission" in payload:
+        payload["annee"], payload["trimestre"] = _period_from_date(payload["date_mission"])
+    for field, value in payload.items():
         setattr(item, field, value)
     await db.commit()
     await db.refresh(item)

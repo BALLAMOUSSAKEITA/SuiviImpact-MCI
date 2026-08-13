@@ -2,8 +2,6 @@ import pytest
 from httpx import AsyncClient
 
 RCC_BASE = {
-    "trimestre": 1,
-    "annee": 2026,
     "date_recommandation": "2026-02-10",
     "description": "Recommandation test",
     "responsable": "M. RCC",
@@ -21,6 +19,8 @@ async def test_recommandations_crud_and_finaliser(
         json=RCC_BASE,
     )
     assert create.status_code == 201
+    assert create.json()["trimestre"] == 1
+    assert create.json()["annee"] == 2026
     item_id = create.json()["id"]
 
     listing = await client.get(
@@ -51,8 +51,6 @@ async def test_recommandations_crud_and_finaliser(
 @pytest.mark.asyncio
 async def test_missions_crud_and_finaliser(client: AsyncClient, auth_headers: dict[str, str]):
     payload = {
-        "trimestre": 2,
-        "annee": 2026,
         "date_mission": "2026-05-01",
         "description": "Mission test",
         "responsable": "M. Mission",
@@ -60,6 +58,8 @@ async def test_missions_crud_and_finaliser(client: AsyncClient, auth_headers: di
     }
     create = await client.post("/api/v1/missions", headers=auth_headers, json=payload)
     assert create.status_code == 201
+    assert create.json()["trimestre"] == 2
+    assert create.json()["annee"] == 2026
     item_id = create.json()["id"]
 
     get = await client.get(f"/api/v1/missions/{item_id}", headers=auth_headers)

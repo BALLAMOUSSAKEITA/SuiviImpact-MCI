@@ -63,7 +63,6 @@ function SuiviRccContent() {
   const createMutation = useMutation({
     mutationFn: () =>
       createRecommandation({
-        annee: DEFAULT_ANNEE,
         date_recommandation: form.date_recommandation,
         description: form.description,
         responsable: form.responsable,

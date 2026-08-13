@@ -4,8 +4,6 @@ from enum import Enum
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.core.years import DEFAULT_ANNEE, MAX_ANNEE, MIN_ANNEE
-
 
 class PpmStatut(str, Enum):
     DAO_ELABORE = "dao_elabore"
@@ -20,8 +18,6 @@ class ProjetType(str, Enum):
 
 
 class RecommandationCreate(BaseModel):
-    trimestre: int = Field(ge=1, le=4)
-    annee: int = Field(default=DEFAULT_ANNEE, ge=MIN_ANNEE, le=MAX_ANNEE)
     date_recommandation: date
     description: str = Field(min_length=1)
     responsable: str = Field(min_length=1, max_length=100)
@@ -30,8 +26,6 @@ class RecommandationCreate(BaseModel):
 
 
 class RecommandationUpdate(BaseModel):
-    trimestre: int | None = Field(default=None, ge=1, le=4)
-    annee: int | None = Field(default=None, ge=MIN_ANNEE, le=MAX_ANNEE)
     date_recommandation: date | None = None
     description: str | None = Field(default=None, min_length=1)
     responsable: str | None = Field(default=None, min_length=1, max_length=100)
@@ -55,8 +49,6 @@ class RecommandationRead(BaseModel):
 
 
 class MissionCreate(BaseModel):
-    trimestre: int = Field(ge=1, le=4)
-    annee: int = Field(default=DEFAULT_ANNEE, ge=MIN_ANNEE, le=MAX_ANNEE)
     date_mission: date
     description: str = Field(min_length=1)
     responsable: str = Field(min_length=1, max_length=100)
@@ -65,8 +57,6 @@ class MissionCreate(BaseModel):
 
 
 class MissionUpdate(BaseModel):
-    trimestre: int | None = Field(default=None, ge=1, le=4)
-    annee: int | None = Field(default=None, ge=MIN_ANNEE, le=MAX_ANNEE)
     date_mission: date | None = None
     description: str | None = Field(default=None, min_length=1)
     responsable: str | None = Field(default=None, min_length=1, max_length=100)
