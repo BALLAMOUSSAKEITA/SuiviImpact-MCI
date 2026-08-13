@@ -18,11 +18,11 @@ export function ChartPanel({
   return (
     <section
       className={cn(
-        "flex flex-col border border-hairline bg-white px-5 py-4",
+        "flex flex-col border border-hairline border-t-[3px] border-t-forest-ink bg-white px-5 py-4",
         className,
       )}
     >
-      <header className="mb-4 flex items-start justify-between gap-3 border-b border-hairline pb-3">
+      <header className="mb-4 flex items-start justify-between gap-3 border-b border-hairline bg-[#e0f5ea] -mx-5 -mt-4 px-5 py-3">
         <div className="min-w-0">
           <h3 className="font-display text-[15px] font-semibold text-graphite">{title}</h3>
           {subtitle && (

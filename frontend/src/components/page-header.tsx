@@ -13,7 +13,7 @@ export function PageBackLink({
   return (
     <Link
       href={href}
-      className={cn("text-sm font-medium text-graphite hover:underline", className)}
+      className={cn("text-sm font-medium text-forest-ink hover:underline", className)}
     >
       {children}
     </Link>
@@ -47,7 +47,7 @@ export function PageHeader({
     >
       <div className="min-w-0">
         {eyebrow && (
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-forest-ink">
             {eyebrow}
           </p>
         )}

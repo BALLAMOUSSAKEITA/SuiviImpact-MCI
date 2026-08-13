@@ -22,7 +22,7 @@ export function MetricStrip({ metrics, className }: MetricStripProps) {
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-none border border-hairline bg-white",
+        "overflow-hidden rounded-none border border-hairline border-t-[3px] border-t-forest-ink bg-white",
         className,
       )}
     >
@@ -41,7 +41,7 @@ export function MetricStrip({ metrics, className }: MetricStripProps) {
             <p
               className={cn(
                 "mt-1 font-display text-[1.625rem] font-semibold tabular-nums leading-none",
-                metric.emphasize ? "text-[#c0392b]" : "text-graphite",
+                metric.emphasize ? "text-[#ce1126]" : "text-forest-ink",
               )}
             >
               {metric.value}
@@ -77,11 +77,11 @@ export function ModuleOverview({
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-none border border-hairline bg-white",
+        "overflow-hidden rounded-none border border-hairline border-t-[3px] border-t-forest-ink bg-white",
         className,
       )}
     >
-      <div className="hidden border-b border-cloud bg-[#f6faf7] px-6 py-2.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate md:grid md:grid-cols-[minmax(0,1.4fr)_4.5rem_4.5rem_minmax(0,1fr)_1.25rem] md:gap-4">
+      <div className="hidden border-b border-cloud bg-[#e0f5ea] px-6 py-2.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-graphite md:grid md:grid-cols-[minmax(0,1.4fr)_4.5rem_4.5rem_minmax(0,1fr)_1.25rem] md:gap-4">
         <span>Module</span>
         <span className="text-right">Total</span>
         <span className="text-right">Exec.</span>
@@ -145,7 +145,7 @@ export function ExecutionGauge({ value, label, className }: ExecutionGaugeProps)
     <div className={cn("flex h-full flex-col justify-center", className)}>
       <p className="text-xs font-medium text-slate">{label}</p>
       <div className="mt-2 flex items-baseline gap-0.5">
-        <span className="font-display text-[2.75rem] font-semibold tabular-nums leading-none text-graphite">
+        <span className="font-display text-[2.75rem] font-semibold tabular-nums leading-none text-forest-ink">
           {pct.toFixed(0)}
         </span>
         <span className="text-lg font-medium text-slate">%</span>

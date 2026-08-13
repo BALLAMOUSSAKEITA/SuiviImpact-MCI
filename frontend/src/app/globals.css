@@ -179,7 +179,7 @@ body {
 }
 
 .table-grain thead {
-  background: #f6faf7;
+  background: #e0f5ea;
 }
 
 .table-grain th {
@@ -189,10 +189,10 @@ body {
   font-size: 0.75rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--color-slate);
+  color: var(--color-obsidian);
   white-space: nowrap;
   border-bottom: 1px solid var(--color-hairline);
-  background: #f6faf7;
+  background: #e0f5ea;
 }
 
 .table-grain tbody tr {
@@ -214,6 +214,7 @@ body {
   -webkit-overflow-scrolling: touch;
   border-radius: 0;
   border: 1px solid var(--color-hairline);
+  border-top: 3px solid var(--color-forest-ink);
   background-color: var(--color-white);
 }
 
@@ -221,6 +222,7 @@ body {
 .panel-grain {
   border-radius: 0;
   border: 1px solid var(--color-hairline);
+  border-top: 3px solid var(--color-forest-ink);
   background-color: var(--color-white);
   padding: 1.5rem 1.5rem 1.35rem;
 }
