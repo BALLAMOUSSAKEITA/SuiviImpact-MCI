@@ -11,9 +11,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Connexion — SuiviImpact | MCI Guinée",
+  title: "Connexion — SuiviImpact | MIC Guinée",
   description:
-    "Plateforme de suivi d'impact du Ministère de l'Industrie et du Commerce — Bureau de Stratégie et de Développement (BSD).",
+    "Plateforme de gestion et de suivi d'impact des politiques publiques du gouvernement — Ministère de l'Industrie et du Commerce (MIC), Bureau de la stratégie et du développement (BSD).",
 };
 
 export default function RootLayout({

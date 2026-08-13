@@ -16,3 +16,20 @@ class MinistreParametrageUpdate(BaseModel):
     prenom: str = Field(min_length=1, max_length=100)
     nom: str = Field(min_length=1, max_length=100)
     email: str = Field(min_length=3, max_length=255)
+
+
+class SgParametrageRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    prenom: str
+    nom: str
+    email: str | None = None
+    email_2: str | None = None
+    updated_at: datetime | None = None
+
+
+class SgParametrageUpdate(BaseModel):
+    prenom: str = Field(min_length=1, max_length=100)
+    nom: str = Field(min_length=1, max_length=100)
+    email: str = Field(min_length=3, max_length=255)
+    email_2: str = Field(min_length=3, max_length=255)

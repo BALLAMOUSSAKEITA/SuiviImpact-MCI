@@ -252,7 +252,7 @@ def build_activite_retard_email(
     corps_texte = f"""Madame, Monsieur,
 
 L'activité « {activite_description} » (code {activite_code}) est en retard.
-La date de fin prévue ({date_fin}) est dépassée, alors que le Bureau de Stratégie et de Développement (BSD) n'a pas encore validé l'ensemble des tâches de suivi.
+La date de fin prévue ({date_fin}) est dépassée, alors que le Bureau de la stratégie et du développement (BSD) n'a pas encore validé l'ensemble des tâches de suivi.
 
 Tâches non encore validées par le BSD :
 {bloc_taches_texte}
@@ -260,7 +260,7 @@ Tâches non encore validées par le BSD :
 Merci de prendre les mesures nécessaires pour régulariser la situation.
 
 —
-SuiviImpact — Programme MIPME / MCI
+SuiviImpact — MIC
 """
 
     corps_html = f"""<!DOCTYPE html>
@@ -273,14 +273,14 @@ SuiviImpact — Programme MIPME / MCI
   </p>
   <p>
     La date de fin prévue (<strong>{date_fin}</strong>) est dépassée, alors que le
-    <strong>Bureau de Stratégie et de Développement (BSD)</strong> n'a pas encore validé
+    <strong>Bureau de la stratégie et du développement (BSD)</strong> n'a pas encore validé
     l'ensemble des tâches de suivi.
   </p>
   <p><strong>Tâches non encore validées par le BSD :</strong></p>
   <ul>{items_html}</ul>
   <p>Merci de prendre les mesures nécessaires pour régulariser la situation.</p>
   <hr style="border: none; border-top: 1px solid #ddd; margin: 24px 0;" />
-  <p style="color: #666; font-size: 12px;">SuiviImpact — Programme MIPME / MCI</p>
+  <p style="color: #666; font-size: 12px;">SuiviImpact — MIC</p>
 </body>
 </html>"""
 

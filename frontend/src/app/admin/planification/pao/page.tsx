@@ -234,7 +234,7 @@ function PlanificationPaoContent() {
     <>
       <PageHeader
         eyebrow="Planification"
-        title="PAO"
+        title="Plan d'Action Opérationnel"
         description="Planifier une activité du plan d'action annuel : objectif, tâches pondérées, calendrier, direction et TDR."
         actions={
           canWrite && !showForm ? (
@@ -355,7 +355,7 @@ function PlanificationPaoContent() {
                   value={emailMinistre}
                   onChange={(e) => setEmailMinistre(e.target.value)}
                   className="input-grain"
-                  placeholder="ministre@mci.gov.gn"
+                  placeholder="ministre@mic.gov.gn"
                 />
               </div>
 

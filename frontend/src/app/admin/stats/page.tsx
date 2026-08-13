@@ -3,6 +3,7 @@ import { BarChart3, Briefcase, ClipboardList, FolderKanban, ShoppingCart } from 
 
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { BRAND } from "@/lib/brand";
 
 const DASHBOARDS = [
   { href: "/admin/stats/pao", label: "Plan d'Action (PAO)", desc: "Activités et progression", icon: ClipboardList },
@@ -16,7 +17,7 @@ export default function StatsHubPage() {
   return (
     <>
       <PageHeader
-        eyebrow="BSD · MIPME"
+        eyebrow={`${BRAND.bureauShort} · ${BRAND.program}`}
         title="Statistiques"
         description="Tableaux de bord et indicateurs de suivi."
       />

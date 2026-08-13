@@ -54,6 +54,10 @@ import type {
 
   MinistreParametrageUpdate,
 
+  SgParametrage,
+
+  SgParametrageUpdate,
+
   PlanificationActivite,
 
   PlanificationPaoActivite,
@@ -670,7 +674,18 @@ export async function updateMinistreParametrage(
   });
 }
 
+export async function getSgParametrage(): Promise<SgParametrage> {
+  return apiFetch<SgParametrage>("/api/v1/parametrage/sg");
+}
 
+export async function updateSgParametrage(
+  data: SgParametrageUpdate,
+): Promise<SgParametrage> {
+  return apiFetch<SgParametrage>("/api/v1/parametrage/sg", {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+}
 
 export async function listObjectifs(): Promise<Objectif[]> {
   return apiFetch<Objectif[]>("/api/v1/objectifs");

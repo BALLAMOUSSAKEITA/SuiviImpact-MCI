@@ -14,9 +14,11 @@ import {
   createDirection,
   deleteDirection,
   getMinistreParametrage,
+  getSgParametrage,
   listDirections,
   updateDirection,
   updateMinistreParametrage,
+  updateSgParametrage,
 } from "@/lib/api";
 import type { Direction } from "@/types";
 
@@ -61,6 +63,25 @@ function DirectionsContent() {
   );
   const showMinistreForm = !ministreConfigured || editingMinistre;
 
+  const sgQueryKey = ["sg-parametrage"];
+  const { data: sg, isLoading: loadingSg } = useQuery({
+    queryKey: sgQueryKey,
+    queryFn: getSgParametrage,
+  });
+  const [sgPrenom, setSgPrenom] = useState("");
+  const [sgNom, setSgNom] = useState("");
+  const [sgEmail, setSgEmail] = useState("");
+  const [sgEmail2, setSgEmail2] = useState("");
+  const [editingSg, setEditingSg] = useState(false);
+
+  const sgConfigured = Boolean(
+    sg?.prenom?.trim() &&
+      sg?.nom?.trim() &&
+      sg?.email?.trim() &&
+      sg?.email_2?.trim(),
+  );
+  const showSgForm = !sgConfigured || editingSg;
+
   useEffect(() => {
     if (ministre) {
       setMinistrePrenom(ministre.prenom ?? "");
@@ -69,6 +90,15 @@ function DirectionsContent() {
     }
   }, [ministre]);
 
+  useEffect(() => {
+    if (sg) {
+      setSgPrenom(sg.prenom ?? "");
+      setSgNom(sg.nom ?? "");
+      setSgEmail(sg.email ?? "");
+      setSgEmail2(sg.email_2 ?? "");
+    }
+  }, [sg]);
+
   const cancelMinistreEdit = () => {
     if (ministre) {
       setMinistrePrenom(ministre.prenom ?? "");
@@ -76,6 +106,16 @@ function DirectionsContent() {
       setMinistreEmail(ministre.email ?? "");
     }
     setEditingMinistre(false);
+  };
+
+  const cancelSgEdit = () => {
+    if (sg) {
+      setSgPrenom(sg.prenom ?? "");
+      setSgNom(sg.nom ?? "");
+      setSgEmail(sg.email ?? "");
+      setSgEmail2(sg.email_2 ?? "");
+    }
+    setEditingSg(false);
   };
 
   const invalidate = () => {
@@ -129,6 +169,22 @@ function DirectionsContent() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const sgMutation = useMutation({
+    mutationFn: () =>
+      updateSgParametrage({
+        prenom: sgPrenom.trim(),
+        nom: sgNom.trim(),
+        email: sgEmail.trim(),
+        email_2: sgEmail2.trim(),
+      }),
+    onSuccess: () => {
+      toast.success("Fiche secrétaire général enregistrée");
+      setEditingSg(false);
+      queryClient.invalidateQueries({ queryKey: sgQueryKey });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const updateMutation = useMutation({
     mutationFn: () =>
       updateDirection(editing!.id, {
@@ -176,7 +232,7 @@ function DirectionsContent() {
       <PageHeader
         eyebrow="Paramétrage"
         title="Directions"
-        description="Ministre et référentiel des directions : libellé, directeur et e-mail."
+        description="Ministre, secrétaire général et référentiel des directions : libellé, directeur et e-mail."
         actions={
           canWrite && !showCreate ? (
             <Button onClick={() => setShowCreate(true)}>
@@ -244,7 +300,7 @@ function DirectionsContent() {
                   onChange={(e) => setMinistreEmail(e.target.value)}
                   className="input-grain"
                   disabled={!canWrite}
-                  placeholder="ministre@mci.gov.gn"
+                  placeholder="ministre@mic.gov.gn"
                 />
               </div>
               {canWrite && (
@@ -283,6 +339,129 @@ function DirectionsContent() {
                 <dt className="text-xs font-medium text-slate">Dernière mise à jour</dt>
                 <dd className="mt-1 text-sm text-slate">
                   {new Date(ministre.updated_at).toLocaleString("fr-FR", {
+                    dateStyle: "medium",
+                    timeStyle: "short",
+                  })}
+                </dd>
+              </div>
+            )}
+          </dl>
+        ) : null}
+      </div>
+
+      <div className="panel-grain mb-6">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+          <h3 className="text-base font-semibold text-graphite">Secrétaire général</h3>
+          {sgConfigured && !showSgForm && canWrite && (
+            <Button type="button" variant="outline" size="sm" onClick={() => setEditingSg(true)}>
+              Modifier
+            </Button>
+          )}
+        </div>
+        {loadingSg ? (
+          <p className="text-sm text-ash">Chargement…</p>
+        ) : showSgForm ? (
+          <>
+            {!sgConfigured && (
+              <p className="mb-4 text-sm text-slate">
+                Renseignez la fiche du secrétaire général (deux e-mails) ; elle pourra être
+                modifiée ensuite.
+              </p>
+            )}
+            <form
+              className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:items-end"
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!canWrite) return;
+                sgMutation.mutate();
+              }}
+            >
+              <div>
+                <label className="label-grain">Prénom</label>
+                <input
+                  required
+                  value={sgPrenom}
+                  onChange={(e) => setSgPrenom(e.target.value)}
+                  className="input-grain"
+                  disabled={!canWrite}
+                  placeholder="Prénom"
+                />
+              </div>
+              <div>
+                <label className="label-grain">Nom</label>
+                <input
+                  required
+                  value={sgNom}
+                  onChange={(e) => setSgNom(e.target.value)}
+                  className="input-grain"
+                  disabled={!canWrite}
+                  placeholder="Nom"
+                />
+              </div>
+              <div>
+                <label className="label-grain">E-mail 1</label>
+                <input
+                  required
+                  type="email"
+                  value={sgEmail}
+                  onChange={(e) => setSgEmail(e.target.value)}
+                  className="input-grain"
+                  disabled={!canWrite}
+                  placeholder="sg@mic.gov.gn"
+                />
+              </div>
+              <div>
+                <label className="label-grain">E-mail 2</label>
+                <input
+                  required
+                  type="email"
+                  value={sgEmail2}
+                  onChange={(e) => setSgEmail2(e.target.value)}
+                  className="input-grain"
+                  disabled={!canWrite}
+                  placeholder="sg.adjoint@mic.gov.gn"
+                />
+              </div>
+              {canWrite && (
+                <div className="flex flex-wrap gap-2 lg:col-span-2">
+                  <Button type="submit" disabled={sgMutation.isPending} className="w-full sm:w-auto">
+                    {sgMutation.isPending ? "Enregistrement…" : "Enregistrer"}
+                  </Button>
+                  {sgConfigured && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      disabled={sgMutation.isPending}
+                      onClick={cancelSgEdit}
+                    >
+                      Annuler
+                    </Button>
+                  )}
+                </div>
+              )}
+            </form>
+          </>
+        ) : sg ? (
+          <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div>
+              <dt className="text-xs font-medium text-slate">Identité</dt>
+              <dd className="mt-1 text-base font-medium text-graphite">
+                {[sg.prenom, sg.nom].filter(Boolean).join(" ")}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs font-medium text-slate">E-mail 1</dt>
+              <dd className="mt-1 text-sm text-slate">{sg.email}</dd>
+            </div>
+            <div>
+              <dt className="text-xs font-medium text-slate">E-mail 2</dt>
+              <dd className="mt-1 text-sm text-slate">{sg.email_2}</dd>
+            </div>
+            {sg.updated_at && (
+              <div>
+                <dt className="text-xs font-medium text-slate">Dernière mise à jour</dt>
+                <dd className="mt-1 text-sm text-slate">
+                  {new Date(sg.updated_at).toLocaleString("fr-FR", {
                     dateStyle: "medium",
                     timeStyle: "short",
                   })}

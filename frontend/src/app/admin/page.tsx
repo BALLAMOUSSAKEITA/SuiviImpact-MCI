@@ -85,8 +85,8 @@ export default function AdminDashboardPage() {
   return (
     <div className="mx-auto max-w-[1400px] space-y-4">
       <PageHeader
-        eyebrow={`${BRAND.bureauShort} · ${BRAND.program}`}
-        title="Tableau de bord"
+        title={BRAND.institutionFull}
+        description="Tableau de bord"
         display
       />
 

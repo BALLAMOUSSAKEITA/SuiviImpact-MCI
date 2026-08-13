@@ -90,6 +90,21 @@ export interface MinistreParametrageUpdate {
   email: string;
 }
 
+export interface SgParametrage {
+  prenom: string;
+  nom: string;
+  email: string | null;
+  email_2: string | null;
+  updated_at?: string;
+}
+
+export interface SgParametrageUpdate {
+  prenom: string;
+  nom: string;
+  email: string;
+  email_2: string;
+}
+
 export interface TrimestrePlan {
   annee: number;
   trimestre: number;
