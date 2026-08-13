@@ -5,7 +5,12 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/components/auth-provider";
-import { ConfirmDialog } from "@/components/confirm-dialog";
+import { ConfirmDialog, FormDialog } from "@/components/confirm-dialog";
+import {
+  DetailDrawerActions,
+  DetailDrawerRows,
+  DetailRow,
+} from "@/components/detail-drawer";
 import { ExecutionBadge } from "@/components/execution-badge";
 import { SegmentedControl } from "@/components/segmented-control";
 import { PageHeader } from "@/components/page-header";
@@ -19,6 +24,12 @@ import {
 } from "@/lib/api";
 import type { ExecutionStatutFilter, Recommandation } from "@/types";
 import { DEFAULT_ANNEE } from "@/types";
+
+function formatDate(value: string): string {
+  const [year, month, day] = value.slice(0, 10).split("-").map(Number);
+  if (!year || !month || !day) return value;
+  return new Date(year, month - 1, day).toLocaleDateString("fr-FR");
+}
 
 const STATUT_TABS: { key: ExecutionStatutFilter; label: string }[] = [
   { key: null, label: "Toutes" },
@@ -38,6 +49,7 @@ function SuiviRccContent() {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Recommandation | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [selected, setSelected] = useState<Recommandation | null>(null);
   const [form, setForm] = useState({
     date_recommandation: new Date().toISOString().slice(0, 10),
     description: "",
@@ -70,7 +82,7 @@ function SuiviRccContent() {
         observations: form.observations || null,
       }),
     onSuccess: () => {
-      toast.success("Recommandation créée");
+      toast.success("Instruction créée");
       resetForm();
       invalidate();
     },
@@ -87,7 +99,7 @@ function SuiviRccContent() {
         observations: form.observations || null,
       }),
     onSuccess: () => {
-      toast.success("Recommandation mise à jour");
+      toast.success("Instruction mise à jour");
       resetForm();
       invalidate();
     },
@@ -97,8 +109,9 @@ function SuiviRccContent() {
   const deleteMutation = useMutation({
     mutationFn: deleteRecommandation,
     onSuccess: () => {
-      toast.success("Recommandation supprimée");
+      toast.success("Instruction supprimée");
       setDeleteId(null);
+      setSelected(null);
       invalidate();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -107,7 +120,8 @@ function SuiviRccContent() {
   const finaliserMutation = useMutation({
     mutationFn: finaliserRecommandation,
     onSuccess: () => {
-      toast.success("Recommandation finalisée");
+      toast.success("Instruction finalisée");
+      setSelected(null);
       invalidate();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -126,6 +140,7 @@ function SuiviRccContent() {
   };
 
   const startEdit = (item: Recommandation) => {
+    setSelected(null);
     setEditing(item);
     setShowForm(true);
     setForm({
@@ -146,8 +161,8 @@ function SuiviRccContent() {
   return (
     <>
       <PageHeader
-        title="Recommandations IRC"
-        description="Suivi des recommandations du Conseil de Cabinet"
+        title="Instructions RC"
+        description="Suivi des instructions"
         actions={
           canWrite && !showForm ? (
             <Button onClick={() => setShowForm(true)}>Nouvelle IRC</Button>
@@ -167,7 +182,7 @@ function SuiviRccContent() {
           className="space-y-4 panel-grain"
         >
           <h2 className="text-lg font-semibold">
-            {editing ? "Modifier" : "Nouvelle recommandation"}
+            {editing ? "Modifier" : "Nouvelle instruction"}
           </h2>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
@@ -246,53 +261,27 @@ function SuiviRccContent() {
               <th className="px-4 py-3 text-left font-medium text-slate">Description</th>
               <th className="px-4 py-3 text-left font-medium text-slate">Responsable</th>
               <th className="px-4 py-3 text-left font-medium text-slate">Exécution</th>
-              <th className="px-4 py-3 text-right font-medium text-slate">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-cloud/60">
             {isLoading && (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-ash">
+                <td colSpan={4} className="px-4 py-8 text-center text-ash">
                   Chargement…
                 </td>
               </tr>
             )}
             {data?.items.map((item) => (
-              <tr key={item.id} className="hover:bg-veil">
+              <tr
+                key={item.id}
+                className="cursor-pointer hover:bg-veil"
+                onClick={() => setSelected(item)}
+              >
                 <td className="px-4 py-3">{item.date_recommandation}</td>
                 <td className="max-w-xs truncate px-4 py-3">{item.description}</td>
                 <td className="px-4 py-3">{item.responsable}</td>
                 <td className="px-4 py-3">
                   <ExecutionBadge value={item.execution} />
-                </td>
-                <td className="px-4 py-3 text-right">
-                  {canWrite && (
-                    <div className="flex flex-wrap justify-end gap-1 sm:gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => startEdit(item)}
-                      >
-                        Modifier
-                      </Button>
-                      {parseFloat(item.execution) < 100 && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => finaliserMutation.mutate(item.id)}
-                        >
-                          Finaliser
-                        </Button>
-                      )}
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => setDeleteId(item.id)}
-                      >
-                        Supprimer
-                      </Button>
-                    </div>
-                  )}
                 </td>
               </tr>
             ))}
@@ -300,10 +289,72 @@ function SuiviRccContent() {
         </table>
       </div>
 
+      <FormDialog
+        open={selected !== null}
+        title="Instruction RC"
+        subtitle={selected ? formatDate(selected.date_recommandation) : undefined}
+        onClose={() => setSelected(null)}
+      >
+        {selected && (
+          <>
+            <DetailDrawerRows>
+              <DetailRow label="Date">{formatDate(selected.date_recommandation)}</DetailRow>
+              <DetailRow label="Description">
+                <p className="whitespace-pre-wrap">{selected.description}</p>
+              </DetailRow>
+              <DetailRow label="Responsable">{selected.responsable}</DetailRow>
+              <DetailRow label="Exécution">
+                <ExecutionBadge value={selected.execution} />
+              </DetailRow>
+              <DetailRow label="Observations">
+                {selected.observations?.trim() ? (
+                  <p className="whitespace-pre-wrap">{selected.observations}</p>
+                ) : (
+                  "—"
+                )}
+              </DetailRow>
+              <DetailRow label="Période">
+                T{selected.trimestre} · {selected.annee}
+              </DetailRow>
+            </DetailDrawerRows>
+            {canWrite && (
+              <DetailDrawerActions>
+                <div className="flex flex-wrap justify-end gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => startEdit(selected)}
+                  >
+                    Modifier
+                  </Button>
+                  {parseFloat(selected.execution) < 100 && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={finaliserMutation.isPending}
+                      onClick={() => finaliserMutation.mutate(selected.id)}
+                    >
+                      Finaliser
+                    </Button>
+                  )}
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => setDeleteId(selected.id)}
+                  >
+                    Supprimer
+                  </Button>
+                </div>
+              </DetailDrawerActions>
+            )}
+          </>
+        )}
+      </FormDialog>
+
       <ConfirmDialog
         open={deleteId !== null}
-        title="Supprimer la recommandation"
-        description="Cette recommandation sera définitivement supprimée."
+        title="Supprimer l'instruction"
+        description="Cette instruction sera définitivement supprimée."
         confirmLabel="Supprimer"
         variant="destructive"
         loading={deleteMutation.isPending}

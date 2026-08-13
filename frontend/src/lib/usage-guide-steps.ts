@@ -341,8 +341,8 @@ const STEP_COPY: Record<string, CopyTable> = {
     "bsd-lecture": "Consultation du suivi projet.",
   },
   "suivi-rcc": {
-    "bsd-ecriture": "Recommandations IRC : saisie et historique par trimestre.",
-    "bsd-lecture": "Consultation des recommandations IRC.",
+    "bsd-ecriture": "Instructions RC : saisie et historique par trimestre.",
+    "bsd-lecture": "Consultation des instructions RC.",
   },
   "suivi-missions": {
     "bsd-ecriture": "Missions de terrain et comptes rendus.",
@@ -426,7 +426,7 @@ const DEFAULT_COPY: Partial<Record<string, string>> = {
   suivi: "Mise à jour de l’avancement réel sur l’ensemble des volets.",
   "suivi-pao": "Exécution trimestrielle du PAO.",
   "suivi-projet": "Avancement des actions projet.",
-  "suivi-rcc": "Recommandations IRC par trimestre.",
+  "suivi-rcc": "Instructions RC par trimestre.",
   "suivi-missions": "Missions de terrain et reporting.",
   "suivi-ppm": "Plan de passation des marchés.",
   "suivi-indicateurs": "Suivi du réalisé des indicateurs planifiés.",
