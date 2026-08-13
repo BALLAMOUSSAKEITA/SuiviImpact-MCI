@@ -78,7 +78,7 @@ const navItems: NavItem[] = [
     children: [
       { href: "/admin/suivi/pao", label: "PAO", icon: ClipboardList },
       { href: "/admin/suivi/projet", label: "Projet", icon: FolderKanban },
-      { href: "/admin/suivi/rcc", label: "RCC", icon: Briefcase },
+      { href: "/admin/suivi/rcc", label: "IRC", icon: Briefcase },
       { href: "/admin/suivi/missions", label: "Missions", icon: MapPin },
       { href: "/admin/suivi/ppm", label: "PPM", icon: ShoppingCart },
       { href: "/admin/suivi/indicateurs", label: "Indicateurs", icon: BarChart3 },

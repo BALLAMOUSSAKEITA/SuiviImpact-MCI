@@ -60,7 +60,7 @@ type StatsPeriodState = ReturnType<typeof useStatsPeriodState>;
 const views = [
   { id: "finances", label: "Finances" },
   { id: "activites", label: "Activités" },
-  { id: "rcc", label: "RCC" },
+  { id: "rcc", label: "Instructions RC" },
   { id: "missions", label: "Missions" },
   { id: "ppm", label: "PPM" },
   { id: "projets", label: "Projets" },

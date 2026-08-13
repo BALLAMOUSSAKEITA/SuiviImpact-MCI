@@ -169,7 +169,7 @@ const BASE_STEPS: UsageGuideStep[] = [
     target: "/admin/suivi/rcc",
     navHref: "/admin/suivi/rcc",
     expandNav: "/admin/suivi",
-    title: "Suivi RCC",
+    title: "Suivi IRC",
     body: "",
   },
   {
@@ -328,7 +328,7 @@ const STEP_COPY: Record<string, CopyTable> = {
     "bsd-lecture": "Consultation des indicateurs planifiés.",
   },
   suivi: {
-    admin: "Hub de saisie de l’exécution réelle (PAO, RCC, missions, PPM, projets, indicateurs).",
+    admin: "Hub de saisie de l’exécution réelle (PAO, IRC, missions, PPM, projets, indicateurs).",
     "bsd-ecriture": "Mettez à jour l’avancement, les statuts, commentaires et pièces jointes.",
     "bsd-lecture": "Consultation de l’avancement et des pièces sans saisie.",
   },
@@ -341,8 +341,8 @@ const STEP_COPY: Record<string, CopyTable> = {
     "bsd-lecture": "Consultation du suivi projet.",
   },
   "suivi-rcc": {
-    "bsd-ecriture": "Recommandations RCC : saisie et historique par trimestre.",
-    "bsd-lecture": "Consultation des recommandations RCC.",
+    "bsd-ecriture": "Recommandations IRC : saisie et historique par trimestre.",
+    "bsd-lecture": "Consultation des recommandations IRC.",
   },
   "suivi-missions": {
     "bsd-ecriture": "Missions de terrain et comptes rendus.",
@@ -426,7 +426,7 @@ const DEFAULT_COPY: Partial<Record<string, string>> = {
   suivi: "Mise à jour de l’avancement réel sur l’ensemble des volets.",
   "suivi-pao": "Exécution trimestrielle du PAO.",
   "suivi-projet": "Avancement des actions projet.",
-  "suivi-rcc": "Recommandations RCC par trimestre.",
+  "suivi-rcc": "Recommandations IRC par trimestre.",
   "suivi-missions": "Missions de terrain et reporting.",
   "suivi-ppm": "Plan de passation des marchés.",
   "suivi-indicateurs": "Suivi du réalisé des indicateurs planifiés.",

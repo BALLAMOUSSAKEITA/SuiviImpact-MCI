@@ -146,11 +146,11 @@ function SuiviRccContent() {
   return (
     <>
       <PageHeader
-        title="Recommandations RCC"
+        title="Recommandations IRC"
         description="Suivi des recommandations du Conseil de Cabinet"
         actions={
           canWrite && !showForm ? (
-            <Button onClick={() => setShowForm(true)}>Nouvelle RCC</Button>
+            <Button onClick={() => setShowForm(true)}>Nouvelle IRC</Button>
           ) : undefined
         }
       />
