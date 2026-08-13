@@ -236,7 +236,7 @@ async def export_pao(
 async def export_recommandations(db: AsyncSession) -> BytesIO:
     wb = Workbook()
     ws = wb.active
-    ws.title = "Recommandations RCC"
+    ws.title = "Instructions IRC"
     headers = [
         "Trimestre",
         "Année",
@@ -248,7 +248,7 @@ async def export_recommandations(db: AsyncSession) -> BytesIO:
     ]
     start = prepare_branded_sheet(
         ws,
-        report_title="Recommandations du Comité de coordination (RCC)",
+        report_title="Instructions du Comité de coordination (IRC)",
         subtitle="Export SuiviImpact",
         headers=headers,
     )

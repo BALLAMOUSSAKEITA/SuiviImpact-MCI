@@ -358,7 +358,7 @@ const STEP_COPY: Record<string, CopyTable> = {
   },
   stats: {
     admin: "Tableaux de bord par domaine avec filtres de période.",
-    "bsd-ecriture": "Analyse PAO, RCC, missions, PPM et projets pour le reporting interne.",
+    "bsd-ecriture": "Analyse PAO, IRC, missions, PPM et projets pour le reporting interne.",
     "bsd-lecture": "Tableaux de bord en lecture pour le reporting.",
     sg: "Indicateurs agrégés pour le pilotage au niveau SG.",
     ministre: "Vision consolidée pour le suivi ministériel.",
@@ -383,7 +383,7 @@ const STEP_COPY: Record<string, CopyTable> = {
     daf: "Intervenez sur les étapes qui relèvent du DAF dans le circuit.",
   },
   export: {
-    admin: "Extractions Excel (PAO, RCC, etc.) avec filtres de période.",
+    admin: "Extractions Excel (PAO, IRC, etc.) avec filtres de période.",
     "bsd-ecriture": "Générez les fichiers Excel pour reporting et partage.",
     "bsd-lecture": "Lancez des exports lorsque votre profil le permet ; sinon demandez à un collègue en écriture.",
   },

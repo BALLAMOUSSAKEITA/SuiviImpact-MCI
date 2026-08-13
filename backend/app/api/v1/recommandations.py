@@ -35,7 +35,7 @@ async def get_recommandation(
 ) -> RecommandationRead:
     item = await service.get_recommandation(db, item_id)
     if item is None:
-        raise HTTPException(status_code=404, detail="Recommandation introuvable")
+        raise HTTPException(status_code=404, detail="Instruction introuvable")
     return RecommandationRead.model_validate(item)
 
 
@@ -61,7 +61,7 @@ async def update_recommandation(
 ) -> RecommandationRead:
     item = await service.get_recommandation(db, item_id)
     if item is None:
-        raise HTTPException(status_code=404, detail="Recommandation introuvable")
+        raise HTTPException(status_code=404, detail="Instruction introuvable")
     return await service.update_recommandation(db, item, body)
 
 
@@ -73,7 +73,7 @@ async def delete_recommandation(
 ) -> None:
     item = await service.get_recommandation(db, item_id)
     if item is None:
-        raise HTTPException(status_code=404, detail="Recommandation introuvable")
+        raise HTTPException(status_code=404, detail="Instruction introuvable")
     await service.delete_recommandation(db, item)
 
 
@@ -85,5 +85,5 @@ async def finaliser_recommandation(
 ) -> RecommandationRead:
     item = await service.get_recommandation(db, item_id)
     if item is None:
-        raise HTTPException(status_code=404, detail="Recommandation introuvable")
+        raise HTTPException(status_code=404, detail="Instruction introuvable")
     return await service.finaliser_recommandation(db, item)

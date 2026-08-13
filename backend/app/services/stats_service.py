@@ -131,7 +131,7 @@ async def stats_recommandations(
         du=du,
         au=au,
         mois_csv=mois,
-        period_context="Date de la recommandation",
+        period_context="Date de l'instruction",
     )
     query = select(Recommandation).where(date_cond)
     if trimestre is not None:

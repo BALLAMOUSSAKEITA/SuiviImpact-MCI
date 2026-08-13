@@ -40,7 +40,7 @@ const EXPORTS: { type: ExportType; label: string; desc: string; pao?: boolean }[
     desc: "Plan d'action opérationnel — activités et tâches selon la date de début",
     pao: true,
   },
-  { type: "recommandations", label: "Recommandations RCC", desc: "Liste des RCC" },
+  { type: "recommandations", label: "Instructions IRC", desc: "Liste des IRC" },
   { type: "missions", label: "Missions", desc: "Liste des missions" },
   { type: "ppm", label: "Marchés PPM", desc: "Plan de passation des marchés" },
   { type: "projets", label: "Projets", desc: "Liste des projets" },

@@ -7,7 +7,7 @@ import { BRAND } from "@/lib/brand";
 
 const DASHBOARDS = [
   { href: "/admin/stats/pao", label: "Plan d'Action (PAO)", desc: "Activités et progression", icon: ClipboardList },
-  { href: "/admin/stats/rcc", label: "Recommandations RCC", desc: "Exécution des RCC", icon: Briefcase },
+  { href: "/admin/stats/rcc", label: "Instructions IRC", desc: "Exécution des IRC", icon: Briefcase },
   { href: "/admin/stats/missions", label: "Missions", desc: "Exécution des missions", icon: BarChart3 },
   { href: "/admin/stats/ppm", label: "PPM", desc: "Statuts des marchés", icon: ShoppingCart },
   { href: "/admin/stats/projets", label: "Projets", desc: "Exécution financière et physique", icon: FolderKanban },
