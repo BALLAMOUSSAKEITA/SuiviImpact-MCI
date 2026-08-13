@@ -152,7 +152,7 @@ export function ExecutionGauge({ value, label, className }: ExecutionGaugeProps)
       </div>
       <div className="mt-5 h-1 w-full overflow-hidden rounded-full bg-cloud">
         <div
-          className="h-full rounded-full bg-signal-blue transition-[width] duration-500 ease-[var(--ease-out-expo)]"
+          className="h-full rounded-full bg-forest-ink transition-[width] duration-500 ease-[var(--ease-out-expo)]"
           style={{ width: `${pct}%` }}
         />
       </div>

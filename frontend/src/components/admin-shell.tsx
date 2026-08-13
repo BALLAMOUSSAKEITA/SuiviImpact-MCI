@@ -131,7 +131,7 @@ export function AdminShell({ children, className }: AdminShellProps) {
           </div>
           <Link
             href="/admin/profil"
-            className="flex shrink-0 rounded-[8px] ring-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal-blue/30"
+            className="flex shrink-0 rounded-[8px] ring-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest-ink/30"
             aria-label="Mon profil"
           >
             <UserAvatar

@@ -52,7 +52,7 @@ export function LoginPage() {
   if (isLoading) {
     return (
       <div className="login-page grid min-h-screen place-items-center">
-        <p className="text-sm text-[#476788]">Chargement…</p>
+        <p className="text-sm text-[#4a6b5c]">Chargement…</p>
       </div>
     );
   }
@@ -77,13 +77,13 @@ export function LoginPage() {
               priority
             />
             <div className="min-w-0">
-              <p className="login-serif text-[11px] font-semibold uppercase tracking-[0.18em] text-[#0b3558]">
+              <p className="login-serif text-[11px] font-semibold uppercase tracking-[0.18em] text-[#0d4f38]">
                 {BRAND.country}
               </p>
-              <p className="login-serif mt-1 text-[1.05rem] font-semibold leading-snug text-[#0b3558] sm:text-[1.2rem]">
+              <p className="login-serif mt-1 text-[1.05rem] font-semibold leading-snug text-[#0d4f38] sm:text-[1.2rem]">
                 {BRAND.ministry}
               </p>
-              <p className="mt-0.5 text-[13px] text-[#476788]">{BRAND.bureau}</p>
+              <p className="mt-0.5 text-[13px] text-[#4a6b5c]">{BRAND.bureau}</p>
             </div>
           </div>
 
@@ -98,10 +98,10 @@ export function LoginPage() {
             />
             <Image
               src="/branding/simandou-2040.png"
-              alt="Simandou 2040"
-              width={132}
-              height={42}
-              className="h-9 w-auto bg-[#0b3558] object-contain px-2 py-1"
+              alt="Programme Simandou 2040"
+              width={180}
+              height={72}
+              className="h-14 w-auto object-contain"
               priority
             />
           </div>
@@ -124,20 +124,20 @@ export function LoginPage() {
 
       <main className="login-wrap flex flex-1 flex-col gap-10 py-10 sm:py-12 lg:flex-row lg:items-start lg:gap-16">
         <div className="max-w-md lg:flex-1 lg:pt-2">
-          <h2 className="login-serif text-[1.35rem] font-semibold text-[#0b3558]">
+          <h2 className="login-serif text-[1.35rem] font-semibold text-[#0d4f38]">
             Accès à la plateforme
           </h2>
-          <p className="mt-3 text-[15px] leading-relaxed text-[#476788]">
+          <p className="mt-3 text-[15px] leading-relaxed text-[#4a6b5c]">
             {BRAND.loginSubtitle}
           </p>
-          <dl className="mt-8 space-y-4 border-t border-[#d4e0ed] pt-6 text-sm">
+          <dl className="mt-8 space-y-4 border-t border-[#d4e5dc] pt-6 text-sm">
             <div>
-              <dt className="font-semibold text-[#0b3558]">Devise nationale</dt>
-              <dd className="mt-1 text-[#476788]">Travail · Justice · Solidarité</dd>
+              <dt className="font-semibold text-[#0d4f38]">Devise nationale</dt>
+              <dd className="mt-1 text-[#4a6b5c]">Travail · Justice · Solidarité</dd>
             </div>
             <div>
-              <dt className="font-semibold text-[#0b3558]">Tutelle</dt>
-              <dd className="mt-1 text-[#476788]">
+              <dt className="font-semibold text-[#0d4f38]">Tutelle</dt>
+              <dd className="mt-1 text-[#4a6b5c]">
                 {BRAND.ministry} ({BRAND.ministryShort})
               </dd>
             </div>
@@ -153,18 +153,18 @@ export function LoginPage() {
             />
             <Image
               src="/branding/simandou-2040.png"
-              alt="Simandou 2040"
-              width={132}
-              height={42}
-              className="h-9 w-auto bg-[#0b3558] object-contain px-2 py-1"
+              alt="Programme Simandou 2040"
+              width={180}
+              height={72}
+              className="h-14 w-auto object-contain"
             />
           </div>
         </div>
 
         <div className="w-full lg:max-w-[400px] lg:shrink-0">
           <form onSubmit={handleSubmit(onSubmit)} className="login-form">
-            <h2 className="login-serif text-xl font-semibold text-[#0b3558]">Connexion</h2>
-            <p className="mt-1 text-sm text-[#476788]">
+            <h2 className="login-serif text-xl font-semibold text-[#0d4f38]">Connexion</h2>
+            <p className="mt-1 text-sm text-[#4a6b5c]">
               Saisissez vos identifiants institutionnels.
             </p>
 
@@ -214,10 +214,10 @@ export function LoginPage() {
 
       <footer className="login-footer">
         <div className="login-wrap py-5 text-center sm:text-left">
-          <p className="login-serif text-sm font-semibold text-[#0b3558]">
+          <p className="login-serif text-sm font-semibold text-[#0d4f38]">
             Travail · Justice · Solidarité
           </p>
-          <p className="mt-1 text-xs leading-relaxed text-[#476788]">
+          <p className="mt-1 text-xs leading-relaxed text-[#4a6b5c]">
             © {new Date().getFullYear()} {BRAND.country} — {BRAND.ministry} — {BRAND.bureau}.
             Accès réservé au personnel autorisé.
           </p>

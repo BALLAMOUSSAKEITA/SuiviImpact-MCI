@@ -51,7 +51,7 @@ export function DashboardToolbar({
                 className={cn(
                   "shrink-0 border-b-2 pb-3 pt-1 text-sm font-medium transition-colors",
                   active
-                    ? "border-signal-blue text-graphite"
+                    ? "border-forest-ink text-graphite"
                     : "border-transparent text-slate hover:border-hairline hover:text-graphite",
                 )}
               >

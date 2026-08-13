@@ -28,12 +28,12 @@ export function ComparisonBarChart({
     {
       name: "Financier",
       value: parseProgress(financier),
-      fill: "#006bff",
+      fill: "#009460",
     },
     {
       name: "Physique",
       value: parseProgress(physique),
-      fill: "#0b3558",
+      fill: "#0d4f38",
     },
   ];
 

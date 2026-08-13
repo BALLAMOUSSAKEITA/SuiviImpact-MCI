@@ -1,34 +1,34 @@
 @import "tailwindcss";
 
 @theme {
-  /* ─── Brand (Calendly-inspired: navy ink, signal blue) ─── */
-  --color-ink-navy: #0b3558;
-  --color-signal-blue: #006bff;
-  --color-slate-gray: #476788;
-  --color-mist-gray: #a6bbd1;
-  --color-hairline: #d4e0ed;
-  --color-pebble: #f0f3f8;
-  --color-deep-cobalt: #004eba;
+  /* ─── Brand — vert national, encre forestière ─── */
+  --color-ink-navy: #0d4f38;
+  --color-signal-blue: #009460;
+  --color-slate-gray: #4a6b5c;
+  --color-mist-gray: #9bb5a8;
+  --color-hairline: #d4e5dc;
+  --color-pebble: #f0f6f3;
+  --color-deep-cobalt: #0d6b4a;
 
-  --color-forest-ink: #006bff;
-  --color-vine: #0052cc;
-  --color-neon-sprout: #0099ff;
-  --color-ice-blue: #0099ff;
+  --color-forest-ink: #009460;
+  --color-vine: #007a4d;
+  --color-neon-sprout: #00b96c;
+  --color-ice-blue: #2db88a;
 
-  --color-obsidian: #0b3558;
-  --color-graphite: #0b3558;
-  --color-carbon: #0b3558;
-  --color-slate: #476788;
-  --color-fog: #476788;
-  --color-ash: #a6bbd1;
-  --color-mist: #a6bbd1;
-  --color-cloud: #d4e0ed;
-  --color-veil: #f0f3f8;
-  --color-paper: #f8f9fb;
+  --color-obsidian: #0d4f38;
+  --color-graphite: #0d4f38;
+  --color-carbon: #0d4f38;
+  --color-slate: #4a6b5c;
+  --color-fog: #4a6b5c;
+  --color-ash: #9bb5a8;
+  --color-mist: #9bb5a8;
+  --color-cloud: #d4e5dc;
+  --color-veil: #f0f6f3;
+  --color-paper: #f6faf7;
   --color-white: #ffffff;
 
-  --color-mint: #e6f0ff;
-  --color-sky: #e6f0ff;
+  --color-mint: #e0f5ea;
+  --color-sky: #e0f5ea;
   --color-peach: #fff0e8;
   --color-lavender: #f0eaff;
   --color-periwinkle: #e7ecff;
@@ -56,16 +56,16 @@
   --radius-pill: 9999px;
   --radius-full: 9999px;
 
-  --shadow-subtle: rgba(71, 103, 136, 0.04) 0px 4px 5px 0px,
-    rgba(71, 103, 136, 0.03) 0px 4px 10px 0px, rgba(71, 103, 136, 0.05) 0px 10px 20px 0px;
-  --shadow-card: rgba(71, 103, 136, 0.04) 0px 4px 5px 0px,
-    rgba(71, 103, 136, 0.03) 0px 8px 15px 0px, rgba(71, 103, 136, 0.08) 0px 30px 50px 0px;
-  --shadow-elevated: rgba(71, 103, 136, 0.04) 0px 4px 5px 0px,
-    rgba(71, 103, 136, 0.03) 0px 8px 15px 0px, rgba(71, 103, 136, 0.08) 0px 30px 50px 0px;
-  --shadow-soft: rgba(71, 103, 136, 0.04) 0px 4px 5px 0px,
-    rgba(71, 103, 136, 0.03) 0px 8px 15px 0px, rgba(71, 103, 136, 0.06) 0px 15px 30px 0px;
-  --shadow-inset: rgba(71, 103, 136, 0.04) 0px 0px 12px 0px inset;
-  --shadow-glow: 0 0 0 1px rgba(0, 107, 255, 0.12);
+  --shadow-subtle: rgba(13, 79, 56, 0.04) 0px 4px 5px 0px,
+    rgba(13, 79, 56, 0.03) 0px 4px 10px 0px, rgba(13, 79, 56, 0.05) 0px 10px 20px 0px;
+  --shadow-card: rgba(13, 79, 56, 0.04) 0px 4px 5px 0px,
+    rgba(13, 79, 56, 0.03) 0px 8px 15px 0px, rgba(13, 79, 56, 0.08) 0px 30px 50px 0px;
+  --shadow-elevated: rgba(13, 79, 56, 0.04) 0px 4px 5px 0px,
+    rgba(13, 79, 56, 0.03) 0px 8px 15px 0px, rgba(13, 79, 56, 0.08) 0px 30px 50px 0px;
+  --shadow-soft: rgba(13, 79, 56, 0.04) 0px 4px 5px 0px,
+    rgba(13, 79, 56, 0.03) 0px 8px 15px 0px, rgba(13, 79, 56, 0.06) 0px 15px 30px 0px;
+  --shadow-inset: rgba(13, 79, 56, 0.04) 0px 0px 12px 0px inset;
+  --shadow-glow: 0 0 0 1px rgba(0, 148, 96, 0.14);
 
   /* ─── Animation ─── */
   --duration-fast: 150ms;
@@ -75,9 +75,9 @@
 }
 
 :root {
-  --background: #f8f9fb;
-  --foreground: #0b3558;
-  --surface-canvas: #f8f9fb;
+  --background: #f6faf7;
+  --foreground: #0d4f38;
+  --surface-canvas: #f6faf7;
   --surface-card: #ffffff;
 }
 
@@ -162,8 +162,8 @@ body {
 }
 
 .input-grain:focus {
-  border-color: var(--color-signal-blue);
-  box-shadow: 0 0 0 1px var(--color-signal-blue);
+  border-color: var(--color-forest-ink);
+  box-shadow: 0 0 0 1px var(--color-forest-ink);
   background-color: var(--color-white);
 }
 
@@ -295,7 +295,7 @@ body {
 
 .login-masthead {
   background: #fff;
-  border-bottom: 1px solid #d4e0ed;
+  border-bottom: 1px solid #d4e5dc;
 }
 
 .login-masthead-inner {
@@ -307,11 +307,11 @@ body {
 }
 
 .login-banner {
-  background: #0b3558;
+  background: #0d4f38;
 }
 
 .login-form {
-  border: 1px solid #d4e0ed;
+  border: 1px solid #d4e5dc;
   background: #fff;
   padding: 1.75rem 1.5rem;
 }
@@ -321,22 +321,22 @@ body {
   margin-bottom: 0.35rem;
   font-size: 0.8125rem;
   font-weight: 600;
-  color: #0b3558;
+  color: #0d4f38;
 }
 
 .login-input {
   width: 100%;
-  border: 1px solid #c5d0dc;
+  border: 1px solid #c5d5cc;
   background: #fff;
   padding: 0.7rem 0.85rem;
   font-size: 1rem;
   line-height: 1.4;
-  color: #0b3558;
+  color: #0d4f38;
   outline: none;
 }
 
 .login-input:focus {
-  border-color: #0b3558;
+  border-color: #009460;
 }
 
 .login-submit {
@@ -344,7 +344,7 @@ body {
   width: 100%;
   height: 2.75rem;
   border: none;
-  background: #0b3558;
+  background: #009460;
   color: #fff;
   font-size: 0.9375rem;
   font-weight: 600;
@@ -352,7 +352,7 @@ body {
 }
 
 .login-submit:hover:not(:disabled) {
-  background: #082a46;
+  background: #007a4d;
 }
 
 .login-submit:disabled {
@@ -362,8 +362,8 @@ body {
 
 .login-footer {
   margin-top: auto;
-  border-top: 1px solid #d4e0ed;
-  background: #f8f9fb;
+  border-top: 1px solid #d4e5dc;
+  background: #f6faf7;
 }
 
 /* ─── Scrollbar ─── */
