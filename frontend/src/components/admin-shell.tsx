@@ -128,7 +128,7 @@ export function AdminShell({ children, className }: AdminShellProps) {
               className,
             )}
           >
-            <div className="flex-1 space-y-6 p-5 sm:space-y-[var(--section-gap)] sm:p-7 lg:px-10 lg:py-8">
+            <div className="flex-1 space-y-5 p-4 sm:space-y-6 sm:p-6 lg:px-8 lg:py-6">
               {children}
             </div>
             <PlatformFooter />

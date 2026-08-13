@@ -54,17 +54,17 @@ export function PageHeader({
         <h1
           className={cn(
             "font-display text-graphite",
-            eyebrow && "mt-2",
+            eyebrow && "mt-1",
             display
-              ? "text-[1.85rem] font-semibold leading-[1.18] sm:text-[2.15rem]"
-              : "text-[1.55rem] font-semibold leading-[1.22] sm:text-[1.75rem]",
+              ? "text-[1.55rem] font-semibold leading-[1.2] sm:text-[1.75rem]"
+              : "text-[1.35rem] font-semibold leading-[1.25] sm:text-[1.5rem]",
           )}
         >
           {title}
         </h1>
-        <span className="mt-3 block h-[3px] w-12 bg-forest-ink" aria-hidden />
+        <span className="mt-2 block h-[2px] w-10 bg-forest-ink" aria-hidden />
         {description && (
-          <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-slate">
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate">
             {description}
           </p>
         )}

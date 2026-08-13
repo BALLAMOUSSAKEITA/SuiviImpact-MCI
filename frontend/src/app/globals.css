@@ -281,8 +281,15 @@ body {
 .app-flag {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  height: 8px;
   flex-shrink: 0;
+}
+
+.login-flag {
+  height: 8px;
+}
+
+.app-flag {
+  height: 5px;
 }
 
 .login-wrap {
@@ -369,11 +376,11 @@ body {
 .app-masthead {
   flex-shrink: 0;
   background: #fff;
-  border-bottom: 1px solid #d4e5dc;
+  border-bottom: none;
 }
 
-.app-banner {
-  flex-shrink: 0;
+.app-masthead-accent {
+  height: 3px;
   background: #0d4f38;
 }
 
