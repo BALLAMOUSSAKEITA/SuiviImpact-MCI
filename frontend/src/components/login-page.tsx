@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -19,24 +18,6 @@ const loginSchema = z.object({
 });
 
 type LoginForm = z.infer<typeof loginSchema>;
-
-const LOGOS = [
-  {
-    src: "/branding/embleme-guinee.jpg",
-    alt: "Armoiries de la République de Guinée",
-    className: "login-logo-emblem",
-  },
-  {
-    src: "/branding/guinee-nimba.png",
-    alt: "Logo Guinée — masque Nimba",
-    className: "login-logo-nimba",
-  },
-  {
-    src: "/branding/simandou-2040.png",
-    alt: "Simandou 2040",
-    className: "login-logo-simandou",
-  },
-] as const;
 
 export function LoginPage() {
   const { login, isAuthenticated, isLoading } = useAuth();
@@ -71,209 +52,161 @@ export function LoginPage() {
 
   if (isLoading) {
     return (
-      <div className="login-shell flex min-h-screen items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--guinea-green)]/25 border-t-[var(--guinea-green)]" />
-          <p className="text-sm text-fog">Chargement…</p>
-        </div>
+      <div className="login-shell grid min-h-screen place-items-center">
+        <p className="login-sans text-sm text-white/70">Chargement…</p>
       </div>
     );
   }
 
   return (
-    <div className="login-shell flex min-h-screen flex-col">
-      <div className="login-flag-stripe" aria-hidden="true" />
+    <div className="login-shell login-sans grid min-h-screen lg:grid-cols-[minmax(0,1.1fr)_minmax(360px,480px)]">
+      <aside className="relative flex flex-col justify-between px-8 py-10 text-white sm:px-12 lg:px-14 lg:py-12">
+        <div className="login-tricolor" aria-hidden="true" />
 
-      <header className="login-brand-bar px-4 py-4 sm:px-6">
-        <div className="mx-auto flex max-w-[1100px] flex-col items-center gap-4">
-          <div className="text-center animate-fade-in">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--guinea-red)]">
-              {BRAND.country}
+        <div>
+          <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-white/65">
+            {BRAND.country}
+          </p>
+          <div className="mt-8 max-w-md">
+            <Image
+              src="/branding/embleme-guinee.jpg"
+              alt="Armoiries de la République de Guinée"
+              width={160}
+              height={180}
+              className="h-28 w-auto bg-white object-contain p-2 sm:h-36"
+              priority
+            />
+            <h1 className="login-display mt-8 text-[2.75rem] leading-[1.05] tracking-[-0.02em] text-white sm:text-[3.25rem]">
+              {BRAND.appName}
+            </h1>
+            <p className="mt-4 max-w-sm text-[1.05rem] leading-relaxed text-white/78">
+              {BRAND.tagline}
             </p>
-            <p className="mt-1 text-sm font-semibold leading-snug text-graphite sm:text-base">
-              {BRAND.ministry}
-            </p>
-            <p className="text-xs text-slate">{BRAND.bureau}</p>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-5 animate-fade-in">
-            {LOGOS.map((logo) => (
-              <div key={logo.src} className={`login-logo-chip ${logo.className}`}>
-                <Image
-                  src={logo.src}
-                  alt={logo.alt}
-                  width={180}
-                  height={90}
-                  className="h-12 w-auto object-contain sm:h-14"
-                  priority
-                />
-              </div>
-            ))}
           </div>
         </div>
-      </header>
 
-      <main className="flex flex-1 items-center justify-center px-4 py-8 sm:px-6 sm:py-12">
-        <div className="grid w-full max-w-[1100px] items-center gap-10 lg:grid-cols-[1.05fr_420px] lg:gap-16">
-          <section className="hidden lg:block">
-            <div className="login-hero-panel animate-fade-in">
-              <div className="flex items-start gap-5">
-                <Image
-                  src="/branding/embleme-guinee.jpg"
-                  alt=""
-                  width={120}
-                  height={140}
-                  className="h-[7.5rem] w-auto shrink-0 object-contain"
-                  aria-hidden
-                />
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--guinea-gold)]">
-                    Travail · Justice · Solidarité
-                  </p>
-                  <h1 className="mt-2 font-display text-[2.6rem] leading-[1.08] tracking-tight text-graphite">
-                    {BRAND.appName}
-                  </h1>
-                  <p className="mt-3 max-w-md text-base leading-relaxed text-slate">
-                    {BRAND.tagline}
-                  </p>
-                </div>
-              </div>
+        <div className="mt-12 space-y-6">
+          <div>
+            <p className="text-sm font-medium text-white">{BRAND.ministry}</p>
+            <p className="mt-1 text-sm text-white/65">{BRAND.bureau}</p>
+          </div>
 
-              <div className="mt-8 flex flex-wrap items-center gap-3">
-                <div className="login-pill">
-                  <ShieldCheck className="h-4 w-4 shrink-0 text-[var(--guinea-green)]" />
-                  <span>
-                    {BRAND.bureauShort} · {BRAND.program}
-                  </span>
-                </div>
-                <div className="login-pill login-pill-dark">
-                  <Image
-                    src="/branding/simandou-2040.png"
-                    alt="Simandou 2040"
-                    width={120}
-                    height={40}
-                    className="h-7 w-auto object-contain"
-                  />
-                </div>
-                <div className="login-pill">
-                  <Image
-                    src="/branding/guinee-nimba.png"
-                    alt="Guinée"
-                    width={100}
-                    height={36}
-                    className="h-7 w-auto object-contain"
-                  />
-                </div>
-              </div>
-            </div>
-          </section>
+          <div className="flex flex-wrap items-end gap-6 border-t border-white/15 pt-6">
+            <Image
+              src="/branding/guinee-nimba.png"
+              alt="Guinée"
+              width={120}
+              height={40}
+              className="h-9 w-auto brightness-0 invert"
+              priority
+            />
+            <Image
+              src="/branding/simandou-2040.png"
+              alt="Simandou 2040"
+              width={150}
+              height={48}
+              className="h-11 w-auto"
+              priority
+            />
+          </div>
+        </div>
+      </aside>
 
-          <section className="mx-auto w-full max-w-[420px] animate-scale-in">
-            <div className="login-card">
-              <div className="mb-5 flex items-center gap-3 lg:hidden">
-                <Image
-                  src="/branding/embleme-guinee.jpg"
-                  alt="Armoiries nationales"
-                  width={48}
-                  height={54}
-                  className="h-12 w-auto object-contain"
-                />
-                <div>
-                  <p className="font-display text-xl text-graphite">{BRAND.appName}</p>
-                  <p className="text-xs text-slate">
-                    {BRAND.ministryShort} · {BRAND.bureauShort}
-                  </p>
-                </div>
-              </div>
-
-              <div className="mb-5 flex items-center justify-center gap-3 lg:hidden">
-                <div className="login-logo-chip login-logo-nimba px-2 py-1">
-                  <Image
-                    src="/branding/guinee-nimba.png"
-                    alt="Guinée"
-                    width={90}
-                    height={32}
-                    className="h-8 w-auto object-contain"
-                  />
-                </div>
-                <div className="login-logo-chip login-logo-simandou px-2 py-1">
-                  <Image
-                    src="/branding/simandou-2040.png"
-                    alt="Simandou 2040"
-                    width={110}
-                    height={36}
-                    className="h-8 w-auto object-contain"
-                  />
-                </div>
-              </div>
-
-              <h2 className="text-xl font-semibold tracking-tight text-graphite">Connexion</h2>
-              <p className="mt-1 text-sm text-slate">{BRAND.loginSubtitle}</p>
-
-              <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-4">
-                <div>
-                  <input
-                    {...register("username")}
-                    placeholder="Identifiant"
-                    autoComplete="username"
-                    className="login-input"
-                  />
-                  {errors.username && (
-                    <p className="mt-1.5 text-xs font-medium text-[var(--guinea-red)]">
-                      {errors.username.message}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <input
-                    type="password"
-                    {...register("password")}
-                    placeholder="Mot de passe"
-                    autoComplete="current-password"
-                    className="login-input"
-                  />
-                  {errors.password && (
-                    <p className="mt-1.5 text-xs font-medium text-[var(--guinea-red)]">
-                      {errors.password.message}
-                    </p>
-                  )}
-                </div>
-
-                <Button
-                  type="submit"
-                  className="login-submit mt-2 h-12 w-full text-base"
-                  disabled={submitting}
-                >
-                  {submitting ? (
-                    <span className="flex items-center gap-2">
-                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                      Connexion en cours…
-                    </span>
-                  ) : (
-                    "Se connecter"
-                  )}
-                </Button>
-              </form>
-
-              <p className="mt-6 border-t border-cloud/60 pt-4 text-center text-xs leading-relaxed text-ash">
-                Plateforme sécurisée — accès réservé au personnel autorisé.
-                <br />
-                En cas de problème, contactez l&apos;administrateur {BRAND.bureauShort}.
+      <main className="flex flex-col justify-center bg-white px-6 py-12 sm:px-10 lg:px-12">
+        <div className="mx-auto w-full max-w-[360px]">
+          <div className="mb-8 flex items-center gap-3 lg:hidden">
+            <Image
+              src="/branding/embleme-guinee.jpg"
+              alt=""
+              width={48}
+              height={54}
+              className="h-12 w-auto bg-white object-contain p-1"
+              aria-hidden
+            />
+            <div>
+              <p className="login-display text-2xl text-[#1a1a1a]">{BRAND.appName}</p>
+              <p className="text-xs text-[#666]">
+                {BRAND.ministryShort} · {BRAND.bureauShort}
               </p>
             </div>
-          </section>
+          </div>
+
+          <h2 className="login-display text-[1.85rem] leading-tight text-[#1a1a1a]">
+            Connexion
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed text-[#666]">
+            {BRAND.loginSubtitle}
+          </p>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-5">
+            <div>
+              <label htmlFor="login-username" className="login-label">
+                Identifiant
+              </label>
+              <input
+                id="login-username"
+                {...register("username")}
+                autoComplete="username"
+                className="login-input"
+              />
+              {errors.username && (
+                <p className="mt-1.5 text-xs font-medium text-[#b42318]">
+                  {errors.username.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="login-password" className="login-label">
+                Mot de passe
+              </label>
+              <input
+                id="login-password"
+                type="password"
+                {...register("password")}
+                autoComplete="current-password"
+                className="login-input"
+              />
+              {errors.password && (
+                <p className="mt-1.5 text-xs font-medium text-[#b42318]">
+                  {errors.password.message}
+                </p>
+              )}
+            </div>
+
+            <Button
+              type="submit"
+              className="login-submit mt-2 h-11 w-full text-[0.95rem]"
+              disabled={submitting}
+            >
+              {submitting ? "Connexion…" : "Se connecter"}
+            </Button>
+          </form>
+
+          <div className="mt-10 flex items-center gap-5 border-t border-[#e8e8e8] pt-6 lg:hidden">
+            <Image
+              src="/branding/guinee-nimba.png"
+              alt="Guinée"
+              width={100}
+              height={34}
+              className="h-8 w-auto"
+            />
+            <div className="bg-[#111] px-2 py-1">
+              <Image
+                src="/branding/simandou-2040.png"
+                alt="Simandou 2040"
+                width={120}
+                height={40}
+                className="h-8 w-auto"
+              />
+            </div>
+          </div>
+
+          <p className="mt-8 text-xs leading-relaxed text-[#888]">
+            Accès réservé au personnel autorisé. Assistance : {BRAND.bureauShort}.
+          </p>
         </div>
       </main>
-
-      <footer className="border-t border-cloud/80 bg-white/80 px-6 py-4 text-center text-xs text-slate backdrop-blur-sm">
-        <p className="font-medium text-graphite">
-          Travail · Justice · Solidarité
-        </p>
-        <p className="mt-1">
-          © {new Date().getFullYear()} {BRAND.country} · {BRAND.ministry} · {BRAND.bureau}
-        </p>
-      </footer>
     </div>
   );
 }
