@@ -345,6 +345,10 @@ body {
   border-color: #009460;
 }
 
+.login-input-with-toggle {
+  padding-right: 2.75rem;
+}
+
 .login-submit {
   margin-top: 1.25rem;
   width: 100%;

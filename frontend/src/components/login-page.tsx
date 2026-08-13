@@ -1,5 +1,6 @@
 "use client";
 
+import { Eye, EyeOff } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -23,6 +24,7 @@ export function LoginPage() {
   const { login, isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -187,13 +189,28 @@ export function LoginPage() {
                 <label htmlFor="login-password" className="login-label">
                   Mot de passe
                 </label>
-                <input
-                  id="login-password"
-                  type="password"
-                  {...register("password")}
-                  autoComplete="current-password"
-                  className="login-input"
-                />
+                <div className="relative">
+                  <input
+                    id="login-password"
+                    type={showPassword ? "text" : "password"}
+                    {...register("password")}
+                    autoComplete="current-password"
+                    className="login-input login-input-with-toggle"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    className="absolute inset-y-0 right-0 flex items-center px-3 text-[#4a6b5c] transition-colors hover:text-[#0d4f38]"
+                    aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                    aria-pressed={showPassword}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" strokeWidth={1.75} />
+                    ) : (
+                      <Eye className="h-4 w-4" strokeWidth={1.75} />
+                    )}
+                  </button>
+                </div>
                 {errors.password && (
                   <p className="mt-1.5 text-xs font-medium text-[#b42318]">
                     {errors.password.message}
