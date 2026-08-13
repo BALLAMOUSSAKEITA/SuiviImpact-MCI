@@ -1825,3 +1825,18 @@ export async function triggerActiviteReminders(
   );
 }
 
+/* ─── Finances ─── */
+
+import type { FinanceState } from "@/types";
+
+export async function getFinances(): Promise<FinanceState> {
+  return apiFetch<FinanceState>("/api/v1/finances");
+}
+
+export async function importFinances(file: File): Promise<FinanceState> {
+  const formData = new FormData();
+  formData.append("file", file);
+  return apiFetchFormData<FinanceState>("/api/v1/finances/import", formData);
+}
+
+

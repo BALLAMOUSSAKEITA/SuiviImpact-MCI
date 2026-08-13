@@ -24,6 +24,7 @@ import {
   Target,
   UserCircle,
   Users,
+  Wallet,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -83,6 +84,7 @@ const navItems: NavItem[] = [
       { href: "/admin/suivi/indicateurs", label: "Indicateurs", icon: BarChart3 },
     ],
   },
+  { href: "/admin/finances", label: "Finances", icon: Wallet },
   { href: "/admin/stats", label: "Statistiques", icon: BarChart3 },
   { href: "/admin/workflow", label: "Workflow", icon: GitBranch },
   { href: "/admin/export", label: "Export", icon: Download },

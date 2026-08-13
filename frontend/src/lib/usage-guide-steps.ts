@@ -197,6 +197,13 @@ const BASE_STEPS: UsageGuideStep[] = [
     body: "",
   },
   {
+    id: "finances",
+    target: "/admin/finances",
+    navHref: "/admin/finances",
+    title: "Finances",
+    body: "",
+  },
+  {
     id: "stats",
     target: "/admin/stats",
     navHref: "/admin/stats",
@@ -258,7 +265,7 @@ const STEP_COPY: Record<string, CopyTable> = {
     directeur: `Visite pour un compte ${ROLE_LABELS.directeur} : planification PAO de votre direction, workflow documentaire et archive.`,
     sg: `Visite pour un compte ${ROLE_LABELS.sg} : validation au workflow, statistiques de pilotage et archive institutionnelle.`,
     ministre: `Visite pour un compte ${ROLE_LABELS.ministre} : suivi des validations, indicateurs agrégés et documents archivés.`,
-    daf: `Visite pour un compte ${ROLE_LABELS.daf} : mêmes onglets que le ministre (statistiques, workflow, archive).`,
+    daf: `Visite pour un compte ${ROLE_LABELS.daf} : mêmes onglets que le ministre (finances, statistiques, workflow, archive).`,
   },
   sidebar: {
     admin: "Accès complet au menu BSD et à l’administration (Comptes). Seules les entrées utiles à votre rôle sont listées ici.",
@@ -268,9 +275,9 @@ const STEP_COPY: Record<string, CopyTable> = {
       "Même arborescence que l’équipe BSD, mais vos actions de modification sont désactivées sur les écrans métier.",
     directeur:
       "Menu réduit au périmètre directeur : accueil, planification PAO, workflow, archive et profil.",
-    sg: "Menu institutionnel : accueil, statistiques, workflow, archive et profil.",
-    ministre: "Menu institutionnel : accueil, statistiques, workflow, archive et profil.",
-    daf: "Menu identique au ministre : accueil, statistiques, workflow, archive et profil.",
+    sg: "Menu institutionnel : accueil, finances, statistiques, workflow, archive et profil.",
+    ministre: "Menu institutionnel : accueil, finances, statistiques, workflow, archive et profil.",
+    daf: "Menu identique au ministre : accueil, finances, statistiques, workflow, archive et profil.",
   },
   home: {
     directeur: "Point d’entrée : synthèse et liens vers vos modules (PAO, validations, archive).",
@@ -357,6 +364,14 @@ const STEP_COPY: Record<string, CopyTable> = {
     ministre: "Vision consolidée pour le suivi ministériel.",
     daf: "Vision consolidée pour le suivi et le contrôle (mêmes tableaux que le ministre).",
   },
+  finances: {
+    admin: "Importez le fichier Excel de suivi budgétaire : le tableau actuel est entièrement remplacé.",
+    "bsd-ecriture": "Importez le fichier Excel LFI / engagements / paiements ; chaque import écrase le précédent.",
+    "bsd-lecture": "Consultation du tableau budgétaire importé (LFI, engagements, décaissements).",
+    sg: "Consultation du suivi budgétaire (prévisions, engagements, paiements).",
+    ministre: "Consultation du suivi budgétaire consolidé.",
+    daf: "Consultation du tableau budgétaire (LFI, engagements, taux de décaissement).",
+  },
   workflow: {
     admin: "Supervision des circuits de validation ; vous traitez l’étape BSD et pouvez supprimer les dossiers.",
     "bsd-ecriture": "Suivi des dossiers en circulation ; la saisie des étapes releve surtout des rôles institutionnels.",
@@ -416,6 +431,7 @@ const DEFAULT_COPY: Partial<Record<string, string>> = {
   "suivi-ppm": "Plan de passation des marchés.",
   "suivi-indicateurs": "Suivi du réalisé des indicateurs planifiés.",
   stats: "Tableaux de bord par domaine avec filtres de période.",
+  finances: "Tableau budgétaire (LFI, engagements, paiements) importé depuis Excel.",
   workflow: "Circuits de validation documentaire entre les rôles.",
   export: "Extractions Excel pour reporting.",
   archive: "Dossiers et pièces jointes institutionnelles.",

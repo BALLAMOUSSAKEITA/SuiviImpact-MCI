@@ -67,7 +67,7 @@ export function isPathAllowed(role: UserRole | undefined, pathname: string): boo
   }
 
   if (hasPilotageTabAccess(role)) {
-    const allowed = ["/admin", "/admin/workflow", "/admin/archive", "/admin/stats"];
+    const allowed = ["/admin", "/admin/workflow", "/admin/archive", "/admin/stats", "/admin/finances"];
     return matchesAllowed(path, allowed);
   }
 

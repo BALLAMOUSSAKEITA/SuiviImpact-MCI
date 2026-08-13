@@ -4,6 +4,7 @@ from app.api.v1 import (
     archive,
     auth,
     exports,
+    finances,
     health,
     indicateurs,
     missions,
@@ -34,6 +35,7 @@ api_router.include_router(ppm.router, tags=["ppm"])
 api_router.include_router(projets.router, tags=["projets"])
 api_router.include_router(indicateurs.router, tags=["indicateurs"])
 api_router.include_router(stats.router, tags=["stats"])
+api_router.include_router(finances.router, tags=["finances"])
 api_router.include_router(exports.router, tags=["exports"])
 api_router.include_router(archive.router, tags=["archive"])
 api_router.include_router(workflow.router, tags=["workflow"])

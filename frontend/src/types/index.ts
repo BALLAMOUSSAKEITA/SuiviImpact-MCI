@@ -762,6 +762,31 @@ export interface EmailConfig {
   message: string;
 }
 
+export interface FinanceLigne {
+  id: number;
+  ordre: number;
+  titre_budget: string;
+  montant_prevu: string | null;
+  montant_engage: string | null;
+  montant_paye: string | null;
+  taux_engagement: string | null;
+  taux_caisse: string | null;
+  source_information: string | null;
+  is_total: boolean;
+}
+
+export interface FinanceSnapshot {
+  filename: string;
+  imported_at: string;
+  imported_by_user_id: number | null;
+  row_count: number;
+}
+
+export interface FinanceState {
+  snapshot: FinanceSnapshot | null;
+  lignes: FinanceLigne[];
+}
+
 export const NOTIFICATION_STATUT_LABELS: Record<string, string> = {
   envoye: "Envoyé",
   simule: "Simulé",
