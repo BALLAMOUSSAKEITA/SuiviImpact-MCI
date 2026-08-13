@@ -6,12 +6,14 @@ import Link from "next/link";
 
 import { UserAvatar } from "@/components/user-avatar";
 import { BRAND } from "@/lib/brand";
-import { cn } from "@/lib/utils";
+import { ROLE_LABELS } from "@/lib/roles";
+import type { UserRole } from "@/types";
 
 interface InstitutionalMastheadProps {
   prenom?: string;
   nom?: string;
   hasAvatar?: boolean;
+  role?: UserRole;
   mobileOpen?: boolean;
   onToggleMobile?: () => void;
 }
@@ -20,86 +22,100 @@ export function InstitutionalMasthead({
   prenom = "",
   nom,
   hasAvatar,
+  role,
   mobileOpen,
   onToggleMobile,
 }: InstitutionalMastheadProps) {
+  const displayName = [prenom, nom].filter(Boolean).join(" ") || "Mon profil";
+  const roleLabel = role ? ROLE_LABELS[role] : null;
+
   return (
     <>
       <header className="app-masthead">
-        <div className="flex items-center gap-3 px-3 py-2 sm:gap-4 sm:px-5 lg:px-6">
+        <div className="flex items-center gap-4 px-4 py-3 sm:px-6 lg:px-8">
           {onToggleMobile && (
             <button
               type="button"
               aria-label={mobileOpen ? "Fermer le menu" : "Ouvrir le menu"}
               aria-expanded={mobileOpen}
-              className="flex h-10 w-10 shrink-0 items-center justify-center border border-hairline text-graphite transition-colors hover:bg-pebble lg:hidden"
+              className="flex h-11 w-11 shrink-0 items-center justify-center border border-hairline text-graphite transition-colors hover:bg-pebble lg:hidden"
               onClick={onToggleMobile}
             >
               {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           )}
 
-          <div className="flex min-w-0 flex-1 items-center gap-3">
+          <div className="flex min-w-0 flex-1 items-center gap-4">
             <Image
               src="/branding/armoiries-guinee.jpg"
               alt="Armoiries de la République de Guinée"
-              width={48}
-              height={54}
-              className="h-10 w-auto shrink-0 object-contain sm:h-12"
+              width={64}
+              height={72}
+              className="h-[3.35rem] w-auto shrink-0 object-contain sm:h-[3.75rem]"
               priority
             />
             <div className="min-w-0">
-              <p className="font-display text-[10px] font-semibold uppercase tracking-[0.16em] text-graphite sm:text-[11px]">
+              <p className="font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-graphite">
                 {BRAND.country}
               </p>
-              <p className="font-display truncate text-[13px] font-semibold leading-snug text-graphite sm:text-[15px]">
+              <p className="font-display mt-0.5 truncate text-[1.05rem] font-semibold leading-snug text-graphite sm:text-[1.2rem]">
                 {BRAND.ministry}
               </p>
-              <p className="hidden truncate text-[12px] text-slate sm:block">
+              <p className="mt-0.5 hidden truncate text-[13px] text-slate sm:block">
                 {BRAND.bureau}
               </p>
             </div>
           </div>
 
-          <div className="hidden items-center gap-5 md:flex">
+          <div className="hidden items-center gap-6 border-l border-hairline pl-6 md:flex">
             <Image
               src="/branding/guinee-nimba.png"
               alt="Guinée"
-              width={90}
-              height={30}
-              className="h-7 w-auto object-contain"
+              width={110}
+              height={36}
+              className="h-8 w-auto object-contain"
             />
             <Image
               src="/branding/simandou-2040.png"
               alt="Programme Simandou 2040"
-              width={140}
-              height={56}
-              className="h-10 w-auto object-contain"
+              width={160}
+              height={64}
+              className="h-12 w-auto object-contain"
             />
           </div>
-
-          <Link
-            href="/admin/profil"
-            className="flex shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest-ink/30"
-            aria-label="Mon profil"
-          >
-            <UserAvatar prenom={prenom} nom={nom} hasAvatar={hasAvatar} size="sm" />
-          </Link>
         </div>
       </header>
 
       <div className="app-banner">
-        <div className="flex items-baseline justify-between gap-4 px-3 py-2 sm:px-5 lg:px-6">
-          <p className="font-display text-[1.05rem] font-semibold leading-none text-white sm:text-lg">
-            {BRAND.appName}
-          </p>
-          <p
-            className={cn(
-              "hidden text-[11px] font-semibold uppercase tracking-[0.16em] text-white/70 sm:block",
-            )}
+        <div className="flex items-center justify-between gap-4 px-4 py-3.5 sm:px-6 lg:px-8">
+          <div className="min-w-0">
+            <p className="font-display text-[1.35rem] font-semibold leading-none text-white sm:text-[1.55rem]">
+              {BRAND.appName}
+            </p>
+            <p className="mt-1.5 hidden text-[13px] leading-snug text-white/75 sm:block">
+              {BRAND.tagline}
+            </p>
+          </div>
+
+          <Link
+            href="/admin/profil"
+            className="flex shrink-0 items-center gap-3 text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+            aria-label="Mon profil"
           >
-            Espace agents — {BRAND.bureauShort}
-          </p>
+            <span className="hidden text-right sm:block">
+              <span className="block text-sm font-semibold leading-tight">{displayName}</span>
+              {roleLabel && (
+                <span className="mt-0.5 block text-[11px] text-white/70">{roleLabel}</span>
+              )}
+            </span>
+            <UserAvatar
+              prenom={prenom}
+              nom={nom}
+              hasAvatar={hasAvatar}
+              size="sm"
+              className="bg-white/15 text-white"
+            />
+          </Link>
         </div>
       </div>
     </>

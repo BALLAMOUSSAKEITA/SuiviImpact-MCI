@@ -28,13 +28,13 @@ import {
 import { useEffect, useState } from "react";
 
 import { useAuth } from "@/components/auth-provider";
-import { UserAvatar } from "@/components/user-avatar";
 import { Button } from "@/components/ui/button";
 import {
   USAGE_GUIDE_PREPARE_STEP_EVENT,
   type UsageGuideStepPrepareDetail,
 } from "@/lib/onboarding";
-import { canSeeNavGroup, canSeeNavHref, ROLE_LABELS } from "@/lib/roles";
+import { canSeeNavGroup, canSeeNavHref } from "@/lib/roles";
+import { BRAND } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 
 interface NavItem {
@@ -158,11 +158,11 @@ export function Sidebar({
 
   const navLinkClass = (active: boolean) =>
     cn(
-      "group relative flex items-center text-sm font-medium transition-colors duration-[var(--duration-fast)]",
-      narrow ? "justify-center px-2 py-2.5" : "gap-3 px-3 py-2.5",
+      "group relative flex items-center text-[13.5px] transition-colors duration-[var(--duration-fast)]",
+      narrow ? "justify-center px-2 py-2.5" : "gap-3 px-4 py-2.5",
       active
-        ? "bg-[#e0f5ea] text-graphite"
-        : "text-slate hover:bg-pebble hover:text-graphite",
+        ? "bg-[#f3faf6] font-semibold text-graphite"
+        : "font-medium text-slate hover:bg-[#f6faf7] hover:text-graphite",
     );
 
   return (
@@ -171,73 +171,17 @@ export function Sidebar({
       className={cn(
         "flex min-h-0 shrink-0 flex-col border-r border-hairline bg-white",
         "fixed inset-y-0 left-0 z-50 transition-[width,transform] duration-300 ease-[var(--ease-out-expo)] lg:static lg:h-full lg:translate-x-0",
-        narrow ? "w-[72px]" : "w-[260px]",
+        narrow ? "w-[72px]" : "w-[248px]",
         mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
       )}
     >
-      {/* En-tête */}
-      <div
-        className={cn(
-          "flex items-center border-b border-hairline",
-          narrow ? "justify-center px-2 py-3" : "justify-between px-3 py-3",
-        )}
-      >
-        {!narrow && (
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate">
-            Navigation
-          </p>
-        )}
-        {onToggleCollapsed && (
-          <button
-            type="button"
-            onClick={onToggleCollapsed}
-            className={cn(
-              "hidden h-9 w-9 shrink-0 items-center justify-center border border-hairline text-graphite transition-colors hover:bg-pebble lg:flex",
-              narrow && "w-full",
-            )}
-            aria-label={narrow ? "Déplier le menu" : "Replier le menu"}
-            title={narrow ? "Déplier le menu" : "Replier le menu"}
-          >
-            {narrow ? (
-              <ChevronRight className="h-4 w-4" />
-            ) : (
-              <ChevronLeft className="h-4 w-4" />
-            )}
-          </button>
-        )}
+      <div className="border-b border-hairline px-4 py-3 lg:hidden">
+        <p className="font-display text-base font-semibold text-graphite">{BRAND.appName}</p>
+        <p className="text-[12px] text-slate">Menu</p>
       </div>
 
-      <Link
-        href="/admin/profil"
-        onClick={onNavigate}
-        title="Mon profil"
-        aria-label="Mon profil"
-        className={cn(
-          "flex items-center border-b border-hairline transition-colors hover:bg-pebble",
-          narrow ? "justify-center px-1 py-3" : "gap-3 px-3 py-3",
-          pathname.startsWith("/admin/profil") && "bg-[#e0f5ea]",
-        )}
-      >
-        <UserAvatar
-          prenom={user?.prenom ?? ""}
-          nom={user?.nom}
-          hasAvatar={user?.has_avatar}
-          size="sm"
-        />
-        {!narrow && (
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-graphite">
-              {[user?.prenom, user?.nom].filter(Boolean).join(" ") || "Profil"}
-            </p>
-            <p className="text-[11px] text-ash">
-              {user ? ROLE_LABELS[user.role] : "Mon profil"}
-            </p>
-          </div>
-        )}
-      </Link>
-
       {/* Navigation */}
-      <nav className={cn("flex-1 space-y-0.5 overflow-y-auto py-4", narrow ? "px-2" : "px-3")}>
+      <nav className={cn("flex-1 space-y-0.5 overflow-y-auto py-3", narrow ? "px-1.5" : "px-0")}>
         {navItems
           .filter((item) => {
             if (item.adminOnly && user?.role !== "admin") return false;
@@ -360,7 +304,7 @@ export function Sidebar({
                   </button>
 
                   {isOpen && (
-                    <div className="ml-5 mt-0.5 space-y-0.5 border-l border-cloud/80 pl-3">
+                    <div className="mt-0.5 space-y-0.5 border-l border-hairline ml-7 pl-3">
                       {children.map(({ href, label, icon: ChildIcon }) => {
                         const childActive = isActive(href);
                         return (
@@ -412,12 +356,33 @@ export function Sidebar({
       </nav>
 
       {/* Pied */}
-      <div className={cn("border-t border-hairline p-3", narrow && "px-2")}>
+      <div className={cn("border-t border-hairline p-2", narrow && "px-1.5")}>
+        {onToggleCollapsed && (
+          <button
+            type="button"
+            onClick={onToggleCollapsed}
+            className={cn(
+              "mb-1 hidden h-10 items-center text-[13px] font-medium text-slate transition-colors hover:bg-[#f6faf7] hover:text-graphite lg:flex",
+              narrow ? "w-full justify-center px-0" : "w-full justify-start gap-2.5 px-3",
+            )}
+            aria-label={narrow ? "Déplier le menu" : "Replier le menu"}
+            title={narrow ? "Déplier le menu" : "Replier le menu"}
+          >
+            {narrow ? (
+              <ChevronRight className="h-4 w-4" />
+            ) : (
+              <>
+                <ChevronLeft className="h-4 w-4 shrink-0" />
+                Replier le menu
+              </>
+            )}
+          </button>
+        )}
         <Button
           variant="ghost"
           className={cn(
-            "text-[13px] text-ash hover:text-red-600",
-            narrow ? "h-10 w-full justify-center px-0" : "w-full justify-start gap-2.5",
+            "text-[13px] font-medium text-slate hover:text-[#ce1126]",
+            narrow ? "h-10 w-full justify-center px-0" : "w-full justify-start gap-2.5 px-3",
           )}
           onClick={handleLogout}
           title={narrow ? "Déconnexion" : undefined}

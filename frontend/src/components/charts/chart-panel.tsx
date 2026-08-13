@@ -22,9 +22,9 @@ export function ChartPanel({
         className,
       )}
     >
-      <header className="mb-4 flex items-start justify-between gap-3">
+      <header className="mb-4 flex items-start justify-between gap-3 border-b border-hairline pb-3">
         <div className="min-w-0">
-          <h3 className="font-display text-sm font-semibold text-graphite">{title}</h3>
+          <h3 className="font-display text-[15px] font-semibold text-graphite">{title}</h3>
           {subtitle && (
             <p className="mt-0.5 truncate text-xs text-slate">{subtitle}</p>
           )}

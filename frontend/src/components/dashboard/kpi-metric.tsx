@@ -31,13 +31,13 @@ export function MetricStrip({ metrics, className }: MetricStripProps) {
           <div
             key={metric.label}
             className={cn(
-              "px-5 py-4",
+              "px-6 py-5",
               i > 0 && "border-t border-cloud sm:border-t-0",
               i % 2 === 1 && "sm:border-l sm:border-cloud lg:border-l-0",
               i >= 2 && "lg:border-t-0",
             )}
           >
-            <p className="text-xs font-medium text-slate">{metric.label}</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-slate">{metric.label}</p>
             <p
               className={cn(
                 "mt-1 font-display text-[1.625rem] font-semibold tabular-nums leading-none",
@@ -81,7 +81,7 @@ export function ModuleOverview({
         className,
       )}
     >
-      <div className="hidden border-b border-cloud px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.05em] text-slate md:grid md:grid-cols-[minmax(0,1.4fr)_4.5rem_4.5rem_minmax(0,1fr)_1.25rem] md:gap-4">
+      <div className="hidden border-b border-cloud bg-[#f6faf7] px-6 py-2.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate md:grid md:grid-cols-[minmax(0,1.4fr)_4.5rem_4.5rem_minmax(0,1fr)_1.25rem] md:gap-4">
         <span>Module</span>
         <span className="text-right">Total</span>
         <span className="text-right">Exec.</span>
@@ -97,7 +97,7 @@ export function ModuleOverview({
               <button
                 type="button"
                 onClick={() => onSelect(mod.id)}
-                className="group grid w-full gap-3 px-5 py-4 text-left transition-colors hover:bg-veil/60 md:grid-cols-[minmax(0,1.4fr)_4.5rem_4.5rem_minmax(0,1fr)_1.25rem] md:items-center md:gap-4"
+                className="group grid w-full gap-3 px-6 py-4 text-left transition-colors hover:bg-[#f6faf7] md:grid-cols-[minmax(0,1.4fr)_4.5rem_4.5rem_minmax(0,1fr)_1.25rem] md:items-center md:gap-4"
               >
                 <div className="min-w-0">
                   <p className="text-sm font-medium text-graphite">{mod.title}</p>

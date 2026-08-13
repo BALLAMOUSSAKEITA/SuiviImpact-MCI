@@ -45,24 +45,26 @@ export function PageHeader({
         className,
       )}
     >
-      <div className="min-w-0 space-y-1.5">
+      <div className="min-w-0">
         {eyebrow && (
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate">
             {eyebrow}
           </p>
         )}
         <h1
           className={cn(
             "font-display text-graphite",
+            eyebrow && "mt-2",
             display
-              ? "text-[1.65rem] font-semibold leading-[1.2] sm:text-[1.9rem]"
-              : "text-[1.45rem] font-semibold leading-[1.25] sm:text-[1.65rem]",
+              ? "text-[1.85rem] font-semibold leading-[1.18] sm:text-[2.15rem]"
+              : "text-[1.55rem] font-semibold leading-[1.22] sm:text-[1.75rem]",
           )}
         >
           {title}
         </h1>
+        <span className="mt-3 block h-[3px] w-12 bg-forest-ink" aria-hidden />
         {description && (
-          <p className="max-w-2xl text-sm leading-[1.43] text-slate">
+          <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-slate">
             {description}
           </p>
         )}

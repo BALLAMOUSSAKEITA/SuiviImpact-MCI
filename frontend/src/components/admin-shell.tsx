@@ -97,6 +97,7 @@ export function AdminShell({ children, className }: AdminShellProps) {
         prenom={user?.prenom}
         nom={user?.nom}
         hasAvatar={user?.has_avatar}
+        role={user?.role}
         mobileOpen={mobileOpen}
         onToggleMobile={() => setMobileOpen((open) => !open)}
       />
@@ -122,13 +123,12 @@ export function AdminShell({ children, className }: AdminShellProps) {
           <main
             data-tour-target="workspace"
             className={cn(
-              "min-h-0 flex-1 overflow-y-auto",
-              "p-4 sm:p-6 lg:px-10 lg:py-8",
+              "flex min-h-0 flex-1 flex-col overflow-y-auto",
               "animate-fade-in",
               className,
             )}
           >
-            <div className="space-y-6 sm:space-y-[var(--section-gap)]">
+            <div className="flex-1 space-y-6 p-5 sm:space-y-[var(--section-gap)] sm:p-7 lg:px-10 lg:py-8">
               {children}
             </div>
             <PlatformFooter />

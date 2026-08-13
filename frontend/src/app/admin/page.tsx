@@ -85,9 +85,9 @@ export default function AdminDashboardPage() {
   return (
     <div className="mx-auto max-w-[1400px] space-y-4">
       <PageHeader
-        eyebrow={`Espace agents — ${BRAND.bureauShort}`}
-        title={BRAND.institutionFull}
-        description="Tableau de bord de suivi des politiques publiques"
+        eyebrow={`${BRAND.bureauShort} · ${BRAND.ministryShort}`}
+        title="Vue d'ensemble"
+        description="Tableau de bord de suivi des politiques publiques du gouvernement."
         display
       />
 
