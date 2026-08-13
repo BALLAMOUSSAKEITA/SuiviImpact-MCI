@@ -51,7 +51,7 @@ export function UserAvatar({ prenom, nom, hasAvatar, className, size = "sm" }: U
   return (
     <div
       className={cn(
-        "relative shrink-0 overflow-hidden rounded-full bg-forest-ink/10 text-forest-ink",
+        "relative shrink-0 overflow-hidden bg-[#0d4f38] text-white",
         sizeClass[size],
         className,
       )}

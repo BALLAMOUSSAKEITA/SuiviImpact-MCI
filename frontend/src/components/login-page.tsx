@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { FlagStripe } from "@/components/flag-stripe";
+import { FlagStripe, FlagMark } from "@/components/flag-stripe";
 import { useAuth } from "@/components/auth-provider";
 import { BRAND } from "@/lib/brand";
 
@@ -210,14 +210,17 @@ export function LoginPage() {
       </main>
 
       <footer className="login-footer">
-        <div className="login-wrap py-5 text-center sm:text-left">
-          <p className="login-serif text-sm font-semibold text-[#0d4f38]">
-            {BRAND.motto}
-          </p>
-          <p className="mt-1 text-xs leading-relaxed text-[#4a6b5c]">
-            © {new Date().getFullYear()} {BRAND.country} — {BRAND.ministry} — {BRAND.bureau}.
-            Accès réservé au personnel autorisé.
-          </p>
+        <div className="login-wrap flex items-start gap-3 py-5">
+          <FlagMark className="mt-0.5 h-8 w-[4px] self-auto" />
+          <div>
+            <p className="login-serif text-sm font-semibold text-[#0d4f38]">
+              {BRAND.motto}
+            </p>
+            <p className="mt-1 text-xs leading-relaxed text-[#4a6b5c]">
+              © {new Date().getFullYear()} {BRAND.country} — {BRAND.ministry} — {BRAND.bureau}.
+              Accès réservé au personnel autorisé.
+            </p>
+          </div>
         </div>
       </footer>
     </div>

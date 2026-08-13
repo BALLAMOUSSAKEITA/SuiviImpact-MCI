@@ -2,7 +2,6 @@ import Link from "next/link";
 import { BarChart3, Briefcase, ClipboardList, FolderKanban, ShoppingCart } from "lucide-react";
 
 import { PageHeader } from "@/components/page-header";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BRAND } from "@/lib/brand";
 
 const DASHBOARDS = [
@@ -25,25 +24,18 @@ export default function StatsHubPage() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {DASHBOARDS.map(({ href, label, desc, icon: Icon }) => (
           <Link key={href} href={href} className="group block">
-            <Card className="h-full p-4 transition-colors sm:p-5 group-hover:border-forest-ink">
-              <CardHeader className="p-0 pb-2">
-                <CardTitle className="flex items-center gap-3">
-                  <span className="flex h-10 w-10 items-center justify-center border border-hairline bg-[#e0f5ea] text-graphite">
-                    <Icon className="h-[18px] w-[18px]" strokeWidth={1.75} />
-                  </span>
-                  {label}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <p className="mb-3 text-sm text-slate">{desc}</p>
-                <span className="inline-flex items-center gap-1 text-sm font-medium text-graphite transition-all group-hover:gap-2">
+            <article className="flex h-full flex-col border border-[#0d4f38] bg-white transition-colors hover:bg-[#f6faf7]">
+              <header className="flex items-center gap-3 bg-[#0d4f38] px-4 py-3">
+                <Icon className="h-[18px] w-[18px] text-white" strokeWidth={1.75} />
+                <h2 className="font-display text-[15px] font-semibold text-white">{label}</h2>
+              </header>
+              <div className="flex flex-1 flex-col p-4 sm:p-5">
+                <p className="text-sm leading-relaxed text-[#4a6b5c]">{desc}</p>
+                <span className="mt-4 text-sm font-semibold text-[#0d4f38] group-hover:underline">
                   Consulter
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                  </svg>
                 </span>
-              </CardContent>
-            </Card>
+              </div>
+            </article>
           </Link>
         ))}
       </div>

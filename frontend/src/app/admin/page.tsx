@@ -89,6 +89,7 @@ export default function AdminDashboardPage() {
         title="Vue d'ensemble"
         description="Tableau de bord de suivi des politiques publiques du gouvernement."
         display
+        rule={false}
       />
 
       <DashboardToolbar

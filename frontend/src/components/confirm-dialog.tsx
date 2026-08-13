@@ -38,21 +38,26 @@ export function ConfirmDialog({
       <button
         type="button"
         aria-label="Fermer"
-        className="absolute inset-0 bg-obsidian/50"
+        className="absolute inset-0 bg-[#0d4f38]/55"
         onClick={onCancel}
       />
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="confirm-dialog-title"
-        className="relative w-full max-w-md overflow-hidden overlay-panel border-t-[3px] border-t-[#0d4f38]"
+        className="relative w-full max-w-md overflow-hidden border border-[#0d4f38] bg-white shadow-[var(--shadow-elevated)]"
       >
-        <div className="p-6">
-          <h2 id="confirm-dialog-title" className="font-display text-xl font-semibold text-graphite">
+        <header className="bg-[#0d4f38] px-6 py-3.5">
+          <h2
+            id="confirm-dialog-title"
+            className="font-display text-lg font-semibold text-white"
+          >
             {title}
           </h2>
-          <p className="mt-3 text-sm leading-relaxed text-slate">{description}</p>
-          <div className="mt-6 flex flex-wrap justify-end gap-2 border-t border-hairline pt-4">
+        </header>
+        <div className="p-6">
+          <p className="text-sm leading-relaxed text-[#4a6b5c]">{description}</p>
+          <div className="mt-6 flex flex-wrap justify-end gap-2 border-t border-[#d4e5dc] pt-4">
             <Button type="button" variant="outline" onClick={onCancel} disabled={loading}>
               {cancelLabel}
             </Button>
@@ -114,7 +119,7 @@ export function FormDialog({
       <button
         type="button"
         aria-label="Fermer"
-        className="absolute inset-0 bg-obsidian/50"
+        className="absolute inset-0 bg-[#0d4f38]/55"
         onClick={onClose}
       />
       <div
@@ -122,20 +127,23 @@ export function FormDialog({
         aria-modal="true"
         aria-labelledby="form-dialog-title"
         className={cn(
-          "relative w-full overflow-hidden overlay-panel",
+          "relative w-full overflow-hidden border border-[#0d4f38] bg-white shadow-[var(--shadow-elevated)]",
           isLarge
             ? "flex max-h-[min(92vh,920px)] max-w-4xl flex-col"
             : "max-w-lg",
           className,
         )}
       >
-        <div className="flex shrink-0 items-start justify-between gap-3 border-b border-hairline border-t-[3px] border-t-[#0d4f38] px-6 py-4">
+        <div className="flex shrink-0 items-start justify-between gap-3 bg-[#0d4f38] px-6 py-3.5">
           <div className="min-w-0 pr-2">
-            <h2 id="form-dialog-title" className="font-display text-lg font-semibold text-graphite">
+            <h2
+              id="form-dialog-title"
+              className="font-display text-lg font-semibold text-white"
+            >
               {title}
             </h2>
             {subtitle && (
-              <p className="mt-0.5 truncate text-sm text-slate">{subtitle}</p>
+              <p className="mt-0.5 truncate text-sm text-white/70">{subtitle}</p>
             )}
           </div>
           <div className="flex shrink-0 items-center gap-2">
@@ -143,7 +151,7 @@ export function FormDialog({
             <button
               type="button"
               aria-label="Fermer"
-              className="rounded-[var(--radius-sm)] p-1.5 text-ash transition-colors hover:bg-veil hover:text-graphite"
+              className="p-1.5 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
               onClick={onClose}
             >
               <X className="h-4 w-4" />

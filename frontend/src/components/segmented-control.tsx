@@ -36,10 +36,10 @@ export function SegmentedControl<T extends string | number | null | undefined>({
             aria-selected={active}
             onClick={() => onChange(optionValue)}
             className={cn(
-              "-mb-px border-b-2 px-3 py-2 text-sm transition-colors",
+              "-mb-px border-b-[3px] px-3 py-2 text-sm transition-colors",
               active
-                ? "border-forest-ink font-semibold text-graphite"
-                : "border-transparent font-medium text-slate hover:text-graphite",
+                ? "border-[#0d4f38] font-semibold text-[#0d4f38]"
+                : "border-transparent font-medium text-slate hover:text-[#0d4f38]",
             )}
           >
             {label}

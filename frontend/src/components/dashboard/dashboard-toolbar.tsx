@@ -31,7 +31,7 @@ export function DashboardToolbar({
   return (
     <div
       className={cn(
-        "sticky top-0 z-20 border-b border-hairline bg-[var(--background)]",
+        "sticky top-0 z-20 border-b border-[#d4e5dc] bg-[#f6faf7]",
         className,
       )}
     >
@@ -49,10 +49,10 @@ export function DashboardToolbar({
                 onClick={() => onTabChange(tab.id)}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "shrink-0 border-b-2 pb-3 pt-1 text-sm transition-colors",
+                  "shrink-0 border-b-[3px] pb-3 pt-1 text-sm transition-colors",
                   active
-                    ? "border-forest-ink font-semibold text-graphite"
-                    : "border-transparent font-medium text-slate hover:text-graphite",
+                    ? "border-[#0d4f38] font-semibold text-[#0d4f38]"
+                    : "border-transparent font-medium text-slate hover:text-[#0d4f38]",
                 )}
               >
                 {tab.label}

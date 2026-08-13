@@ -80,8 +80,8 @@ export function StatsPeriodCompact({ state, className }: StatsPeriodCompactProps
         aria-expanded={open}
         aria-haspopup="dialog"
         className={cn(
-          "inline-flex items-center gap-2 rounded-[var(--radius-sm)] border border-cloud bg-white px-3 py-1.5 text-sm text-graphite transition-colors hover:bg-veil/80",
-          open && "border-graphite/30",
+          "inline-flex items-center gap-2 border border-[#0d4f38] bg-white px-3 py-1.5 text-sm text-[#0d4f38] transition-colors hover:bg-[#e0f5ea]",
+          open && "bg-[#e0f5ea]",
         )}
       >
         <Calendar className="size-3.5 shrink-0 text-slate" aria-hidden />
@@ -101,7 +101,7 @@ export function StatsPeriodCompact({ state, className }: StatsPeriodCompactProps
         <div
           role="dialog"
           aria-label="Période d'analyse"
-          className="absolute right-0 z-50 mt-2 w-[min(100vw-2rem,320px)] animate-scale-in border border-hairline bg-white p-4 shadow-[var(--shadow-elevated)]"
+          className="absolute right-0 z-50 mt-2 w-[min(100vw-2rem,320px)] animate-scale-in border border-[#0d4f38] bg-white p-4 shadow-[var(--shadow-elevated)]"
         >
           <p className="text-xs font-semibold uppercase tracking-wide text-slate">
             Période
@@ -183,10 +183,10 @@ export function StatsPeriodCompact({ state, className }: StatsPeriodCompactProps
                         type="button"
                         onClick={() => toggleMonth(month)}
                         className={cn(
-                          "rounded-[var(--radius-sm)] px-1 py-1.5 text-xs font-medium transition-colors",
+                          "border px-1 py-1.5 text-xs font-medium transition-colors",
                           checked
-                            ? "bg-graphite text-white"
-                            : "bg-veil text-slate hover:text-graphite",
+                            ? "border-[#0d4f38] bg-[#0d4f38] text-white"
+                            : "border-[#d4e5dc] bg-white text-slate hover:border-[#0d4f38] hover:text-[#0d4f38]",
                         )}
                       >
                         {name}
@@ -201,7 +201,7 @@ export function StatsPeriodCompact({ state, className }: StatsPeriodCompactProps
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="mt-4 w-full rounded-[var(--radius-sm)] bg-graphite py-2 text-xs font-medium text-white transition-opacity hover:opacity-90"
+            className="mt-4 w-full border border-[#0d4f38] bg-[#0d4f38] py-2 text-xs font-semibold text-white transition-colors hover:bg-[#165c44]"
           >
             Appliquer
           </button>
