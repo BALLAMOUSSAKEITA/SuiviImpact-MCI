@@ -59,7 +59,14 @@ export function StatusDonutChart({
             outerRadius={outerRadius}
             paddingAngle={2}
             dataKey="value"
-            stroke="none"
+            stroke="#fff"
+            strokeWidth={2}
+            label={({ percent }) =>
+              percent != null && percent >= 0.08
+                ? `${(percent * 100).toFixed(0)} %`
+                : ""
+            }
+            labelLine={false}
           >
             {filtered.map((entry) => (
               <Cell key={entry.name} fill={entry.color} />
@@ -99,27 +106,39 @@ interface StatusLegendProps {
 
 export function StatusLegend({ items, className }: StatusLegendProps) {
   const visible = items.filter((i) => i.value > 0);
+  const total = items.reduce((sum, i) => sum + i.value, 0);
   if (visible.length === 0) return null;
 
   return (
     <ul className={className}>
-      {visible.map((item) => (
-        <li
-          key={item.name}
-          className="flex items-center justify-between gap-3 py-1.5 text-sm"
-        >
-          <span className="flex min-w-0 items-center gap-2 text-slate">
-            <span
-              className="size-2.5 shrink-0 rounded-full"
-              style={{ backgroundColor: item.color }}
-            />
-            <span className="truncate">{item.name}</span>
-          </span>
-          <span className="shrink-0 font-semibold tabular-nums text-graphite">
-            {item.value}
-          </span>
-        </li>
-      ))}
+      {visible.map((item) => {
+        const pct = total > 0 ? (item.value / total) * 100 : 0;
+        return (
+          <li
+            key={item.name}
+            className="flex items-center justify-between gap-3 py-1.5 text-sm"
+          >
+            <span className="flex min-w-0 items-center gap-2 text-slate">
+              <span
+                className="size-2.5 shrink-0 rounded-full"
+                style={{ backgroundColor: item.color }}
+              />
+              <span className="truncate">{item.name}</span>
+            </span>
+            <span className="shrink-0 text-right">
+              <span className="font-semibold tabular-nums text-graphite">
+                {item.value}
+              </span>
+              <span className="ml-2 text-xs tabular-nums text-ash">
+                {pct.toLocaleString("fr-FR", {
+                  maximumFractionDigits: 0,
+                })}{" "}
+                %
+              </span>
+            </span>
+          </li>
+        );
+      })}
     </ul>
   );
 }

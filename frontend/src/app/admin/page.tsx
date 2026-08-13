@@ -1,21 +1,21 @@
 "use client";
 
-import { useQueries, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
 import { ComparisonBarChart } from "@/components/charts/comparison-bar-chart";
 import { ChartPanel } from "@/components/charts/chart-panel";
 import { FunnelBarChart } from "@/components/charts/funnel-bar-chart";
+import { RadialStat } from "@/components/charts/radial-stat";
+import { StatusBarChart } from "@/components/charts/status-bar-chart";
 import {
-  StatusStackBar,
-} from "@/components/charts/status-stack-bar";
+  StatusDonutChart,
+  StatusLegend,
+} from "@/components/charts/status-donut-chart";
 import { DashboardToolbar } from "@/components/dashboard/dashboard-toolbar";
 import {
   DashboardSurface,
-  ExecutionGauge,
   MetricStrip,
-  ModuleOverview,
-  StatusBreakdown,
   type MetricItem,
 } from "@/components/dashboard/kpi-metric";
 import { DirectionFilter } from "@/components/direction-filter";
@@ -24,7 +24,6 @@ import { StatsQueryStatus } from "@/components/stats-query-status";
 import { useStatsPeriodState } from "@/components/stats-period-filter";
 import { BRAND } from "@/lib/brand";
 import {
-  avgProgression,
   executionStatusSlices,
   parseProgress,
   ppmFunnelSlices,
@@ -59,19 +58,18 @@ import { TrimestreFilter } from "@/components/trimestre-tabs";
 type StatsPeriodState = ReturnType<typeof useStatsPeriodState>;
 
 const views = [
-  { id: "synthese", label: "Synthèse" },
+  { id: "finances", label: "Finances" },
   { id: "activites", label: "Activités" },
   { id: "rcc", label: "RCC" },
   { id: "missions", label: "Missions" },
   { id: "ppm", label: "PPM" },
   { id: "projets", label: "Projets" },
-  { id: "finances", label: "Finances" },
 ] as const;
 
 type ViewId = (typeof views)[number]["id"];
 
 export default function AdminDashboardPage() {
-  const [currentView, setCurrentView] = useState<ViewId>("synthese");
+  const [currentView, setCurrentView] = useState<ViewId>("finances");
   const periodState = useStatsPeriodState();
 
   const [direction, setDirection] = useState<string | null>(null);
@@ -109,9 +107,7 @@ export default function AdminDashboardPage() {
         secondaryFilter={secondaryFilter}
       />
 
-      {currentView === "synthese" && (
-        <SyntheseView periodState={periodState} onNavigate={setCurrentView} />
-      )}
+      {currentView === "finances" && <FinancesView />}
       {currentView === "activites" && (
         <ActivitesView periodState={periodState} direction={direction} />
       )}
@@ -123,200 +119,7 @@ export default function AdminDashboardPage() {
       )}
       {currentView === "ppm" && <PpmView periodState={periodState} />}
       {currentView === "projets" && <ProjetsView periodState={periodState} />}
-      {currentView === "finances" && <FinancesView />}
     </div>
-  );
-}
-
-function SyntheseView({
-  periodState,
-  onNavigate,
-}: {
-  periodState: StatsPeriodState;
-  onNavigate: (view: ViewId) => void;
-}) {
-  const { params: period } = periodState;
-
-  const results = useQueries({
-    queries: [
-      {
-        queryKey: ["stats-activites", null, period],
-        queryFn: () => getStatsActivites(undefined, period),
-      },
-      {
-        queryKey: ["stats-rcc", undefined, period],
-        queryFn: () => getStatsRcc({ period }),
-      },
-      {
-        queryKey: ["stats-missions", undefined, period],
-        queryFn: () => getStatsMissions({ period }),
-      },
-      {
-        queryKey: ["stats-ppm", period],
-        queryFn: () => getStatsPpm(undefined, period),
-      },
-      {
-        queryKey: ["stats-projets", period],
-        queryFn: () => getStatsProjets({ period }),
-      },
-      {
-        queryKey: ["finances"],
-        queryFn: getFinances,
-      },
-    ],
-  });
-
-  const isLoading = results.some((r) => r.isLoading);
-  const isError = results.some((r) => r.isError);
-  const error = results.find((r) => r.error)?.error ?? null;
-
-  const activites = results[0].data;
-  const rcc = results[1].data;
-  const missions = results[2].data;
-  const ppm = results[3].data;
-  const projets = results[4].data;
-  const finances = computeFinanceStats(results[5].data?.lignes ?? []);
-
-  const totalItems =
-    (activites?.total ?? 0) +
-    (rcc?.total ?? 0) +
-    (missions?.total ?? 0) +
-    (ppm?.total ?? 0) +
-    (projets?.total ?? 0);
-
-  const avgExec = avgProgression([
-    activites?.progression ?? 0,
-    rcc?.progression ?? 0,
-    missions?.progression ?? 0,
-    ppm ? ppmProgression(ppm) : 0,
-    projets?.execution_physique ?? 0,
-  ]);
-
-  const retards = activites?.en_retard ?? 0;
-
-  const modules = [
-    activites && {
-      id: "activites",
-      title: "Activités PAO",
-      total: activites.total,
-      progression: activites.progression,
-      segments: executionStatusSlices(activites, true),
-    },
-    rcc && {
-      id: "rcc",
-      title: "Recommandations RCC",
-      total: rcc.total,
-      progression: rcc.progression,
-      segments: executionStatusSlices(rcc),
-    },
-    missions && {
-      id: "missions",
-      title: "Missions",
-      total: missions.total,
-      progression: missions.progression,
-      segments: executionStatusSlices(missions),
-    },
-  ].filter(Boolean) as {
-    id: ViewId;
-    title: string;
-    total: number;
-    progression: string;
-    segments: ReturnType<typeof executionStatusSlices>;
-  }[];
-
-  return (
-    <StatsQueryStatus isLoading={isLoading} isError={isError} error={error}>
-      <DashboardSurface>
-        <MetricStrip
-          metrics={[
-            {
-              label: "Éléments suivis",
-              value: totalItems,
-              hint: "Ensemble des modules",
-            },
-            {
-              label: "Progression moyenne",
-              value: `${avgExec} %`,
-              hint: "Taux d'exécution global",
-            },
-            {
-              label: "Activités en retard",
-              value: retards,
-              hint: "Tâches PAO dépassées",
-              emphasize: retards > 0,
-            },
-            {
-              label: "Projets actifs",
-              value: projets?.total ?? 0,
-              hint: "Suivi financier et physique",
-            },
-          ]}
-        />
-
-        <ModuleOverview
-          modules={modules}
-          onSelect={(id) => onNavigate(id as ViewId)}
-        />
-
-        <div className="grid gap-3 lg:grid-cols-2">
-          {ppm && (
-            <ChartPanel
-              title="Pipeline PPM"
-              subtitle={`${ppm.total} marché${ppm.total > 1 ? "s" : ""} sur la période`}
-              action={
-                <button
-                  type="button"
-                  onClick={() => onNavigate("ppm")}
-                  className="text-xs font-medium text-slate hover:text-graphite"
-                >
-                  Ouvrir
-                </button>
-              }
-            >
-              <FunnelBarChart data={ppmFunnelSlices(ppm)} height={220} />
-            </ChartPanel>
-          )}
-          {projets && (
-            <ChartPanel
-              title="Exécution projets"
-              subtitle="Moyennes financière et physique"
-              action={
-                <button
-                  type="button"
-                  onClick={() => onNavigate("projets")}
-                  className="text-xs font-medium text-slate hover:text-graphite"
-                >
-                  Ouvrir
-                </button>
-              }
-            >
-              <ComparisonBarChart
-                financier={projets.execution_financiere}
-                physique={projets.execution_physique}
-                height={220}
-              />
-            </ChartPanel>
-          )}
-          {finances && (
-            <ChartPanel
-              title="Répartition du budget"
-              subtitle="Part de chaque titre dans le LFI"
-              action={
-                <button
-                  type="button"
-                  onClick={() => onNavigate("finances")}
-                  className="text-xs font-medium text-slate hover:text-graphite"
-                >
-                  Ouvrir
-                </button>
-              }
-            >
-              <FinancePieChart titres={finances.titres} height={220} />
-            </ChartPanel>
-          )}
-        </div>
-      </DashboardSurface>
-    </StatsQueryStatus>
   );
 }
 
@@ -455,19 +258,40 @@ function ExecutionDashboard({
         <ChartPanel
           title="Répartition par statut"
           subtitle={`${stats.total} élément${stats.total > 1 ? "s" : ""} sur la période`}
-          className="lg:col-span-8"
+          className="lg:col-span-7"
         >
-          <StatusStackBar segments={slices} height={6} className="mb-5" />
-          <StatusBreakdown segments={slices} />
+          <div className="grid items-center gap-4 sm:grid-cols-[minmax(0,1fr)_11.5rem]">
+            <StatusDonutChart
+              data={slices}
+              height={240}
+              innerRadius={58}
+              outerRadius={92}
+              centerValue={stats.total}
+              centerLabel="Total"
+            />
+            <StatusLegend items={slices} />
+          </div>
         </ChartPanel>
 
         <ChartPanel
           title="Taux d'exécution"
-          className="lg:col-span-4"
+          subtitle="Progression globale"
+          className="lg:col-span-5"
         >
-          <ExecutionGauge value={stats.progression} label="Progression globale" />
+          <RadialStat
+            value={stats.progression}
+            label="Exécution"
+            hint="Part des éléments terminés"
+          />
         </ChartPanel>
       </div>
+
+      <ChartPanel
+        title="Volume par statut"
+        subtitle="Comparaison des effectifs"
+      >
+        <StatusBarChart data={slices} height={260} />
+      </ChartPanel>
     </DashboardSurface>
   );
 }
@@ -561,22 +385,50 @@ function PpmView({ periodState }: { periodState: StatsPeriodState }) {
 
           <div className="grid gap-3 lg:grid-cols-12">
             <ChartPanel
-              title="Cycle de passation"
-              subtitle="Progression par statut de marché"
-              className="lg:col-span-8"
+              title="Répartition des marchés"
+              subtitle={`${stats.total} marché${stats.total > 1 ? "s" : ""} sur la période`}
+              className="lg:col-span-7"
             >
-              <FunnelBarChart data={funnel} height={260} />
+              <div className="grid items-center gap-4 sm:grid-cols-[minmax(0,1fr)_12rem]">
+                <StatusDonutChart
+                  data={funnel}
+                  height={240}
+                  innerRadius={58}
+                  outerRadius={92}
+                  centerValue={stats.total}
+                  centerLabel="Marchés"
+                />
+                <StatusLegend items={funnel} />
+              </div>
             </ChartPanel>
 
             <ChartPanel
               title="Contractualisation"
-              subtitle="Part des contrats signés"
-              className="lg:col-span-4"
+              subtitle="Contrats signés / total"
+              className="lg:col-span-5"
             >
-              <ExecutionGauge
+              <RadialStat
                 value={progression}
-                label="Contrats signés / total"
+                label="Taux de contractualisation"
+                hint={`${stats.contrat_signe} contrat${stats.contrat_signe > 1 ? "s" : ""} signé${stats.contrat_signe > 1 ? "s" : ""}`}
               />
+            </ChartPanel>
+          </div>
+
+          <div className="grid gap-3 lg:grid-cols-12">
+            <ChartPanel
+              title="Cycle de passation"
+              subtitle="Progression par statut de marché"
+              className="lg:col-span-7"
+            >
+              <FunnelBarChart data={funnel} height={260} />
+            </ChartPanel>
+            <ChartPanel
+              title="Volume par statut"
+              subtitle="DAO, attribution et signature"
+              className="lg:col-span-5"
+            >
+              <StatusBarChart data={funnel} height={260} />
             </ChartPanel>
           </div>
         </DashboardSurface>
@@ -635,16 +487,40 @@ function ProjetsView({ periodState }: { periodState: StatsPeriodState }) {
               ]}
             />
 
-            <ChartPanel
-              title="Comparaison des exécutions"
-              subtitle={projetStatsScopeLabel(projetScope)}
-            >
-              <ComparisonBarChart
-                financier={stats.execution_financiere}
-                physique={stats.execution_physique}
-                height={280}
-              />
-            </ChartPanel>
+            <div className="grid gap-3 lg:grid-cols-12">
+              <ChartPanel
+                title="Jauges d'exécution"
+                subtitle={projetStatsScopeLabel(projetScope)}
+                className="lg:col-span-5"
+              >
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <RadialStat
+                    value={fin}
+                    size={140}
+                    label="Financière"
+                    hint="Décaissement"
+                  />
+                  <RadialStat
+                    value={phys}
+                    size={140}
+                    label="Physique"
+                    hint="Avancement terrain"
+                  />
+                </div>
+              </ChartPanel>
+
+              <ChartPanel
+                title="Comparaison des exécutions"
+                subtitle="Financier vs physique"
+                className="lg:col-span-7"
+              >
+                <ComparisonBarChart
+                  financier={stats.execution_financiere}
+                  physique={stats.execution_physique}
+                  height={280}
+                />
+              </ChartPanel>
+            </div>
           </DashboardSurface>
         ) : null}
       </StatsQueryStatus>

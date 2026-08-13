@@ -26,7 +26,10 @@ export function MetricStrip({ metrics, className }: MetricStripProps) {
         className,
       )}
     >
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 lg:divide-x lg:divide-cloud">
+      <div className={cn(
+        "grid sm:grid-cols-2 lg:divide-x lg:divide-cloud",
+        metrics.length >= 5 ? "lg:grid-cols-5" : "lg:grid-cols-4",
+      )}>
         {metrics.map((metric, i) => (
           <div
             key={metric.label}
