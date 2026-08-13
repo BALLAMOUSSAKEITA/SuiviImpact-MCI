@@ -11,27 +11,8 @@ import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { getFinances, importFinances } from "@/lib/api";
 import { BRAND } from "@/lib/brand";
+import { formatMontantGnf, formatTauxPct } from "@/lib/finances";
 import { cn } from "@/lib/utils";
-
-const GNF = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 });
-
-function formatMontant(value: string | null): string {
-  if (value == null || value === "") return "—";
-  const n = Number(value);
-  if (!Number.isFinite(n)) return "—";
-  return GNF.format(n);
-}
-
-function formatTaux(value: string | null): string {
-  if (value == null || value === "") return "—";
-  const n = Number(value);
-  if (!Number.isFinite(n)) return "—";
-  const pct = n <= 1.5 ? n * 100 : n;
-  return `${pct.toLocaleString("fr-FR", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })} %`;
-}
 
 function formatImportedAt(iso: string): string {
   const d = new Date(iso);
@@ -126,7 +107,7 @@ export default function FinancesPage() {
       )}
 
       <div className="table-shell overflow-x-auto">
-        <table className="table-grain min-w-[960px]">
+        <table className="table-grain min-w-[800px]">
           <thead>
             <tr>
               <th
@@ -143,15 +124,9 @@ export default function FinancesPage() {
               </th>
               <th
                 colSpan={2}
-                className="border-b border-r border-hairline px-4 py-2 text-center font-medium text-slate"
+                className="border-b border-hairline px-4 py-2 text-center font-medium text-slate"
               >
                 Taux de décaissement
-              </th>
-              <th
-                rowSpan={2}
-                className="border-b border-hairline px-4 py-3 text-left align-middle font-medium text-slate"
-              >
-                Sources d&apos;information
               </th>
             </tr>
             <tr>
@@ -167,7 +142,7 @@ export default function FinancesPage() {
               <th className="border-b border-r border-hairline px-4 py-2 text-right font-medium text-slate">
                 Base « engagement » (2)/(1)
               </th>
-              <th className="border-b border-r border-hairline px-4 py-2 text-right font-medium text-slate">
+              <th className="border-b border-hairline px-4 py-2 text-right font-medium text-slate">
                 Base « caisse » (3)/(1)
               </th>
             </tr>
@@ -175,14 +150,14 @@ export default function FinancesPage() {
           <tbody className="divide-y divide-cloud/60">
             {isLoading && (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-ash">
+                <td colSpan={6} className="px-4 py-8 text-center text-ash">
                   Chargement…
                 </td>
               </tr>
             )}
             {!isLoading && lignes.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-10 text-center text-ash">
+                <td colSpan={6} className="px-4 py-10 text-center text-ash">
                   Aucune donnée. Importez le fichier Excel de suivi budgétaire
                   {canWrite ? " via le bouton Importer." : "."}
                 </td>
@@ -198,22 +173,19 @@ export default function FinancesPage() {
               >
                 <td className="px-4 py-3 text-graphite">{ligne.titre_budget}</td>
                 <td className="px-4 py-3 text-right tabular-nums">
-                  {formatMontant(ligne.montant_prevu)}
+                  {formatMontantGnf(ligne.montant_prevu)}
                 </td>
                 <td className="px-4 py-3 text-right tabular-nums">
-                  {formatMontant(ligne.montant_engage)}
+                  {formatMontantGnf(ligne.montant_engage)}
                 </td>
                 <td className="px-4 py-3 text-right tabular-nums">
-                  {formatMontant(ligne.montant_paye)}
+                  {formatMontantGnf(ligne.montant_paye)}
                 </td>
                 <td className="px-4 py-3 text-right tabular-nums">
-                  {formatTaux(ligne.taux_engagement)}
+                  {formatTauxPct(ligne.taux_engagement)}
                 </td>
                 <td className="px-4 py-3 text-right tabular-nums">
-                  {formatTaux(ligne.taux_caisse)}
-                </td>
-                <td className="px-4 py-3 text-slate">
-                  {ligne.source_information || "—"}
+                  {formatTauxPct(ligne.taux_caisse)}
                 </td>
               </tr>
             ))}

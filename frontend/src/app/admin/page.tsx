@@ -37,13 +37,22 @@ import {
   type ProjetStatsScope,
 } from "@/lib/projet-stats-scope";
 import { ProjetStatsFilter } from "@/components/projet-stats-filter";
+import { FinanceAmountsChart } from "@/components/charts/finance-amounts-chart";
+import { FinancePieChart } from "@/components/charts/finance-pie-chart";
+import { FinanceRatesChart } from "@/components/charts/finance-rates-chart";
 import {
+  getFinances,
   getStatsActivites,
   getStatsMissions,
   getStatsPpm,
   getStatsProjets,
   getStatsRcc,
 } from "@/lib/api";
+import {
+  computeFinanceStats,
+  formatMontantGnfCompact,
+  formatTauxPct,
+} from "@/lib/finances";
 import { PPM_STATUT_LABELS } from "@/types";
 import { TrimestreFilter } from "@/components/trimestre-tabs";
 
@@ -56,6 +65,7 @@ const views = [
   { id: "missions", label: "Missions" },
   { id: "ppm", label: "PPM" },
   { id: "projets", label: "Projets" },
+  { id: "finances", label: "Finances" },
 ] as const;
 
 type ViewId = (typeof views)[number]["id"];
@@ -113,6 +123,7 @@ export default function AdminDashboardPage() {
       )}
       {currentView === "ppm" && <PpmView periodState={periodState} />}
       {currentView === "projets" && <ProjetsView periodState={periodState} />}
+      {currentView === "finances" && <FinancesView />}
     </div>
   );
 }
@@ -148,6 +159,10 @@ function SyntheseView({
         queryKey: ["stats-projets", period],
         queryFn: () => getStatsProjets({ period }),
       },
+      {
+        queryKey: ["finances"],
+        queryFn: getFinances,
+      },
     ],
   });
 
@@ -160,6 +175,7 @@ function SyntheseView({
   const missions = results[2].data;
   const ppm = results[3].data;
   const projets = results[4].data;
+  const finances = computeFinanceStats(results[5].data?.lignes ?? []);
 
   const totalItems =
     (activites?.total ?? 0) +
@@ -281,8 +297,119 @@ function SyntheseView({
               />
             </ChartPanel>
           )}
+          {finances && (
+            <ChartPanel
+              title="Répartition du budget"
+              subtitle="Part de chaque titre dans le LFI"
+              action={
+                <button
+                  type="button"
+                  onClick={() => onNavigate("finances")}
+                  className="text-xs font-medium text-slate hover:text-graphite"
+                >
+                  Ouvrir
+                </button>
+              }
+            >
+              <FinancePieChart titres={finances.titres} height={220} />
+            </ChartPanel>
+          )}
         </div>
       </DashboardSurface>
+    </StatsQueryStatus>
+  );
+}
+
+function FinancesView() {
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ["finances"],
+    queryFn: getFinances,
+  });
+
+  const stats = computeFinanceStats(data?.lignes ?? []);
+
+  return (
+    <StatsQueryStatus isLoading={isLoading} isError={isError} error={error}>
+      {stats ? (
+        <DashboardSurface>
+          <MetricStrip
+            metrics={[
+              {
+                label: "Prévu / LFI",
+                value: formatMontantGnfCompact(stats.prevu),
+                hint: "Montants en GNF",
+              },
+              {
+                label: "Engagés",
+                value: formatMontantGnfCompact(stats.engage),
+                hint: "Montants en GNF",
+              },
+              {
+                label: "Taux d'engagement",
+                value: formatTauxPct(stats.tauxEngagement),
+                hint: "Engagés / prévus",
+              },
+              {
+                label: "Taux de caisse",
+                value: formatTauxPct(stats.tauxCaisse),
+                hint: "Payés / prévus",
+              },
+            ]}
+          />
+
+          <div className="grid gap-3 lg:grid-cols-12">
+            <ChartPanel
+              title="Montants par titre"
+              subtitle="Prévus, engagés et payés"
+              className="lg:col-span-8"
+            >
+              <FinanceAmountsChart titres={stats.titres} height={280} />
+            </ChartPanel>
+
+            <ChartPanel
+              title="Décaissement"
+              subtitle="Taux globaux"
+              className="lg:col-span-4"
+            >
+              <div className="space-y-8">
+                <ExecutionGauge
+                  value={stats.tauxEngagement}
+                  label="Base engagement (2)/(1)"
+                />
+                <ExecutionGauge
+                  value={stats.tauxCaisse}
+                  label="Base caisse (3)/(1)"
+                />
+              </div>
+            </ChartPanel>
+          </div>
+
+          <div className="grid gap-3 lg:grid-cols-12">
+            <ChartPanel
+              title="Répartition des titres"
+              subtitle="Part de chaque titre dans le prévu / LFI"
+              className="lg:col-span-5"
+            >
+              <FinancePieChart titres={stats.titres} height={240} />
+            </ChartPanel>
+
+            <ChartPanel
+              title="Taux de décaissement par titre"
+              subtitle="Comparaison engagement et caisse"
+              className="lg:col-span-7"
+            >
+              <FinanceRatesChart titres={stats.titres} height={260} />
+            </ChartPanel>
+          </div>
+        </DashboardSurface>
+      ) : (
+        <DashboardSurface>
+          <p className="px-1 py-8 text-center text-sm text-slate">
+            Aucune donnée financière. Importez le fichier Excel depuis l’onglet
+            Finances du menu.
+          </p>
+        </DashboardSurface>
+      )}
     </StatsQueryStatus>
   );
 }
