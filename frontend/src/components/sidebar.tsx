@@ -30,7 +30,6 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/components/auth-provider";
 import { UserAvatar } from "@/components/user-avatar";
 import { Button } from "@/components/ui/button";
-import { BRAND } from "@/lib/brand";
 import {
   USAGE_GUIDE_PREPARE_STEP_EVENT,
   type UsageGuideStepPrepareDetail,
@@ -159,10 +158,10 @@ export function Sidebar({
 
   const navLinkClass = (active: boolean) =>
     cn(
-      "group relative flex items-center rounded-[8px] text-sm font-medium transition-colors duration-[var(--duration-fast)]",
+      "group relative flex items-center text-sm font-medium transition-colors duration-[var(--duration-fast)]",
       narrow ? "justify-center px-2 py-2.5" : "gap-3 px-3 py-2.5",
       active
-        ? "bg-pebble text-graphite"
+        ? "bg-[#e0f5ea] text-graphite"
         : "text-slate hover:bg-pebble hover:text-graphite",
     );
 
@@ -170,85 +169,72 @@ export function Sidebar({
     <aside
       data-tour-target="sidebar"
       className={cn(
-        "flex shrink-0 flex-col border-r border-hairline bg-white",
-        "fixed inset-y-0 left-0 z-50 transition-[width,transform] duration-300 ease-[var(--ease-out-expo)] lg:static lg:translate-x-0",
-        narrow ? "w-[72px]" : "w-[272px]",
+        "flex min-h-0 shrink-0 flex-col border-r border-hairline bg-white",
+        "fixed inset-y-0 left-0 z-50 transition-[width,transform] duration-300 ease-[var(--ease-out-expo)] lg:static lg:h-full lg:translate-x-0",
+        narrow ? "w-[72px]" : "w-[260px]",
         mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
       )}
     >
       {/* En-tête */}
       <div
         className={cn(
-          "border-b border-hairline",
-          narrow ? "px-2 py-4" : "px-5 py-5",
+          "flex items-center border-b border-hairline",
+          narrow ? "justify-center px-2 py-3" : "justify-between px-3 py-3",
         )}
       >
-        <div className="flex items-start justify-between gap-2">
-          <div className={cn("min-w-0 flex-1", narrow && "flex justify-center")}>
-            {narrow ? (
-              <div
-                className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-card)] bg-forest-ink text-xs font-bold text-white"
-                title={BRAND.appName}
-              >
-                SI
-              </div>
-            ) : (
-              <>
-                <p className="text-xs font-medium leading-tight text-slate">
-                  {BRAND.ministryShort}
-                </p>
-                <p className="mt-1 text-base font-semibold text-graphite tracking-tight">
-                  {BRAND.appName}
-                </p>
-                <p className="text-xs text-slate">
-                  {BRAND.bureauShort} · {BRAND.program}
-                </p>
-              </>
+        {!narrow && (
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate">
+            Navigation
+          </p>
+        )}
+        {onToggleCollapsed && (
+          <button
+            type="button"
+            onClick={onToggleCollapsed}
+            className={cn(
+              "hidden h-9 w-9 shrink-0 items-center justify-center border border-hairline text-graphite transition-colors hover:bg-pebble lg:flex",
+              narrow && "w-full",
             )}
-          </div>
-          {!narrow && onToggleCollapsed && (
-            <button
-              type="button"
-              onClick={onToggleCollapsed}
-              className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-[8px] bg-pebble text-graphite transition-colors hover:bg-hairline lg:flex"
-              aria-label="Replier le menu"
-              title="Replier le menu"
-            >
+            aria-label={narrow ? "Déplier le menu" : "Replier le menu"}
+            title={narrow ? "Déplier le menu" : "Replier le menu"}
+          >
+            {narrow ? (
+              <ChevronRight className="h-4 w-4" />
+            ) : (
               <ChevronLeft className="h-4 w-4" />
-            </button>
-          )}
-        </div>
-
-        <Link
-          href="/admin/profil"
-          onClick={onNavigate}
-          title="Mon profil"
-          aria-label="Mon profil"
-          className={cn(
-            "mt-4 flex items-center border-t border-hairline pt-4 transition-colors hover:bg-pebble rounded-[8px]",
-            narrow ? "justify-center px-1 py-2" : "gap-3 px-1 py-1",
-            pathname.startsWith("/admin/profil") && "bg-pebble",
-          )}
-        >
-          <UserAvatar
-            prenom={user?.prenom ?? ""}
-            nom={user?.nom}
-            hasAvatar={user?.has_avatar}
-            size="sm"
-          />
-          {!narrow && (
-            <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-graphite">
-                {[user?.prenom, user?.nom].filter(Boolean).join(" ") || "Profil"}
-              </p>
-              <p className="text-[11px] text-ash">
-                {user ? ROLE_LABELS[user.role] : "Mon profil"} ·{" "}
-                <span className="text-forest-ink">Voir le profil</span>
-              </p>
-            </div>
-          )}
-        </Link>
+            )}
+          </button>
+        )}
       </div>
+
+      <Link
+        href="/admin/profil"
+        onClick={onNavigate}
+        title="Mon profil"
+        aria-label="Mon profil"
+        className={cn(
+          "flex items-center border-b border-hairline transition-colors hover:bg-pebble",
+          narrow ? "justify-center px-1 py-3" : "gap-3 px-3 py-3",
+          pathname.startsWith("/admin/profil") && "bg-[#e0f5ea]",
+        )}
+      >
+        <UserAvatar
+          prenom={user?.prenom ?? ""}
+          nom={user?.nom}
+          hasAvatar={user?.has_avatar}
+          size="sm"
+        />
+        {!narrow && (
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold text-graphite">
+              {[user?.prenom, user?.nom].filter(Boolean).join(" ") || "Profil"}
+            </p>
+            <p className="text-[11px] text-ash">
+              {user ? ROLE_LABELS[user.role] : "Mon profil"}
+            </p>
+          </div>
+        )}
+      </Link>
 
       {/* Navigation */}
       <nav className={cn("flex-1 space-y-0.5 overflow-y-auto py-4", narrow ? "px-2" : "px-3")}>
@@ -289,7 +275,7 @@ export function Sidebar({
                       className={navLinkClass(sectionActive)}
                     >
                       {sectionActive && (
-                        <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-full bg-forest-ink" />
+                        <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 bg-forest-ink" />
                       )}
                       <item.icon
                         className={cn(
@@ -355,7 +341,7 @@ export function Sidebar({
                     className={cn(navLinkClass(sectionActive), "w-full")}
                   >
                     {sectionActive && (
-                      <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-full bg-forest-ink" />
+                      <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 bg-forest-ink" />
                     )}
                     <item.icon
                       className={cn(
@@ -384,7 +370,7 @@ export function Sidebar({
                             data-tour-target={href}
                             onClick={onNavigate}
                             className={cn(
-                              "flex items-center gap-2.5 rounded-[var(--radius-card)] px-2.5 py-2 text-[12.5px] font-medium transition-all duration-[var(--duration-fast)]",
+                              "flex items-center gap-2.5 px-2.5 py-2 text-[12.5px] font-medium transition-all duration-[var(--duration-fast)]",
                               childActive ? "text-forest-ink" : "text-ash hover:text-graphite",
                             )}
                           >
@@ -410,7 +396,7 @@ export function Sidebar({
                 className={navLinkClass(active)}
               >
                 {active && (
-                  <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-full bg-forest-ink" />
+                  <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 bg-forest-ink" />
                 )}
                 <item.icon
                   className={cn(
@@ -427,17 +413,6 @@ export function Sidebar({
 
       {/* Pied */}
       <div className={cn("border-t border-hairline p-3", narrow && "px-2")}>
-        {narrow && onToggleCollapsed && (
-          <button
-            type="button"
-            onClick={onToggleCollapsed}
-            className="mb-2 flex h-10 w-full items-center justify-center rounded-[8px] bg-pebble text-graphite transition-colors hover:bg-hairline"
-            aria-label="Déplier le menu"
-            title="Déplier le menu"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
-        )}
         <Button
           variant="ghost"
           className={cn(

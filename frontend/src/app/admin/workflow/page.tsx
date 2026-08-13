@@ -340,8 +340,8 @@ function WorkflowCard({
   return (
     <div
       className={cn(
-        "cursor-pointer overflow-hidden rounded-[var(--radius-card)] bg-white transition-shadow",
-        isSelected ? "shadow-[var(--shadow-subtle)] ring-1 ring-graphite/15" : "hover:bg-veil/50",
+        "cursor-pointer overflow-hidden border border-transparent bg-white transition-colors",
+        isSelected ? "border-forest-ink bg-[#e0f5ea]" : "hover:bg-veil/50",
       )}
       onClick={onSelect}
     >

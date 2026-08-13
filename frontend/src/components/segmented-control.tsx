@@ -14,7 +14,7 @@ interface SegmentedControlProps<T extends string | number | null | undefined> {
   className?: string;
 }
 
-/** Filtres et onglets segmentés (fond veil, segment actif blanc). */
+/** Filtres et onglets — style portail (bordure, segment actif vert). */
 export function SegmentedControl<T extends string | number | null | undefined>({
   value,
   onChange,
@@ -23,10 +23,7 @@ export function SegmentedControl<T extends string | number | null | undefined>({
 }: SegmentedControlProps<T>) {
   return (
     <div
-      className={cn(
-        "inline-flex flex-wrap gap-1 rounded-[var(--radius-sm)] bg-veil p-1",
-        className,
-      )}
+      className={cn("inline-flex flex-wrap border border-hairline bg-white", className)}
       role="tablist"
     >
       {options.map(({ value: optionValue, label }) => {
@@ -39,10 +36,10 @@ export function SegmentedControl<T extends string | number | null | undefined>({
             aria-selected={active}
             onClick={() => onChange(optionValue)}
             className={cn(
-              "rounded-[var(--radius-sm)] px-3 py-1.5 text-sm font-medium transition-colors",
+              "border-r border-hairline px-3 py-1.5 text-sm font-medium last:border-r-0 transition-colors",
               active
-                ? "bg-white text-graphite shadow-[var(--shadow-subtle)]"
-                : "text-slate hover:text-graphite",
+                ? "bg-[#0d4f38] text-white"
+                : "bg-white text-slate hover:bg-pebble hover:text-graphite",
             )}
           >
             {label}

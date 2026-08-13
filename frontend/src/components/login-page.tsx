@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { FlagStripe } from "@/components/flag-stripe";
 import { useAuth } from "@/components/auth-provider";
 import { BRAND } from "@/lib/brand";
 
@@ -59,11 +60,7 @@ export function LoginPage() {
 
   return (
     <div className="login-page flex min-h-screen flex-col">
-      <div className="login-flag" aria-hidden="true">
-        <span className="bg-[#ce1126]" />
-        <span className="bg-[#fcd116]" />
-        <span className="bg-[#009460]" />
-      </div>
+      <FlagStripe className="login-flag" />
 
       <header className="login-masthead">
         <div className="login-wrap login-masthead-inner">
@@ -133,7 +130,7 @@ export function LoginPage() {
           <dl className="mt-8 space-y-4 border-t border-[#d4e5dc] pt-6 text-sm">
             <div>
               <dt className="font-semibold text-[#0d4f38]">Devise nationale</dt>
-              <dd className="mt-1 text-[#4a6b5c]">Travail · Justice · Solidarité</dd>
+              <dd className="mt-1 text-[#4a6b5c]">{BRAND.motto}</dd>
             </div>
             <div>
               <dt className="font-semibold text-[#0d4f38]">Tutelle</dt>
@@ -215,7 +212,7 @@ export function LoginPage() {
       <footer className="login-footer">
         <div className="login-wrap py-5 text-center sm:text-left">
           <p className="login-serif text-sm font-semibold text-[#0d4f38]">
-            Travail · Justice · Solidarité
+            {BRAND.motto}
           </p>
           <p className="mt-1 text-xs leading-relaxed text-[#4a6b5c]">
             © {new Date().getFullYear()} {BRAND.country} — {BRAND.ministry} — {BRAND.bureau}.

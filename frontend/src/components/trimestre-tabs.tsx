@@ -17,7 +17,7 @@ export function TrimestreTabs({
   className,
 }: TrimestreTabsProps) {
   return (
-    <div className={cn("inline-flex gap-1 rounded-[var(--radius-sm)] bg-veil p-1", className)}>
+    <div className={cn("inline-flex border border-hairline bg-white", className)}>
       {[1, 2, 3, 4].map((t) => {
         const href = `${basePath}/${t}`;
         const isActive = currentTrimestre === t;
@@ -27,10 +27,10 @@ export function TrimestreTabs({
             key={t}
             href={href}
             className={cn(
-              "relative rounded-[var(--radius-sm)] px-4 py-2 text-sm font-medium transition-colors duration-[var(--duration-fast)]",
+              "border-r border-hairline px-4 py-2 text-sm font-medium last:border-r-0 transition-colors duration-[var(--duration-fast)]",
               isActive
-                ? "bg-white text-graphite shadow-[var(--shadow-subtle)]"
-                : "text-slate hover:text-graphite",
+                ? "bg-[#0d4f38] text-white"
+                : "bg-white text-slate hover:bg-pebble hover:text-graphite",
             )}
           >
             T{t}

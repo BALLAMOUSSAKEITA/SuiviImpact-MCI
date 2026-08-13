@@ -47,7 +47,7 @@ export function PageHeader({
     >
       <div className="min-w-0 space-y-1.5">
         {eyebrow && (
-          <p className="text-xs font-medium text-slate">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate">
             {eyebrow}
           </p>
         )}
@@ -55,8 +55,8 @@ export function PageHeader({
           className={cn(
             "font-display text-graphite",
             display
-              ? "text-[28px] font-bold leading-[1.2] sm:text-[32px]"
-              : "text-[24px] font-bold leading-[1.25] tracking-[-0.02em]",
+              ? "text-[1.65rem] font-semibold leading-[1.2] sm:text-[1.9rem]"
+              : "text-[1.45rem] font-semibold leading-[1.25] sm:text-[1.65rem]",
           )}
         >
           {title}

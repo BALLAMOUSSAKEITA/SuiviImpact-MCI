@@ -35,37 +35,33 @@
 
   --font-sans: var(--font-manrope), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", Roboto, sans-serif;
-  --font-display: var(--font-sans);
+  --font-display: var(--font-display-serif), "Times New Roman", Times, serif;
 
   --text-body: 0.875rem;
   --leading-body: 1.43;
   --text-ui: 1rem;
   --text-heading-sm: 1.75rem;
-  --tracking-heading-sm: -0.02em;
+  --tracking-heading-sm: 0;
   --text-heading: 2rem;
   --leading-heading: 1.21;
 
-  --section-gap: 3rem;
+  --section-gap: 2.5rem;
   --card-padding: 1.5rem;
   --element-gap: 1rem;
 
-  --radius-sm: 8px;
-  --radius-card: 16px;
-  --radius-lg: 16px;
-  --radius-image: 16px;
-  --radius-pill: 9999px;
+  --radius-sm: 2px;
+  --radius-card: 0px;
+  --radius-lg: 0px;
+  --radius-image: 0px;
+  --radius-pill: 2px;
   --radius-full: 9999px;
 
-  --shadow-subtle: rgba(13, 79, 56, 0.04) 0px 4px 5px 0px,
-    rgba(13, 79, 56, 0.03) 0px 4px 10px 0px, rgba(13, 79, 56, 0.05) 0px 10px 20px 0px;
-  --shadow-card: rgba(13, 79, 56, 0.04) 0px 4px 5px 0px,
-    rgba(13, 79, 56, 0.03) 0px 8px 15px 0px, rgba(13, 79, 56, 0.08) 0px 30px 50px 0px;
-  --shadow-elevated: rgba(13, 79, 56, 0.04) 0px 4px 5px 0px,
-    rgba(13, 79, 56, 0.03) 0px 8px 15px 0px, rgba(13, 79, 56, 0.08) 0px 30px 50px 0px;
-  --shadow-soft: rgba(13, 79, 56, 0.04) 0px 4px 5px 0px,
-    rgba(13, 79, 56, 0.03) 0px 8px 15px 0px, rgba(13, 79, 56, 0.06) 0px 15px 30px 0px;
-  --shadow-inset: rgba(13, 79, 56, 0.04) 0px 0px 12px 0px inset;
-  --shadow-glow: 0 0 0 1px rgba(0, 148, 96, 0.14);
+  --shadow-subtle: none;
+  --shadow-card: none;
+  --shadow-elevated: 0 12px 32px rgba(13, 79, 56, 0.14);
+  --shadow-soft: 0 8px 24px rgba(13, 79, 56, 0.1);
+  --shadow-inset: none;
+  --shadow-glow: 0 0 0 1px rgba(0, 148, 96, 0.18);
 
   /* ─── Animation ─── */
   --duration-fast: 150ms;
@@ -136,21 +132,21 @@ body {
 .font-display {
   font-family: var(--font-display);
   font-weight: 600;
-  letter-spacing: var(--tracking-heading-sm);
+  letter-spacing: 0;
 }
 
 /* ─── Inputs ─── */
 .input-grain {
   width: 100%;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-hairline);
-  background-color: var(--color-pebble);
-  padding: 0.625rem 1rem;
+  border-radius: 0;
+  border: 1px solid #c5d5cc;
+  background-color: var(--color-white);
+  padding: 0.625rem 0.85rem;
   font-size: var(--text-body);
   line-height: var(--leading-body);
   color: var(--color-graphite);
   outline: none;
-  transition: border-color var(--duration-fast), box-shadow var(--duration-fast), background-color var(--duration-fast);
+  transition: border-color var(--duration-fast);
 }
 
 .input-grain::placeholder {
@@ -158,13 +154,11 @@ body {
 }
 
 .input-grain:hover {
-  background-color: var(--color-white);
+  border-color: var(--color-slate);
 }
 
 .input-grain:focus {
   border-color: var(--color-forest-ink);
-  box-shadow: 0 0 0 1px var(--color-forest-ink);
-  background-color: var(--color-white);
 }
 
 .label-grain {
@@ -189,13 +183,16 @@ body {
 }
 
 .table-grain th {
-  padding: 0.75rem 1rem;
+  padding: 0.7rem 1rem;
   text-align: left;
   font-weight: 600;
-  font-size: var(--text-body);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   color: var(--color-slate);
   white-space: nowrap;
   border-bottom: 1px solid var(--color-hairline);
+  background: #f6faf7;
 }
 
 .table-grain tbody tr {
@@ -215,19 +212,17 @@ body {
 .table-shell {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  border-radius: var(--radius-card);
+  border-radius: 0;
   border: 1px solid var(--color-hairline);
   background-color: var(--color-white);
-  box-shadow: var(--shadow-subtle);
 }
 
 /* ─── Panels ─── */
 .panel-grain {
-  border-radius: var(--radius-card);
+  border-radius: 0;
   border: 1px solid var(--color-hairline);
   background-color: var(--color-white);
   padding: 1.5rem;
-  box-shadow: var(--shadow-subtle);
 }
 
 @media (min-width: 640px) {
@@ -242,13 +237,15 @@ body {
 }
 
 .overlay-panel {
-  border-radius: var(--radius-card);
+  border-radius: 0;
+  border: 1px solid var(--color-hairline);
   background-color: var(--color-white);
   box-shadow: var(--shadow-elevated);
 }
 
 .dropdown-panel {
-  border-radius: var(--radius-card);
+  border-radius: 0;
+  border: 1px solid var(--color-hairline);
   background-color: var(--color-white);
   box-shadow: var(--shadow-soft);
 }
@@ -257,13 +254,13 @@ body {
 .badge-grain {
   display: inline-flex;
   align-items: center;
-  border-radius: var(--radius-pill);
-  border: none;
-  background-color: #e6f0ff;
-  padding: 0.25rem 0.5rem;
+  border-radius: 0;
+  border: 1px solid var(--color-hairline);
+  background-color: #e0f5ea;
+  padding: 0.2rem 0.45rem;
   font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--color-deep-cobalt);
+  font-weight: 600;
+  color: var(--color-obsidian);
   transition: background-color var(--duration-fast);
 }
 
@@ -277,12 +274,18 @@ body {
 }
 
 .login-serif {
-  font-family: var(--font-login-serif), "Times New Roman", Times, serif;
+  font-family: var(--font-display);
+}
+
+.login-flag,
+.app-flag {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  height: 6px;
+  flex-shrink: 0;
 }
 
 .login-flag {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
   height: 8px;
 }
 
@@ -364,6 +367,24 @@ body {
   margin-top: auto;
   border-top: 1px solid #d4e5dc;
   background: #f6faf7;
+}
+
+/* ─── Chrome applicatif — même langage que le portail ─── */
+.app-masthead {
+  flex-shrink: 0;
+  background: #fff;
+  border-bottom: 1px solid #d4e5dc;
+}
+
+.app-banner {
+  flex-shrink: 0;
+  background: #0d4f38;
+}
+
+.app-footer-motto {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: #0d4f38;
 }
 
 /* ─── Scrollbar ─── */

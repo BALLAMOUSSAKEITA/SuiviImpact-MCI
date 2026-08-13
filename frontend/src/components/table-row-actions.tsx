@@ -22,7 +22,7 @@ export function TableRowActions({
   return (
     <div
       className={cn(
-        "table-row-actions inline-flex items-stretch overflow-hidden rounded-[var(--radius-sm)] bg-white ring-1 ring-cloud",
+        "table-row-actions inline-flex items-stretch overflow-hidden border border-hairline bg-white",
         className,
       )}
     >

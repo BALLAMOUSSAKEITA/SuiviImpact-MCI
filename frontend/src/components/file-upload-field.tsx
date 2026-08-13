@@ -34,7 +34,7 @@ export function FileUploadField({
       {label && <label className="label-grain">{label}</label>}
       <div
         className={cn(
-          "mt-1 rounded-[var(--radius-card)] border border-dashed border-cloud bg-white p-4 transition-colors",
+          "mt-1 border border-dashed border-cloud bg-white p-4 transition-colors",
           !disabled && "hover:bg-veil",
           disabled && "opacity-60",
         )}

@@ -101,7 +101,7 @@ export function StatsPeriodCompact({ state, className }: StatsPeriodCompactProps
         <div
           role="dialog"
           aria-label="Période d'analyse"
-          className="absolute right-0 z-50 mt-2 w-[min(100vw-2rem,320px)] animate-scale-in rounded-[var(--radius-card)] border border-cloud bg-white p-4 shadow-[var(--shadow-elevated)]"
+          className="absolute right-0 z-50 mt-2 w-[min(100vw-2rem,320px)] animate-scale-in border border-hairline bg-white p-4 shadow-[var(--shadow-elevated)]"
         >
           <p className="text-xs font-semibold uppercase tracking-wide text-slate">
             Période

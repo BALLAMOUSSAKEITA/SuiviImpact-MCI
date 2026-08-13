@@ -25,10 +25,10 @@ export default function StatsHubPage() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {DASHBOARDS.map(({ href, label, desc, icon: Icon }) => (
           <Link key={href} href={href} className="group block">
-            <Card className="h-full p-4 transition-shadow sm:p-5 group-hover:shadow-[var(--shadow-subtle)]">
+            <Card className="h-full p-4 transition-colors sm:p-5 group-hover:border-forest-ink">
               <CardHeader className="p-0 pb-2">
                 <CardTitle className="flex items-center gap-3">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-sm)] bg-veil text-graphite">
+                  <span className="flex h-10 w-10 items-center justify-center border border-hairline bg-[#e0f5ea] text-graphite">
                     <Icon className="h-[18px] w-[18px]" strokeWidth={1.75} />
                   </span>
                   {label}

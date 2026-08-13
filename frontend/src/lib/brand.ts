@@ -15,4 +15,5 @@ export const BRAND = {
     "Plateforme de gestion et de suivi d'impact des politiques publiques du gouvernement.",
   loginSubtitle:
     "Accès réservé aux agents du Ministère de l'Industrie et du Commerce et aux partenaires habilités du BSD.",
+  motto: "Travail · Justice · Solidarité",
 } as const;

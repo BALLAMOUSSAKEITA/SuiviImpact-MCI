@@ -22,7 +22,7 @@ export function MetricStrip({ metrics, className }: MetricStripProps) {
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-[var(--radius-card)] border border-hairline bg-white shadow-[var(--shadow-subtle)]",
+        "overflow-hidden rounded-none border border-hairline bg-white",
         className,
       )}
     >
@@ -40,7 +40,7 @@ export function MetricStrip({ metrics, className }: MetricStripProps) {
             <p className="text-xs font-medium text-slate">{metric.label}</p>
             <p
               className={cn(
-                "mt-1 text-[1.625rem] font-semibold tabular-nums leading-none tracking-tight",
+                "mt-1 font-display text-[1.625rem] font-semibold tabular-nums leading-none",
                 metric.emphasize ? "text-[#c0392b]" : "text-graphite",
               )}
             >
@@ -77,7 +77,7 @@ export function ModuleOverview({
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-[var(--radius-card)] border border-hairline bg-white shadow-[var(--shadow-subtle)]",
+        "overflow-hidden rounded-none border border-hairline bg-white",
         className,
       )}
     >
@@ -145,7 +145,7 @@ export function ExecutionGauge({ value, label, className }: ExecutionGaugeProps)
     <div className={cn("flex h-full flex-col justify-center", className)}>
       <p className="text-xs font-medium text-slate">{label}</p>
       <div className="mt-2 flex items-baseline gap-0.5">
-        <span className="text-[2.75rem] font-semibold tabular-nums leading-none tracking-tight text-graphite">
+        <span className="font-display text-[2.75rem] font-semibold tabular-nums leading-none text-graphite">
           {pct.toFixed(0)}
         </span>
         <span className="text-lg font-medium text-slate">%</span>

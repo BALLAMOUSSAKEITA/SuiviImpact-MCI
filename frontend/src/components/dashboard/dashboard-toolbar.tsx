@@ -31,7 +31,7 @@ export function DashboardToolbar({
   return (
     <div
       className={cn(
-        "sticky top-0 z-20 -mx-1 border-b border-hairline bg-[var(--background)]/95 px-1 backdrop-blur-sm sm:-mx-0 sm:px-0",
+        "sticky top-0 z-20 -mx-1 border-b border-hairline bg-[var(--background)] px-1 sm:-mx-0 sm:px-0",
         className,
       )}
     >

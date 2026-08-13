@@ -21,7 +21,7 @@ export function StatsQueryStatus({
   }
   if (isError) {
     return (
-      <p className="rounded-[var(--radius-card)] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+      <p className="border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
         Impossible de charger les statistiques
         {error?.message ? ` : ${error.message}` : "."}
       </p>

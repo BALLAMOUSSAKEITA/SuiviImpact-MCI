@@ -170,7 +170,7 @@ export function DetailDrawer({
         aria-modal="true"
         aria-labelledby="detail-drawer-title"
         className={cn(
-          "overlay-panel relative flex max-h-[92vh] w-full flex-col overflow-hidden rounded-t-[var(--radius-card)] sm:max-h-[min(88vh,780px)] sm:rounded-[var(--radius-card)] animate-scale-in",
+          "overlay-panel relative flex max-h-[92vh] w-full flex-col overflow-hidden sm:max-h-[min(88vh,780px)] animate-scale-in",
           size === "wide" ? "sm:max-w-2xl" : "sm:max-w-xl",
         )}
       >
@@ -178,7 +178,7 @@ export function DetailDrawer({
           <button
             type="button"
             aria-label="Fermer"
-            className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full bg-veil text-graphite transition-colors hover:bg-cloud sm:right-4 sm:top-4"
+            className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center border border-hairline bg-white text-graphite transition-colors hover:bg-pebble sm:right-4 sm:top-4"
             onClick={onClose}
           >
             <X className="h-5 w-5" strokeWidth={1.75} />

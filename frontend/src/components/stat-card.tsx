@@ -53,7 +53,7 @@ export function StatCard({
       <CardContent className="p-0">
         <p
           className={cn(
-            "text-[1.625rem] font-semibold tabular-nums leading-none tracking-tight",
+            "font-display text-[1.625rem] font-semibold tabular-nums leading-none",
             VALUE_STYLES[accent],
           )}
         >

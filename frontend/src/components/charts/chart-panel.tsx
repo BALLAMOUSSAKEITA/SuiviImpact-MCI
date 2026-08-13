@@ -18,13 +18,13 @@ export function ChartPanel({
   return (
     <section
       className={cn(
-        "flex flex-col rounded-[var(--radius-card)] border border-hairline bg-white px-5 py-4 shadow-[var(--shadow-subtle)]",
+        "flex flex-col border border-hairline bg-white px-5 py-4",
         className,
       )}
     >
       <header className="mb-4 flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="text-sm font-medium text-graphite">{title}</h3>
+          <h3 className="font-display text-sm font-semibold text-graphite">{title}</h3>
           {subtitle && (
             <p className="mt-0.5 truncate text-xs text-slate">{subtitle}</p>
           )}

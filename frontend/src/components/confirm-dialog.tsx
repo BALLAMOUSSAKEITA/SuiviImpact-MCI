@@ -20,7 +20,7 @@ interface ConfirmDialogProps {
 
 function DialogIcon({ variant }: { variant: ConfirmDialogProps["variant"] }) {
   const base =
-    "flex h-11 w-11 shrink-0 items-center justify-center rounded-full";
+    "flex h-11 w-11 shrink-0 items-center justify-center";
   if (variant === "destructive") {
     return (
       <div className={cn(base, "bg-red-50 text-red-600")}>
@@ -75,7 +75,7 @@ export function ConfirmDialog({
           <div className="flex gap-4">
             <DialogIcon variant={variant} />
             <div className="min-w-0 flex-1 pt-0.5">
-              <h2 id="confirm-dialog-title" className="text-base font-semibold text-graphite">
+              <h2 id="confirm-dialog-title" className="font-display text-lg font-semibold text-graphite">
                 {title}
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-slate">{description}</p>
