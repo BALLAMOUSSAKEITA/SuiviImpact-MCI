@@ -69,7 +69,7 @@ export function LoginPage() {
         <div className="login-wrap login-masthead-inner">
           <div className="flex min-w-0 items-center gap-4">
             <Image
-              src="/branding/embleme-guinee.jpg"
+              src="/branding/armoiries-guinee.jpg"
               alt="Armoiries de la République de Guinée"
               width={72}
               height={80}
