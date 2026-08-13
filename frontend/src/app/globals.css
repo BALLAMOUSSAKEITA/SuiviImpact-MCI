@@ -87,11 +87,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-::selection {
-  background: #0d4f38;
-  color: #fff;
-}
-
 /* ─── Animations ─── */
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(6px); }
@@ -163,8 +158,7 @@ body {
 }
 
 .input-grain:focus {
-  border-color: #0d4f38;
-  box-shadow: inset 0 0 0 1px #0d4f38;
+  border-color: var(--color-forest-ink);
 }
 
 .label-grain {
@@ -185,7 +179,7 @@ body {
 }
 
 .table-grain thead {
-  background: #0d4f38;
+  background: #f6faf7;
 }
 
 .table-grain th {
@@ -193,12 +187,12 @@ body {
   text-align: left;
   font-weight: 600;
   font-size: 0.75rem;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #ffffff;
+  color: #0d4f38;
   white-space: nowrap;
-  border-bottom: none;
-  background: #0d4f38;
+  border-bottom: 1px solid var(--color-hairline);
+  background: #f6faf7;
 }
 
 .table-grain tbody tr {
@@ -207,15 +201,7 @@ body {
 }
 
 .table-grain tbody tr:hover {
-  background-color: #e0f5ea;
-}
-
-.table-grain tbody tr:nth-child(even) {
-  background-color: #f6faf7;
-}
-
-.table-grain tbody tr:nth-child(even):hover {
-  background-color: #e0f5ea;
+  background-color: var(--color-veil);
 }
 
 .table-grain td {
@@ -223,22 +209,18 @@ body {
   color: var(--color-graphite);
 }
 
-.table-grain td:first-child {
-  font-weight: 600;
-}
-
 .table-shell {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   border-radius: 0;
-  border: 1px solid #0d4f38;
+  border: 1px solid var(--color-hairline);
   background-color: var(--color-white);
 }
 
 /* ─── Panels ─── */
 .panel-grain {
   border-radius: 0;
-  border: 1px solid #d4e5dc;
+  border: 1px solid var(--color-hairline);
   background-color: var(--color-white);
   padding: 1.5rem 1.5rem 1.35rem;
 }
@@ -256,14 +238,14 @@ body {
 
 .overlay-panel {
   border-radius: 0;
-  border: 1px solid #0d4f38;
+  border: 1px solid var(--color-hairline);
   background-color: var(--color-white);
   box-shadow: var(--shadow-elevated);
 }
 
 .dropdown-panel {
   border-radius: 0;
-  border: 1px solid #0d4f38;
+  border: 1px solid var(--color-hairline);
   background-color: var(--color-white);
   box-shadow: var(--shadow-soft);
 }
@@ -307,7 +289,7 @@ body {
 }
 
 .app-flag {
-  height: 6px;
+  height: 5px;
 }
 
 .login-wrap {
@@ -336,7 +318,6 @@ body {
 
 .login-form {
   border: 1px solid #d4e5dc;
-  border-top: 3px solid #0d4f38;
   background: #fff;
   padding: 1.75rem 1.5rem;
 }
@@ -387,7 +368,7 @@ body {
 
 .login-footer {
   margin-top: auto;
-  border-top: 3px solid #0d4f38;
+  border-top: 1px solid #d4e5dc;
   background: #f6faf7;
 }
 
@@ -395,7 +376,7 @@ body {
 .app-masthead {
   flex-shrink: 0;
   background: #fff;
-  border-bottom: 3px solid #0d4f38;
+  border-bottom: 1px solid #d4e5dc;
 }
 
 .app-footer-motto {

@@ -26,7 +26,7 @@ export function StatusStackBar({
   if (total === 0) {
     return (
       <div
-        className={cn("w-full bg-[#d4e5dc]", className)}
+        className={cn("w-full rounded-full bg-cloud/80", className)}
         style={{ height }}
       />
     );
@@ -34,7 +34,7 @@ export function StatusStackBar({
 
   return (
     <div
-      className={cn("flex w-full overflow-hidden", className)}
+      className={cn("flex w-full overflow-hidden rounded-full", className)}
       style={{ height }}
       role="img"
       aria-label="Répartition par statut"
@@ -79,7 +79,7 @@ export function StatusStackLegend({
       {visible.map((seg) => (
         <li key={seg.name} className="flex items-center gap-1.5 text-slate">
           <span
-            className="size-2 shrink-0"
+            className="size-2 shrink-0 rounded-full"
             style={{ backgroundColor: seg.color }}
           />
           <span className="truncate">{seg.name}</span>

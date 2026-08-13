@@ -161,8 +161,8 @@ export function Sidebar({
       "group relative flex items-center text-[13.5px] transition-colors duration-[var(--duration-fast)]",
       narrow ? "justify-center px-2 py-2.5" : "gap-3 px-4 py-2.5",
       active
-        ? "bg-[#0d4f38] font-semibold text-white"
-        : "font-medium text-slate hover:bg-[#e8f6ef] hover:text-[#0d4f38]",
+        ? "bg-[#e0f5ea] font-semibold text-graphite"
+        : "font-medium text-slate hover:bg-[#e0f5ea]/50 hover:text-graphite",
     );
 
   return (
@@ -175,28 +175,9 @@ export function Sidebar({
         mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
       )}
     >
-      <div
-        className={cn(
-          "flex items-center bg-[#0d4f38] text-white",
-          narrow ? "justify-center px-2 py-2.5" : "justify-between px-4 py-2.5",
-        )}
-      >
-        {!narrow && (
-          <p className="font-display text-[13px] font-semibold tracking-wide">
-            {mobileOpen ? BRAND.appName : "Menu"}
-          </p>
-        )}
-        {onToggleCollapsed && (
-          <button
-            type="button"
-            onClick={onToggleCollapsed}
-            className="hidden h-7 w-7 items-center justify-center text-white/80 transition-colors hover:bg-white/10 hover:text-white lg:flex"
-            aria-label={narrow ? "Déplier le menu" : "Replier le menu"}
-            title={narrow ? "Déplier le menu" : "Replier le menu"}
-          >
-            {narrow ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-          </button>
-        )}
+      <div className="border-b border-hairline px-4 py-3 lg:hidden">
+        <p className="font-display text-base font-semibold text-graphite">{BRAND.appName}</p>
+        <p className="text-[12px] text-slate">Menu</p>
       </div>
 
       {/* Navigation */}
@@ -237,10 +218,13 @@ export function Sidebar({
                       }
                       className={navLinkClass(sectionActive)}
                     >
+                      {sectionActive && (
+                        <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 bg-forest-ink" />
+                      )}
                       <item.icon
                         className={cn(
                           "h-[18px] w-[18px] shrink-0",
-                          sectionActive ? "text-white" : "text-[#7a9588] group-hover:text-[#0d4f38]",
+                          sectionActive ? "text-forest-ink" : "text-ash group-hover:text-slate",
                         )}
                         strokeWidth={sectionActive ? 2.25 : 1.75}
                       />
@@ -300,18 +284,20 @@ export function Sidebar({
                     }
                     className={cn(navLinkClass(sectionActive), "w-full")}
                   >
+                    {sectionActive && (
+                      <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 bg-forest-ink" />
+                    )}
                     <item.icon
                       className={cn(
                         "h-[18px] w-[18px] shrink-0 transition-colors",
-                        sectionActive ? "text-white" : "text-[#7a9588] group-hover:text-[#0d4f38]",
+                        sectionActive ? "text-forest-ink" : "text-ash group-hover:text-slate",
                       )}
                       strokeWidth={sectionActive ? 2.25 : 1.75}
                     />
                     <span className="flex-1 text-left">{item.label}</span>
                     <ChevronDown
                       className={cn(
-                        "h-4 w-4 shrink-0 transition-transform duration-200",
-                        sectionActive ? "text-white/70" : "text-ash",
+                        "h-4 w-4 shrink-0 text-ash transition-transform duration-200",
                         isOpen && "rotate-180",
                       )}
                     />
@@ -328,10 +314,8 @@ export function Sidebar({
                             data-tour-target={href}
                             onClick={onNavigate}
                             className={cn(
-                              "relative flex items-center gap-2.5 px-2.5 py-2 text-[12.5px] font-medium transition-all duration-[var(--duration-fast)]",
-                              childActive
-                                ? "bg-[#e0f5ea] font-semibold text-[#0d4f38]"
-                                : "text-ash hover:bg-[#e0f5ea]/50 hover:text-graphite",
+                              "flex items-center gap-2.5 px-2.5 py-2 text-[12.5px] font-medium transition-all duration-[var(--duration-fast)]",
+                              childActive ? "bg-[#e0f5ea] text-forest-ink" : "text-ash hover:bg-[#e0f5ea]/50 hover:text-graphite",
                             )}
                           >
                             <ChildIcon className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
@@ -355,10 +339,13 @@ export function Sidebar({
                 title={narrow ? item.label : undefined}
                 className={navLinkClass(active)}
               >
+                {active && (
+                  <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 bg-forest-ink" />
+                )}
                 <item.icon
                   className={cn(
                     "h-[18px] w-[18px] shrink-0 transition-colors",
-                    active ? "text-white" : "text-[#7a9588] group-hover:text-[#0d4f38]",
+                    active ? "text-forest-ink" : "text-ash group-hover:text-slate",
                   )}
                   strokeWidth={active ? 2.25 : 1.75}
                 />
@@ -370,6 +357,27 @@ export function Sidebar({
 
       {/* Pied */}
       <div className={cn("border-t border-hairline p-2", narrow && "px-1.5")}>
+        {onToggleCollapsed && (
+          <button
+            type="button"
+            onClick={onToggleCollapsed}
+            className={cn(
+              "mb-1 hidden h-10 items-center text-[13px] font-medium text-slate transition-colors hover:bg-[#f6faf7] hover:text-graphite lg:flex",
+              narrow ? "w-full justify-center px-0" : "w-full justify-start gap-2.5 px-3",
+            )}
+            aria-label={narrow ? "Déplier le menu" : "Replier le menu"}
+            title={narrow ? "Déplier le menu" : "Replier le menu"}
+          >
+            {narrow ? (
+              <ChevronRight className="h-4 w-4" />
+            ) : (
+              <>
+                <ChevronLeft className="h-4 w-4 shrink-0" />
+                Replier le menu
+              </>
+            )}
+          </button>
+        )}
         <Button
           variant="ghost"
           className={cn(

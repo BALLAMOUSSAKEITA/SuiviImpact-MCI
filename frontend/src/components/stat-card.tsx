@@ -12,13 +12,13 @@ export type StatAccent =
   | "alert";
 
 const VALUE_STYLES: Record<StatAccent, string> = {
-  default: "text-[#0d4f38]",
-  forest: "text-[#0d4f38]",
-  sky: "text-[#0d4f38]",
-  mint: "text-[#0d4f38]",
-  peach: "text-[#0d4f38]",
-  lavender: "text-[#0d4f38]",
-  alert: "text-[#ce1126]",
+  default: "text-graphite",
+  forest: "text-graphite",
+  sky: "text-graphite",
+  mint: "text-graphite",
+  peach: "text-graphite",
+  lavender: "text-graphite",
+  alert: "text-[#c0392b]",
 };
 
 interface StatCardProps {
@@ -43,14 +43,12 @@ export function StatCard({
   return (
     <Card
       className={cn(
-        "border border-[#d4e5dc] border-l-[3px] border-l-[#0d4f38] p-4 sm:p-5",
+        "border border-hairline p-4 sm:p-5",
         className,
       )}
     >
       <CardHeader className="space-y-0 p-0 pb-2">
-        <CardTitle className="text-[11px] font-semibold uppercase tracking-[0.08em] text-slate">
-          {title}
-        </CardTitle>
+        <CardTitle className="text-xs font-medium text-slate">{title}</CardTitle>
       </CardHeader>
       <CardContent className="p-0">
         <p

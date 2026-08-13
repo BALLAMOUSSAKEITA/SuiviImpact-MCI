@@ -275,17 +275,17 @@ export default function WorkflowPage() {
 
 function StepNode({ step }: { step: WorkflowStep }) {
   const statusStyles: Record<StepStatus, string> = {
-    done: "border-[#0d4f38] bg-[#0d4f38] text-white",
-    active: "border-[#0d4f38] bg-white text-[#0d4f38]",
-    waiting: "border-[#d4e5dc] bg-white text-[#9bb5a8]",
-    rejected: "border-[#ce1126] bg-[#fdecea] text-[#ce1126]",
+    done: "border-forest-ink bg-forest-ink text-white",
+    active: "border-forest-ink bg-white text-forest-ink shadow-[0_0_0_4px_rgba(0,153,89,0.08)]",
+    waiting: "border-mist bg-white text-mist",
+    rejected: "border-amber-500 bg-amber-50 text-amber-600 shadow-[0_0_0_4px_rgba(245,158,11,0.08)]",
   };
 
   return (
     <div className="flex flex-col items-center gap-2">
       <div
         className={cn(
-          "flex h-10 w-10 items-center justify-center border-2 transition-all",
+          "flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all",
           statusStyles[step.status],
         )}
       >
@@ -300,10 +300,10 @@ function StepNode({ step }: { step: WorkflowStep }) {
         <p
           className={cn(
             "text-[11px] font-semibold leading-tight",
-            step.status === "done" && "text-[#009460]",
-            step.status === "active" && "text-[#0d4f38]",
+            step.status === "done" && "text-forest-ink",
+            step.status === "active" && "text-graphite",
             step.status === "waiting" && "text-ash",
-            step.status === "rejected" && "text-[#ce1126]",
+            step.status === "rejected" && "text-amber-600",
           )}
         >
           {WORKFLOW_ROLE_LABELS[step.role]}
@@ -341,21 +341,21 @@ function WorkflowCard({
     <div
       className={cn(
         "cursor-pointer overflow-hidden border border-transparent bg-white transition-colors",
-        isSelected ? "border-[#0d4f38] bg-[#e0f5ea]" : "border-[#d4e5dc] hover:border-[#0d4f38]",
+        isSelected ? "border-forest-ink bg-[#e0f5ea]" : "hover:bg-veil/50",
       )}
       onClick={onSelect}
     >
       <div className="flex items-center justify-between gap-4 border-b border-cloud px-5 py-3">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <span className="shrink-0 border border-[#d4e5dc] bg-[#f6faf7] px-2 py-0.5 text-xs font-semibold text-[#0d4f38]">
+            <span className="shrink-0 rounded-[var(--radius-pill)] bg-veil px-2 py-0.5 text-xs font-semibold text-graphite">
               {workflow.ref}
             </span>
-            <span className="shrink-0 border border-[#d4e5dc] bg-white px-2 py-0.5 text-xs font-medium text-[#4a6b5c]">
+            <span className="shrink-0 rounded-[var(--radius-pill)] bg-veil px-2 py-0.5 text-xs font-medium text-slate">
               {workflow.type}
             </span>
             {workflow.status === "rejete" && (
-              <span className="shrink-0 border border-[#ce1126] bg-[#fdecea] px-2 py-0.5 text-[10px] font-semibold text-[#ce1126]">
+              <span className="shrink-0 rounded-[var(--radius-pill)] bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-600">
                 Retourné
               </span>
             )}
@@ -559,22 +559,22 @@ function WorkflowDetailPanel({
           <div
             key={step.id}
             className={cn(
-              "p-4",
-              step.status === "active" && "border border-[#0d4f38] bg-[#e0f5ea]",
-              step.status === "done" && "border border-[#d4e5dc] bg-white",
-              step.status === "waiting" && "border border-[#d4e5dc] bg-white opacity-60",
-              step.status === "rejected" && "border border-[#ce1126] bg-[#fdecea]",
+              "rounded-[var(--radius-sm)] p-4",
+              step.status === "active" && "bg-veil ring-1 ring-cloud",
+              step.status === "done" && "bg-white ring-1 ring-cloud",
+              step.status === "waiting" && "bg-white opacity-60 ring-1 ring-cloud",
+              step.status === "rejected" && "bg-amber-50/80 ring-1 ring-amber-200",
             )}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span
                   className={cn(
-                    "flex h-6 w-6 items-center justify-center text-[10px] font-bold",
-                    step.status === "done" && "bg-[#0d4f38] text-white",
-                    step.status === "active" && "bg-[#0d4f38] text-white",
-                    step.status === "waiting" && "bg-[#d4e5dc] text-[#4a6b5c]",
-                    step.status === "rejected" && "bg-[#ce1126] text-white",
+                    "flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold",
+                    step.status === "done" && "bg-forest-ink text-white",
+                    step.status === "active" && "bg-forest-ink/10 text-forest-ink",
+                    step.status === "waiting" && "bg-mist/50 text-ash",
+                    step.status === "rejected" && "bg-amber-100 text-amber-600",
                   )}
                 >
                   {step.ordre}
@@ -672,7 +672,8 @@ function WorkflowDetailPanel({
               </Button>
               <Button
                 size="sm"
-                variant="destructive"
+                variant="outline"
+                className="border-amber-300 text-amber-600 hover:bg-amber-50"
                 onClick={() => setActionMode("reject")}
               >
                 <RotateCcw className="h-3.5 w-3.5" /> Retourner

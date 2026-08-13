@@ -70,7 +70,7 @@ export function StoredDocumentMenu({
           e.stopPropagation();
           setOpen((v) => !v);
         }}
-        className="inline-flex max-w-full items-center gap-2 border border-[#d4e5dc] bg-white px-3 py-1.5 text-left text-sm font-medium text-[#0d4f38] transition-colors hover:border-[#0d4f38] hover:bg-[#e0f5ea]"
+        className="inline-flex max-w-full items-center gap-2 rounded-[var(--radius-pill)] bg-veil px-3 py-1.5 text-left text-sm font-medium text-graphite transition-colors hover:bg-cloud"
         title={label}
       >
         <FileText className="h-4 w-4 shrink-0" strokeWidth={1.75} />
@@ -162,7 +162,7 @@ export function DetailDrawer({
       <button
         type="button"
         aria-label="Fermer le détail"
-        className="absolute inset-0 bg-[#0d4f38]/55"
+        className="absolute inset-0 bg-obsidian/40 backdrop-blur-[3px]"
         onClick={onClose}
       />
       <div
@@ -170,15 +170,15 @@ export function DetailDrawer({
         aria-modal="true"
         aria-labelledby="detail-drawer-title"
         className={cn(
-          "relative flex max-h-[92vh] w-full flex-col overflow-hidden border border-[#0d4f38] bg-white shadow-[var(--shadow-elevated)] sm:max-h-[min(88vh,780px)] animate-scale-in",
+          "overlay-panel relative flex max-h-[92vh] w-full flex-col overflow-hidden sm:max-h-[min(88vh,780px)] animate-scale-in",
           size === "wide" ? "sm:max-w-2xl" : "sm:max-w-xl",
         )}
       >
-        <header className="relative shrink-0 bg-[#0d4f38] px-5 py-4 sm:px-6">
+        <header className="relative shrink-0 border-b border-cloud px-5 pb-4 pt-5 sm:px-6 sm:pt-6">
           <button
             type="button"
             aria-label="Fermer"
-            className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center text-white/80 transition-colors hover:bg-white/10 hover:text-white sm:right-4 sm:top-4"
+            className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center border border-hairline bg-white text-graphite transition-colors hover:bg-pebble sm:right-4 sm:top-4"
             onClick={onClose}
           >
             <X className="h-5 w-5" strokeWidth={1.75} />
@@ -186,16 +186,18 @@ export function DetailDrawer({
 
           <div className="pr-10">
             {eyebrow && (
-              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/65">
-                {eyebrow}
-              </p>
+              <p className="text-xs font-medium text-slate">{eyebrow}</p>
             )}
-            {subtitle && (
-              <p className="mt-1 text-xs font-semibold text-white/80">{subtitle}</p>
-            )}
+            <div className="mt-1 flex flex-wrap items-center gap-2">
+              {subtitle && (
+                <span className="inline-flex rounded-[var(--radius-pill)] bg-veil px-2.5 py-0.5 text-xs font-semibold text-graphite">
+                  {subtitle}
+                </span>
+              )}
+            </div>
             <h2
               id="detail-drawer-title"
-              className="mt-2 font-display text-xl font-semibold leading-snug text-white sm:text-[1.35rem]"
+              className="mt-3 font-display text-xl font-semibold leading-snug text-graphite sm:text-[1.35rem]"
             >
               {title}
             </h2>

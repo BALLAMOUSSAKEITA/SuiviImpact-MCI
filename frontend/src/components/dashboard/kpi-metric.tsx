@@ -22,7 +22,7 @@ export function MetricStrip({ metrics, className }: MetricStripProps) {
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-none border border-[#0d4f38] bg-white",
+        "overflow-hidden rounded-none border border-hairline bg-white",
         className,
       )}
     >
@@ -40,8 +40,8 @@ export function MetricStrip({ metrics, className }: MetricStripProps) {
             <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-slate">{metric.label}</p>
             <p
               className={cn(
-                "mt-1.5 font-display text-[1.75rem] font-semibold tabular-nums leading-none",
-                metric.emphasize ? "text-[#ce1126]" : "text-[#0d4f38]",
+                "mt-1 font-display text-[1.625rem] font-semibold tabular-nums leading-none",
+                metric.emphasize ? "text-[#ce1126]" : "text-forest-ink",
               )}
             >
               {metric.value}
@@ -77,11 +77,11 @@ export function ModuleOverview({
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-none border border-[#0d4f38] bg-white",
+        "overflow-hidden rounded-none border border-hairline bg-white",
         className,
       )}
     >
-      <div className="hidden border-b border-[#0d4f38] bg-[#0d4f38] px-6 py-2.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-white md:grid md:grid-cols-[minmax(0,1.4fr)_4.5rem_4.5rem_minmax(0,1fr)_1.25rem] md:gap-4">
+      <div className="hidden border-b border-cloud bg-[#f6faf7] px-6 py-2.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate md:grid md:grid-cols-[minmax(0,1.4fr)_4.5rem_4.5rem_minmax(0,1fr)_1.25rem] md:gap-4">
         <span>Module</span>
         <span className="text-right">Total</span>
         <span className="text-right">Exec.</span>
@@ -150,9 +150,9 @@ export function ExecutionGauge({ value, label, className }: ExecutionGaugeProps)
         </span>
         <span className="text-lg font-medium text-slate">%</span>
       </div>
-      <div className="mt-5 h-[3px] w-full overflow-hidden bg-[#d4e5dc]">
+      <div className="mt-5 h-1 w-full overflow-hidden rounded-full bg-cloud">
         <div
-          className="h-full bg-[#0d4f38] transition-[width] duration-500 ease-[var(--ease-out-expo)]"
+          className="h-full rounded-full bg-forest-ink transition-[width] duration-500 ease-[var(--ease-out-expo)]"
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -179,7 +179,7 @@ export function StatusBreakdown({ segments, className }: StatusBreakdownProps) {
   return (
     <div
       className={cn(
-        "grid gap-px overflow-hidden border border-[#0d4f38] bg-[#d4e5dc] sm:grid-cols-2",
+        "grid gap-px overflow-hidden rounded-[var(--radius-sm)] border border-cloud bg-cloud sm:grid-cols-2",
         className,
       )}
     >
@@ -187,7 +187,7 @@ export function StatusBreakdown({ segments, className }: StatusBreakdownProps) {
         <div key={seg.name} className="bg-white px-4 py-3">
           <div className="flex items-center gap-2">
             <span
-              className="size-2 shrink-0"
+              className="size-2 shrink-0 rounded-full"
               style={{ backgroundColor: seg.color }}
             />
             <span className="text-xs text-slate">{seg.name}</span>

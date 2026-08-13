@@ -11,15 +11,15 @@ export function ExecutionBadge({ value, className }: ExecutionBadgeProps) {
   const pct = typeof value === "string" ? parseFloat(value) : value;
   const color =
     pct >= 100
-      ? "border-[#009460] bg-[#e0f5ea] text-[#0d4f38]"
+      ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
       : pct >= 50
-        ? "border-[#0d4f38] bg-white text-[#0d4f38]"
-        : "border-[#ce1126] bg-[#fdecea] text-[#ce1126]";
+        ? "bg-amber-50 text-amber-700 ring-1 ring-amber-200"
+        : "bg-red-50 text-red-700 ring-1 ring-red-200";
 
   return (
     <span
       className={cn(
-        "inline-flex border px-2 py-0.5 text-xs font-semibold tabular-nums",
+        "inline-flex px-2 py-0.5 text-xs font-semibold tabular-nums",
         color,
         className,
       )}
@@ -36,15 +36,15 @@ interface TacheStatutBadgeProps {
 
 export function TacheStatutBadge({ statut, className }: TacheStatutBadgeProps) {
   const colors: Record<TacheStatut, string> = {
-    en_cours: "border-[#009460] bg-[#e0f5ea] text-[#0d4f38]",
-    terminee: "border-[#0d4f38] bg-[#0d4f38] text-white",
-    en_retard: "border-[#ce1126] bg-[#fdecea] text-[#ce1126]",
+    en_cours: "bg-[#e0f5ea] text-[#0d4f38] ring-1 ring-[#d4e5dc]",
+    terminee: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200",
+    en_retard: "bg-red-50 text-red-700 ring-1 ring-red-200",
   };
 
   return (
     <span
       className={cn(
-        "inline-flex border px-2 py-0.5 text-xs font-semibold",
+        "inline-flex px-2 py-0.5 text-xs font-semibold",
         colors[statut],
         className,
       )}
@@ -67,20 +67,24 @@ export function ProgressBar({ value, label, className }: ProgressBarProps) {
   );
 
   const barColor =
-    pct >= 100 ? "bg-[#009460]" : pct >= 50 ? "bg-[#0d4f38]" : "bg-[#ce1126]";
+    pct >= 100
+      ? "bg-emerald-500"
+      : pct >= 50
+        ? "bg-amber-500"
+        : "bg-red-500";
 
   return (
     <div className={cn("space-y-1.5", className)}>
       {label && (
         <div className="flex justify-between text-sm">
           <span className="text-slate">{label}</span>
-          <span className="font-semibold tabular-nums text-[#0d4f38]">{pct.toFixed(0)}%</span>
+          <span className="font-semibold tabular-nums text-graphite">{pct.toFixed(0)}%</span>
         </div>
       )}
-      <div className="h-[3px] w-full overflow-hidden bg-[#d4e5dc]">
+      <div className="h-2 w-full overflow-hidden rounded-full bg-cloud/80">
         <div
           className={cn(
-            "h-full transition-all duration-500 ease-[var(--ease-out-expo)]",
+            "h-full rounded-full transition-all duration-500 ease-[var(--ease-out-expo)]",
             barColor,
           )}
           style={{ width: `${pct}%` }}
