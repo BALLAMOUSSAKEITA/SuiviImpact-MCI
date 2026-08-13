@@ -252,7 +252,7 @@ def build_activite_retard_email(
     corps_texte = f"""Madame, Monsieur,
 
 L'activité « {activite_description} » (code {activite_code}) est en retard.
-La date de fin prévue ({date_fin}) est dépassée, alors que le Bureau de la stratégie et du développement (BSD) n'a pas encore validé l'ensemble des tâches de suivi.
+La date de fin prévue ({date_fin}) est dépassée, alors que le Bureau de Stratégie et de Développement (BSD) n'a pas encore validé l'ensemble des tâches de suivi.
 
 Tâches non encore validées par le BSD :
 {bloc_taches_texte}
@@ -273,7 +273,7 @@ SuiviImpact — MIC
   </p>
   <p>
     La date de fin prévue (<strong>{date_fin}</strong>) est dépassée, alors que le
-    <strong>Bureau de la stratégie et du développement (BSD)</strong> n'a pas encore validé
+    <strong>Bureau de Stratégie et de Développement (BSD)</strong> n'a pas encore validé
     l'ensemble des tâches de suivi.
   </p>
   <p><strong>Tâches non encore validées par le BSD :</strong></p>

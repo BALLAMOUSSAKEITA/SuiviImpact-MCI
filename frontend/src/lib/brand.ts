@@ -4,13 +4,13 @@ export const BRAND = {
   appName: "SuiviImpact",
   ministry: "Ministère de l'Industrie et du Commerce",
   ministryShort: "MIC",
-  bureau: "Bureau de la stratégie et du développement",
+  bureau: "Bureau de Stratégie et de Développement",
   bureauShort: "BSD",
   country: "République de Guinée",
   program: "MIC",
   /** Libellé institutionnel complet (vue d'ensemble). */
   institutionFull:
-    "Ministère de l'Industrie et du Commerce, Bureau de la stratégie et du développement",
+    "Ministère de l'Industrie et du Commerce, Bureau de Stratégie et de Développement",
   tagline:
     "Plateforme de gestion et de suivi d'impact des politiques publiques du gouvernement.",
   loginSubtitle:

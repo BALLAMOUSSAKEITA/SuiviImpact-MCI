@@ -1,7 +1,8 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Building2, ShieldCheck } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -18,6 +19,24 @@ const loginSchema = z.object({
 });
 
 type LoginForm = z.infer<typeof loginSchema>;
+
+const LOGOS = [
+  {
+    src: "/branding/embleme-guinee.jpg",
+    alt: "Armoiries de la République de Guinée",
+    className: "login-logo-emblem",
+  },
+  {
+    src: "/branding/guinee-nimba.png",
+    alt: "Logo Guinée — masque Nimba",
+    className: "login-logo-nimba",
+  },
+  {
+    src: "/branding/simandou-2040.png",
+    alt: "Simandou 2040",
+    className: "login-logo-simandou",
+  },
+] as const;
 
 export function LoginPage() {
   const { login, isAuthenticated, isLoading } = useAuth();
@@ -54,7 +73,7 @@ export function LoginPage() {
     return (
       <div className="login-shell flex min-h-screen items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-forest-ink/20 border-t-forest-ink" />
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--guinea-green)]/25 border-t-[var(--guinea-green)]" />
           <p className="text-sm text-fog">Chargement…</p>
         </div>
       </div>
@@ -63,52 +82,132 @@ export function LoginPage() {
 
   return (
     <div className="login-shell flex min-h-screen flex-col">
-      <main className="flex flex-1 items-center justify-center px-6 py-12">
-        <div className="grid w-full max-w-[1000px] items-center gap-12 lg:grid-cols-[1fr_420px] lg:gap-20">
-          {/* Colonne institutionnelle */}
-          <section className="hidden text-center lg:block lg:text-left">
-            <div className="mb-8 flex items-center justify-center gap-4 lg:justify-start animate-fade-in">
-              <div className="flex h-12 w-12 items-center justify-center rounded-[var(--radius-card)] bg-forest-ink text-white">
-                <Building2 className="h-6 w-6" strokeWidth={1.75} />
-              </div>
-              <div>
-                <p className="text-xs font-medium text-slate">
-                  {BRAND.country}
-                </p>
-                <p className="text-sm font-medium text-graphite">{BRAND.ministry}</p>
-              </div>
-            </div>
+      <div className="login-flag-stripe" aria-hidden="true" />
 
-            <h1 className="font-display text-[2.75rem] leading-[1.1] text-graphite animate-fade-in">
-              {BRAND.appName}
-            </h1>
-            <p className="mt-4 max-w-md text-base leading-[1.43] text-slate animate-fade-in">
-              {BRAND.tagline}
+      <header className="login-brand-bar px-4 py-4 sm:px-6">
+        <div className="mx-auto flex max-w-[1100px] flex-col items-center gap-4">
+          <div className="text-center animate-fade-in">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--guinea-red)]">
+              {BRAND.country}
             </p>
-            <div className="mt-8 inline-flex items-center gap-2.5 rounded-[var(--radius-pill)] bg-white px-5 py-3 text-sm text-slate shadow-[var(--shadow-subtle)] animate-fade-in">
-              <ShieldCheck className="h-4 w-4 shrink-0 text-forest-ink" />
-              <span>
-                {BRAND.bureau} · {BRAND.program}
-              </span>
-            </div>
-          </section>
+            <p className="mt-1 text-sm font-semibold leading-snug text-graphite sm:text-base">
+              {BRAND.ministry}
+            </p>
+            <p className="text-xs text-slate">{BRAND.bureau}</p>
+          </div>
 
-          {/* Formulaire de connexion */}
-          <section className="mx-auto w-full max-w-[420px] animate-scale-in">
-            <div className="login-card">
-              <div className="mb-6 lg:hidden">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-card)] bg-forest-ink text-white">
-                    <Building2 className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="font-display text-xl text-graphite">{BRAND.appName}</p>
-                    <p className="text-xs text-slate">{BRAND.ministryShort} · {BRAND.bureauShort}</p>
-                  </div>
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-5 animate-fade-in">
+            {LOGOS.map((logo) => (
+              <div key={logo.src} className={`login-logo-chip ${logo.className}`}>
+                <Image
+                  src={logo.src}
+                  alt={logo.alt}
+                  width={180}
+                  height={90}
+                  className="h-12 w-auto object-contain sm:h-14"
+                  priority
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </header>
+
+      <main className="flex flex-1 items-center justify-center px-4 py-8 sm:px-6 sm:py-12">
+        <div className="grid w-full max-w-[1100px] items-center gap-10 lg:grid-cols-[1.05fr_420px] lg:gap-16">
+          <section className="hidden lg:block">
+            <div className="login-hero-panel animate-fade-in">
+              <div className="flex items-start gap-5">
+                <Image
+                  src="/branding/embleme-guinee.jpg"
+                  alt=""
+                  width={120}
+                  height={140}
+                  className="h-[7.5rem] w-auto shrink-0 object-contain"
+                  aria-hidden
+                />
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--guinea-gold)]">
+                    Travail · Justice · Solidarité
+                  </p>
+                  <h1 className="mt-2 font-display text-[2.6rem] leading-[1.08] tracking-tight text-graphite">
+                    {BRAND.appName}
+                  </h1>
+                  <p className="mt-3 max-w-md text-base leading-relaxed text-slate">
+                    {BRAND.tagline}
+                  </p>
                 </div>
               </div>
 
-              <h2 className="text-xl font-semibold text-graphite tracking-tight">Connexion</h2>
+              <div className="mt-8 flex flex-wrap items-center gap-3">
+                <div className="login-pill">
+                  <ShieldCheck className="h-4 w-4 shrink-0 text-[var(--guinea-green)]" />
+                  <span>
+                    {BRAND.bureauShort} · {BRAND.program}
+                  </span>
+                </div>
+                <div className="login-pill login-pill-dark">
+                  <Image
+                    src="/branding/simandou-2040.png"
+                    alt="Simandou 2040"
+                    width={120}
+                    height={40}
+                    className="h-7 w-auto object-contain"
+                  />
+                </div>
+                <div className="login-pill">
+                  <Image
+                    src="/branding/guinee-nimba.png"
+                    alt="Guinée"
+                    width={100}
+                    height={36}
+                    className="h-7 w-auto object-contain"
+                  />
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="mx-auto w-full max-w-[420px] animate-scale-in">
+            <div className="login-card">
+              <div className="mb-5 flex items-center gap-3 lg:hidden">
+                <Image
+                  src="/branding/embleme-guinee.jpg"
+                  alt="Armoiries nationales"
+                  width={48}
+                  height={54}
+                  className="h-12 w-auto object-contain"
+                />
+                <div>
+                  <p className="font-display text-xl text-graphite">{BRAND.appName}</p>
+                  <p className="text-xs text-slate">
+                    {BRAND.ministryShort} · {BRAND.bureauShort}
+                  </p>
+                </div>
+              </div>
+
+              <div className="mb-5 flex items-center justify-center gap-3 lg:hidden">
+                <div className="login-logo-chip login-logo-nimba px-2 py-1">
+                  <Image
+                    src="/branding/guinee-nimba.png"
+                    alt="Guinée"
+                    width={90}
+                    height={32}
+                    className="h-8 w-auto object-contain"
+                  />
+                </div>
+                <div className="login-logo-chip login-logo-simandou px-2 py-1">
+                  <Image
+                    src="/branding/simandou-2040.png"
+                    alt="Simandou 2040"
+                    width={110}
+                    height={36}
+                    className="h-8 w-auto object-contain"
+                  />
+                </div>
+              </div>
+
+              <h2 className="text-xl font-semibold tracking-tight text-graphite">Connexion</h2>
               <p className="mt-1 text-sm text-slate">{BRAND.loginSubtitle}</p>
 
               <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-4">
@@ -120,7 +219,9 @@ export function LoginPage() {
                     className="login-input"
                   />
                   {errors.username && (
-                    <p className="mt-1.5 text-xs font-medium text-red-600">{errors.username.message}</p>
+                    <p className="mt-1.5 text-xs font-medium text-[var(--guinea-red)]">
+                      {errors.username.message}
+                    </p>
                   )}
                 </div>
 
@@ -133,13 +234,15 @@ export function LoginPage() {
                     className="login-input"
                   />
                   {errors.password && (
-                    <p className="mt-1.5 text-xs font-medium text-red-600">{errors.password.message}</p>
+                    <p className="mt-1.5 text-xs font-medium text-[var(--guinea-red)]">
+                      {errors.password.message}
+                    </p>
                   )}
                 </div>
 
                 <Button
                   type="submit"
-                  className="mt-2 h-12 w-full text-base"
+                  className="login-submit mt-2 h-12 w-full text-base"
                   disabled={submitting}
                 >
                   {submitting ? (
@@ -163,8 +266,13 @@ export function LoginPage() {
         </div>
       </main>
 
-      <footer className="border-t border-cloud bg-white px-6 py-4 text-center text-xs text-slate">
-        © {new Date().getFullYear()} {BRAND.country} · {BRAND.ministry} · {BRAND.bureau}
+      <footer className="border-t border-cloud/80 bg-white/80 px-6 py-4 text-center text-xs text-slate backdrop-blur-sm">
+        <p className="font-medium text-graphite">
+          Travail · Justice · Solidarité
+        </p>
+        <p className="mt-1">
+          © {new Date().getFullYear()} {BRAND.country} · {BRAND.ministry} · {BRAND.bureau}
+        </p>
       </footer>
     </div>
   );
