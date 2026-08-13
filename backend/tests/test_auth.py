@@ -3,6 +3,8 @@ from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import StaticPool
 
+from sqlalchemy import select
+
 from app.core.database import Base, get_db
 from app.core.security import hash_password
 from app.main import app
@@ -251,3 +253,28 @@ async def test_deactivated_user_cannot_login(client: AsyncClient, db_session: As
         json={"username": "inactif", "password": "pass1234"},
     )
     assert response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_upload_avatar_replaces_missing_previous_file(
+    client: AsyncClient, db_session: AsyncSession
+):
+    login = await client.post(
+        "/api/v1/auth/login",
+        json={"username": "admin", "password": "admin123"},
+    )
+    token = login.json()["access_token"]
+    headers = {"Authorization": f"Bearer {token}"}
+
+    result = await db_session.execute(select(User).where(User.username == "admin"))
+    admin = result.scalar_one()
+    admin.avatar_path = "avatars/orphan.jpg"
+    await db_session.commit()
+
+    response = await client.post(
+        "/api/v1/auth/me/avatar",
+        headers=headers,
+        files={"file": ("photo.jpg", b"\xff\xd8\xff\xd9", "image/jpeg")},
+    )
+    assert response.status_code == 200
+    assert response.json()["has_avatar"] is True
