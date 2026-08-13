@@ -159,18 +159,18 @@ export function Sidebar({
 
   const navLinkClass = (active: boolean) =>
     cn(
-      "group relative flex items-center rounded-[var(--radius-sm)] text-sm font-medium transition-colors duration-[var(--duration-fast)]",
+      "group relative flex items-center rounded-[8px] text-sm font-medium transition-colors duration-[var(--duration-fast)]",
       narrow ? "justify-center px-2 py-2.5" : "gap-3 px-3 py-2.5",
       active
-        ? "text-graphite"
-        : "text-slate hover:bg-veil hover:text-graphite",
+        ? "bg-pebble text-graphite"
+        : "text-slate hover:bg-pebble hover:text-graphite",
     );
 
   return (
     <aside
       data-tour-target="sidebar"
       className={cn(
-        "flex shrink-0 flex-col border-r border-cloud bg-white",
+        "flex shrink-0 flex-col border-r border-hairline bg-white",
         "fixed inset-y-0 left-0 z-50 transition-[width,transform] duration-300 ease-[var(--ease-out-expo)] lg:static lg:translate-x-0",
         narrow ? "w-[72px]" : "w-[272px]",
         mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
@@ -179,7 +179,7 @@ export function Sidebar({
       {/* En-tête */}
       <div
         className={cn(
-          "border-b border-cloud",
+          "border-b border-hairline",
           narrow ? "px-2 py-4" : "px-5 py-5",
         )}
       >
@@ -210,7 +210,7 @@ export function Sidebar({
             <button
               type="button"
               onClick={onToggleCollapsed}
-              className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full bg-veil text-graphite transition-colors hover:bg-cloud lg:flex"
+              className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-[8px] bg-pebble text-graphite transition-colors hover:bg-hairline lg:flex"
               aria-label="Replier le menu"
               title="Replier le menu"
             >
@@ -225,9 +225,9 @@ export function Sidebar({
           title="Mon profil"
           aria-label="Mon profil"
           className={cn(
-            "mt-4 flex items-center border-t border-cloud pt-4 transition-colors hover:bg-veil rounded-[var(--radius-sm)]",
+            "mt-4 flex items-center border-t border-hairline pt-4 transition-colors hover:bg-pebble rounded-[8px]",
             narrow ? "justify-center px-1 py-2" : "gap-3 px-1 py-1",
-            pathname.startsWith("/admin/profil") && "bg-veil",
+            pathname.startsWith("/admin/profil") && "bg-pebble",
           )}
         >
           <UserAvatar
@@ -426,12 +426,12 @@ export function Sidebar({
       </nav>
 
       {/* Pied */}
-      <div className={cn("border-t border-cloud/60 p-3", narrow && "px-2")}>
+      <div className={cn("border-t border-hairline p-3", narrow && "px-2")}>
         {narrow && onToggleCollapsed && (
           <button
             type="button"
             onClick={onToggleCollapsed}
-            className="mb-2 flex h-10 w-full items-center justify-center rounded-full bg-veil text-graphite transition-colors hover:bg-cloud"
+            className="mb-2 flex h-10 w-full items-center justify-center rounded-[8px] bg-pebble text-graphite transition-colors hover:bg-hairline"
             aria-label="Déplier le menu"
             title="Déplier le menu"
           >

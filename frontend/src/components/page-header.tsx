@@ -55,8 +55,8 @@ export function PageHeader({
           className={cn(
             "font-display text-graphite",
             display
-              ? "text-[var(--text-heading)] leading-[var(--leading-heading)] sm:text-[1.75rem]"
-              : "text-[var(--text-heading-sm)] leading-[1.18] tracking-[var(--tracking-heading-sm)]",
+              ? "text-[28px] font-bold leading-[1.2] sm:text-[32px]"
+              : "text-[24px] font-bold leading-[1.25] tracking-[-0.02em]",
           )}
         >
           {title}

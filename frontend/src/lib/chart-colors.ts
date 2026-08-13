@@ -1,38 +1,39 @@
-/** Palette graphiques — sobre, lisible, une seule accentuation verte. */
+/** Palette graphiques — navy / bleu signal. */
 
 export const STATUS_COLORS = {
-  non_demare: "#d4d4d4",
-  en_cours: "#5eb8cc",
-  termine: "#009959",
+  non_demare: "#d4e0ed",
+  en_cours: "#0099ff",
+  termine: "#006bff",
   en_retard: "#d64545",
 } as const;
 
 export const PPM_COLORS = {
-  dao_elabore: "#e8e8e8",
-  dao_publie: "#5eb8cc",
-  marche_attribue: "#00b96c",
-  contrat_signe: "#009959",
+  dao_elabore: "#d4e0ed",
+  dao_publie: "#0099ff",
+  marche_attribue: "#004eba",
+  contrat_signe: "#006bff",
 } as const;
 
 export const MODULE_ACCENTS = {
-  activites: { bg: "bg-mint", border: "border-forest-ink/20", text: "text-forest-ink" },
+  activites: { bg: "bg-mint", border: "border-signal-blue/20", text: "text-signal-blue" },
   rcc: { bg: "bg-sky", border: "border-ice-blue/30", text: "text-carbon" },
   missions: { bg: "bg-lavender", border: "border-periwinkle", text: "text-carbon" },
   ppm: { bg: "bg-peach", border: "border-amber-200/60", text: "text-carbon" },
-  projets: { bg: "bg-periwinkle", border: "border-forest-ink/15", text: "text-forest-ink" },
+  projets: { bg: "bg-periwinkle", border: "border-signal-blue/15", text: "text-signal-blue" },
 } as const;
 
 export const CHART_TOOLTIP_STYLE = {
   contentStyle: {
     backgroundColor: "#ffffff",
-    border: "1px solid #ebebeb",
+    border: "1px solid #d4e0ed",
     borderRadius: "8px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+    boxShadow:
+      "rgba(71, 103, 136, 0.04) 0px 4px 5px 0px, rgba(71, 103, 136, 0.03) 0px 8px 15px 0px",
     fontSize: "13px",
     padding: "8px 12px",
   },
-  itemStyle: { color: "#222222" },
-  labelStyle: { color: "#6a6a6a", fontWeight: 500, marginBottom: 4 },
+  itemStyle: { color: "#0b3558" },
+  labelStyle: { color: "#476788", fontWeight: 500, marginBottom: 4 },
 } as const;
 
 export function parseProgress(value: number | string): number {

@@ -1,66 +1,71 @@
 @import "tailwindcss";
 
 @theme {
-  /* ─── Brand Colors ─── */
-  --color-forest-ink: #009959;
-  --color-vine: #00b96c;
-  --color-neon-sprout: #00ff95;
-  --color-ice-blue: #3de1ff;
+  /* ─── Brand (Calendly-inspired: navy ink, signal blue) ─── */
+  --color-ink-navy: #0b3558;
+  --color-signal-blue: #006bff;
+  --color-slate-gray: #476788;
+  --color-mist-gray: #a6bbd1;
+  --color-hairline: #d4e0ed;
+  --color-pebble: #f0f3f8;
+  --color-deep-cobalt: #004eba;
 
-  /* ─── Neutrals (achromatic canvas — accent vert inchangé) ─── */
-  --color-obsidian: #000000;
-  --color-graphite: #222222;
-  --color-carbon: #2d2d2d;
-  --color-slate: #6a6a6a;
-  --color-fog: #6a6a6a;
-  --color-ash: #9a9a9a;
-  --color-mist: #c1c1c1;
-  --color-cloud: #ebebeb;
-  --color-veil: #f7f7f7;
-  --color-paper: #f7f7f7;
+  --color-forest-ink: #006bff;
+  --color-vine: #0052cc;
+  --color-neon-sprout: #0099ff;
+  --color-ice-blue: #0099ff;
+
+  --color-obsidian: #0b3558;
+  --color-graphite: #0b3558;
+  --color-carbon: #0b3558;
+  --color-slate: #476788;
+  --color-fog: #476788;
+  --color-ash: #a6bbd1;
+  --color-mist: #a6bbd1;
+  --color-cloud: #d4e0ed;
+  --color-veil: #f0f3f8;
+  --color-paper: #f8f9fb;
   --color-white: #ffffff;
 
-  /* ─── Pastel Accents ─── */
-  --color-mint: #e0fce8;
-  --color-sky: #ddf4ff;
+  --color-mint: #e6f0ff;
+  --color-sky: #e6f0ff;
   --color-peach: #fff0e8;
   --color-lavender: #f0eaff;
   --color-periwinkle: #e7ecff;
 
-  /* ─── Typography ─── */
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", Roboto, sans-serif;
   --font-display: var(--font-sans);
 
   --text-body: 0.875rem;
   --leading-body: 1.43;
   --text-ui: 1rem;
-  --text-heading-sm: 1.375rem;
+  --text-heading-sm: 1.75rem;
   --tracking-heading-sm: -0.02em;
-  --text-heading: 1.75rem;
-  --leading-heading: 1.43;
+  --text-heading: 2rem;
+  --leading-heading: 1.21;
 
-  /* ─── Spacing ─── */
   --section-gap: 3rem;
-  --card-padding: 0.75rem;
-  --element-gap: 0.75rem;
+  --card-padding: 1.5rem;
+  --element-gap: 1rem;
 
-  /* ─── Border Radius ─── */
   --radius-sm: 8px;
-  --radius-card: 12px;
+  --radius-card: 16px;
   --radius-lg: 16px;
-  --radius-image: 12px;
+  --radius-image: 16px;
   --radius-pill: 9999px;
   --radius-full: 9999px;
 
-  /* ─── Shadows (réservées aux overlays / recherche) ─── */
-  --shadow-subtle: rgba(0, 0, 0, 0.02) 0px 0px 0px 1px, rgba(0, 0, 0, 0.04) 0px 2px 6px 0px,
-    rgba(0, 0, 0, 0.06) 0px 4px 8px 0px;
-  --shadow-card: var(--shadow-subtle);
-  --shadow-elevated: 0 8px 28px rgba(0, 0, 0, 0.12);
-  --shadow-soft: 0 6px 20px rgba(0, 0, 0, 0.1);
-  --shadow-inset: rgba(0, 0, 0, 0.03) 0px 0px 12px 0px inset;
-  --shadow-glow: 0 0 0 1px rgba(0, 153, 89, 0.08);
+  --shadow-subtle: rgba(71, 103, 136, 0.04) 0px 4px 5px 0px,
+    rgba(71, 103, 136, 0.03) 0px 4px 10px 0px, rgba(71, 103, 136, 0.05) 0px 10px 20px 0px;
+  --shadow-card: rgba(71, 103, 136, 0.04) 0px 4px 5px 0px,
+    rgba(71, 103, 136, 0.03) 0px 8px 15px 0px, rgba(71, 103, 136, 0.08) 0px 30px 50px 0px;
+  --shadow-elevated: rgba(71, 103, 136, 0.04) 0px 4px 5px 0px,
+    rgba(71, 103, 136, 0.03) 0px 8px 15px 0px, rgba(71, 103, 136, 0.08) 0px 30px 50px 0px;
+  --shadow-soft: rgba(71, 103, 136, 0.04) 0px 4px 5px 0px,
+    rgba(71, 103, 136, 0.03) 0px 8px 15px 0px, rgba(71, 103, 136, 0.06) 0px 15px 30px 0px;
+  --shadow-inset: rgba(71, 103, 136, 0.04) 0px 0px 12px 0px inset;
+  --shadow-glow: 0 0 0 1px rgba(0, 107, 255, 0.12);
 
   /* ─── Animation ─── */
   --duration-fast: 150ms;
@@ -70,9 +75,9 @@
 }
 
 :root {
-  --background: #f7f7f7;
-  --foreground: #222222;
-  --surface-canvas: #f7f7f7;
+  --background: #f8f9fb;
+  --foreground: #0b3558;
+  --surface-canvas: #f8f9fb;
   --surface-card: #ffffff;
 }
 
@@ -138,8 +143,8 @@ body {
 .input-grain {
   width: 100%;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--color-cloud);
-  background-color: var(--color-white);
+  border: 1px solid var(--color-hairline);
+  background-color: var(--color-pebble);
   padding: 0.625rem 1rem;
   font-size: var(--text-body);
   line-height: var(--leading-body);
@@ -153,12 +158,12 @@ body {
 }
 
 .input-grain:hover {
-  background-color: var(--color-veil);
+  background-color: var(--color-white);
 }
 
 .input-grain:focus {
-  border-color: var(--color-graphite);
-  box-shadow: 0 0 0 1px var(--color-graphite);
+  border-color: var(--color-signal-blue);
+  box-shadow: 0 0 0 1px var(--color-signal-blue);
   background-color: var(--color-white);
 }
 
@@ -190,7 +195,7 @@ body {
   font-size: var(--text-body);
   color: var(--color-slate);
   white-space: nowrap;
-  border-bottom: 1px solid var(--color-cloud);
+  border-bottom: 1px solid var(--color-hairline);
 }
 
 .table-grain tbody tr {
@@ -211,21 +216,23 @@ body {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   border-radius: var(--radius-card);
-  border: 1px solid var(--color-cloud);
+  border: 1px solid var(--color-hairline);
   background-color: var(--color-white);
+  box-shadow: var(--shadow-subtle);
 }
 
 /* ─── Panels ─── */
 .panel-grain {
   border-radius: var(--radius-card);
-  border: none;
+  border: 1px solid var(--color-hairline);
   background-color: var(--color-white);
-  padding: 1rem;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-subtle);
 }
 
 @media (min-width: 640px) {
   .panel-grain {
-    padding: 1.25rem;
+    padding: 1.5rem;
   }
 }
 
@@ -252,12 +259,11 @@ body {
   align-items: center;
   border-radius: var(--radius-pill);
   border: none;
-  background-color: var(--color-white);
-  padding: 0.375rem 0.75rem;
+  background-color: #e6f0ff;
+  padding: 0.25rem 0.5rem;
   font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--color-graphite);
-  box-shadow: var(--shadow-subtle);
+  font-weight: 500;
+  color: var(--color-deep-cobalt);
   transition: background-color var(--duration-fast);
 }
 
@@ -267,7 +273,7 @@ body {
 
 /* ─── Login ─── */
 .login-shell {
-  background: #fff;
+  background: var(--surface-canvas);
 }
 
 .login-tricolor {
@@ -280,28 +286,37 @@ body {
   );
 }
 
+.login-card {
+  border-radius: 16px;
+  background: var(--color-white);
+  padding: 2rem;
+  box-shadow: var(--shadow-card);
+}
+
 .login-label {
   display: block;
   margin-bottom: 0.35rem;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 500;
   color: var(--color-graphite);
 }
 
 .login-input {
   width: 100%;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-cloud);
-  background-color: var(--color-white);
+  border-radius: 8px;
+  border: 1px solid var(--color-hairline);
+  background-color: var(--color-pebble);
   padding: 0.75rem 0.875rem;
-  font-size: var(--text-ui);
-  line-height: 1.25;
+  font-size: 1rem;
+  line-height: 1.4;
   color: var(--color-graphite);
   outline: none;
 }
 
 .login-input:focus {
-  border-color: var(--color-forest-ink);
+  border-color: var(--color-signal-blue);
+  box-shadow: 0 0 0 1px var(--color-signal-blue);
+  background-color: var(--color-white);
 }
 
 /* ─── Scrollbar ─── */

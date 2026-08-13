@@ -31,7 +31,7 @@ export function DashboardToolbar({
   return (
     <div
       className={cn(
-        "sticky top-0 z-20 -mx-1 border-b border-cloud bg-[var(--background)]/95 px-1 backdrop-blur-sm sm:-mx-0 sm:px-0",
+        "sticky top-0 z-20 -mx-1 border-b border-hairline bg-[var(--background)]/95 px-1 backdrop-blur-sm sm:-mx-0 sm:px-0",
         className,
       )}
     >
@@ -51,8 +51,8 @@ export function DashboardToolbar({
                 className={cn(
                   "shrink-0 border-b-2 pb-3 pt-1 text-sm font-medium transition-colors",
                   active
-                    ? "border-graphite text-graphite"
-                    : "border-transparent text-slate hover:border-cloud hover:text-graphite",
+                    ? "border-signal-blue text-graphite"
+                    : "border-transparent text-slate hover:border-hairline hover:text-graphite",
                 )}
               >
                 {tab.label}

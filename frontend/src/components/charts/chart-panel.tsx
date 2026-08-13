@@ -18,7 +18,7 @@ export function ChartPanel({
   return (
     <section
       className={cn(
-        "flex flex-col rounded-[var(--radius-card)] border border-cloud bg-white px-5 py-4",
+        "flex flex-col rounded-[var(--radius-card)] border border-hairline bg-white px-5 py-4 shadow-[var(--shadow-subtle)]",
         className,
       )}
     >

@@ -19,8 +19,8 @@ export function ProgressionRing({
   value,
   size = 72,
   strokeWidth = 6,
-  trackColor = "#ebebeb",
-  fillColor = "#009959",
+  trackColor = "#d4e0ed",
+  fillColor = "#006bff",
   className,
   label,
 }: ProgressionRingProps) {

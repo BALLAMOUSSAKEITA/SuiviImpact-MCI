@@ -111,27 +111,27 @@ export function AdminShell({ children, className }: AdminShellProps) {
       />
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-cloud bg-white px-4 py-3 lg:hidden">
+        <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-hairline bg-white px-4 py-3 lg:hidden">
           <button
             type="button"
             aria-label={mobileOpen ? "Fermer le menu" : "Ouvrir le menu"}
             aria-expanded={mobileOpen}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-veil text-graphite transition-colors hover:bg-cloud active:scale-95"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] bg-pebble text-graphite transition-colors hover:bg-hairline active:scale-95"
             onClick={() => setMobileOpen((open) => !open)}
           >
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-bold text-forest-ink tracking-tight">
+            <p className="truncate text-sm font-bold text-graphite tracking-tight">
               {BRAND.appName}
             </p>
-            <p className="truncate text-[11px] text-ash">
+            <p className="truncate text-[11px] text-slate">
               {BRAND.bureauShort} · {BRAND.program}
             </p>
           </div>
           <Link
             href="/admin/profil"
-            className="flex shrink-0 rounded-full ring-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest-ink/30"
+            className="flex shrink-0 rounded-[8px] ring-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal-blue/30"
             aria-label="Mon profil"
           >
             <UserAvatar

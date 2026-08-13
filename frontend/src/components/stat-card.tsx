@@ -43,7 +43,7 @@ export function StatCard({
   return (
     <Card
       className={cn(
-        "border border-cloud p-4 sm:p-5",
+        "border border-hairline p-4 sm:p-5",
         className,
       )}
     >

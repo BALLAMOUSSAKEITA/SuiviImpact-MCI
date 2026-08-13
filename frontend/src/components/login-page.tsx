@@ -62,30 +62,30 @@ export function LoginPage() {
     <div className="login-shell flex min-h-screen flex-col">
       <div className="login-tricolor" aria-hidden="true" />
 
-      <main className="mx-auto flex w-full max-w-[440px] flex-1 flex-col px-6 py-10 sm:py-14">
-        <header className="text-center">
+      <main className="mx-auto flex w-full max-w-[480px] flex-1 flex-col justify-center px-6 py-12">
+        <header className="mb-8 text-center">
           <Image
             src="/branding/embleme-guinee.jpg"
             alt="Armoiries de la République de Guinée"
-            width={112}
-            height={126}
-            className="mx-auto h-[5.5rem] w-auto object-contain"
+            width={96}
+            height={108}
+            className="mx-auto h-20 w-auto object-contain"
             priority
           />
-          <p className="mt-4 text-[11px] font-medium uppercase tracking-[0.16em] text-slate">
+          <p className="mt-4 text-xs font-semibold uppercase tracking-[0.14em] text-slate">
             {BRAND.country}
           </p>
-          <p className="mt-2 text-[15px] font-semibold leading-snug text-graphite">
+          <p className="mt-2 text-base font-semibold leading-snug text-graphite">
             {BRAND.ministry}
           </p>
           <p className="mt-0.5 text-sm text-slate">{BRAND.bureau}</p>
         </header>
 
-        <div className="mt-8 border-t border-cloud pt-8">
-          <h1 className="text-center text-[1.375rem] font-semibold tracking-tight text-graphite">
+        <div className="login-card">
+          <h1 className="text-[28px] font-bold leading-tight text-graphite">
             {BRAND.appName}
           </h1>
-          <p className="mt-2 text-center text-sm leading-relaxed text-slate">
+          <p className="mt-2 text-[15px] leading-relaxed text-slate">
             {BRAND.tagline}
           </p>
 
@@ -125,13 +125,13 @@ export function LoginPage() {
               )}
             </div>
 
-            <Button type="submit" className="mt-2 h-11 w-full" disabled={submitting}>
+            <Button type="submit" className="mt-2 h-11 w-full text-[16px]" disabled={submitting}>
               {submitting ? "Connexion…" : "Se connecter"}
             </Button>
           </form>
         </div>
 
-        <div className="mt-auto flex items-center justify-center gap-8 pt-12">
+        <div className="mt-10 flex items-center justify-center gap-8">
           <Image
             src="/branding/guinee-nimba.png"
             alt="Guinée"
@@ -144,12 +144,12 @@ export function LoginPage() {
             alt="Simandou 2040"
             width={140}
             height={44}
-            className="h-10 w-auto rounded-sm bg-black object-contain px-2 py-1"
+            className="h-10 w-auto rounded-[8px] bg-ink-navy object-contain px-2 py-1"
           />
         </div>
       </main>
 
-      <footer className="px-6 py-4 text-center text-xs text-ash">
+      <footer className="px-6 py-5 text-center text-xs text-slate">
         © {new Date().getFullYear()} {BRAND.ministry} — {BRAND.bureauShort}
       </footer>
     </div>

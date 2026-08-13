@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Manrope } from "next/font/google";
 
 import { Providers } from "@/components/providers";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+const manrope = Manrope({
+  variable: "--font-manrope",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
 });
@@ -24,7 +24,7 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
-      className={`${inter.variable} h-full antialiased`}
+      className={`${manrope.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[var(--background)] text-graphite">
         <Providers>{children}</Providers>
