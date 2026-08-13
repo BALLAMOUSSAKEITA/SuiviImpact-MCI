@@ -1,6 +1,6 @@
 "use client";
 
-import { FileUp, Upload, X } from "lucide-react";
+import { Upload, X } from "lucide-react";
 import { useRef } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -34,15 +34,11 @@ export function FileUploadField({
       {label && <label className="label-grain">{label}</label>}
       <div
         className={cn(
-          "mt-1 border border-dashed border-cloud bg-white p-4 transition-colors",
-          !disabled && "hover:bg-veil",
+          "mt-1 border border-hairline bg-white p-4",
           disabled && "opacity-60",
         )}
       >
         <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-sm)] bg-forest-ink/8 text-forest-ink">
-            <FileUp className="h-5 w-5" strokeWidth={1.75} />
-          </div>
           <div className="min-w-0 flex-1">
             {file ? (
               <p className="truncate text-sm font-medium text-graphite">{file.name}</p>

@@ -1,7 +1,5 @@
 "use client";
 
-import { Pencil, Trash2 } from "lucide-react";
-
 import { cn } from "@/lib/utils";
 
 interface TableRowActionsProps {
@@ -20,32 +18,27 @@ export function TableRowActions({
   className,
 }: TableRowActionsProps) {
   return (
-    <div
-      className={cn(
-        "table-row-actions inline-flex items-stretch overflow-hidden border border-hairline bg-white",
-        className,
-      )}
-    >
+    <div className={cn("table-row-actions inline-flex items-center gap-3", className)}>
       <button
         type="button"
         onClick={onEdit}
         title={editLabel}
-        className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-slate transition-colors hover:bg-veil hover:text-graphite"
+        className="text-[13px] font-semibold text-[#0d4f38] hover:underline"
       >
-        <Pencil className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
-        <span>{editLabel}</span>
+        {editLabel}
       </button>
       {onDelete && (
         <>
-          <span className="w-px self-stretch bg-cloud/80" aria-hidden />
+          <span className="text-hairline" aria-hidden>
+            |
+          </span>
           <button
             type="button"
             onClick={onDelete}
             title={deleteLabel}
-            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-slate transition-colors hover:bg-red-50 hover:text-red-600"
+            className="text-[13px] font-semibold text-[#ce1126] hover:underline"
           >
-            <Trash2 className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
-            <span>{deleteLabel}</span>
+            {deleteLabel}
           </button>
         </>
       )}

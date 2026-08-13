@@ -117,8 +117,8 @@ function ComptesContent() {
                     <span
                       className={
                         user.etat
-                          ? "rounded-full bg-veil px-2 py-0.5 text-xs font-medium text-graphite"
-                          : "rounded-full bg-red-100 px-2 py-0.5 text-xs text-red-800"
+                          ? "border border-hairline bg-[#e0f5ea] px-2 py-0.5 text-xs font-semibold text-[#0d4f38]"
+                          : "border border-[#ce1126]/30 bg-[#fdecea] px-2 py-0.5 text-xs font-semibold text-[#ce1126]"
                       }
                     >
                       {user.etat ? "Actif" : "Désactivé"}

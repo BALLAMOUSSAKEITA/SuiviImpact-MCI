@@ -22,7 +22,7 @@ export function MetricStrip({ metrics, className }: MetricStripProps) {
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-none border border-hairline border-t-[3px] border-t-forest-ink bg-white",
+        "overflow-hidden rounded-none border border-hairline border-t-[3px] border-t-[#0d4f38] bg-white",
         className,
       )}
     >
@@ -77,11 +77,11 @@ export function ModuleOverview({
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-none border border-hairline border-t-[3px] border-t-forest-ink bg-white",
+        "overflow-hidden rounded-none border border-hairline border-t-[3px] border-t-[#0d4f38] bg-white",
         className,
       )}
     >
-      <div className="hidden border-b border-cloud bg-[#e0f5ea] px-6 py-2.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-graphite md:grid md:grid-cols-[minmax(0,1.4fr)_4.5rem_4.5rem_minmax(0,1fr)_1.25rem] md:gap-4">
+      <div className="hidden border-b border-cloud bg-[#f6faf7] px-6 py-2.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate md:grid md:grid-cols-[minmax(0,1.4fr)_4.5rem_4.5rem_minmax(0,1fr)_1.25rem] md:gap-4">
         <span>Module</span>
         <span className="text-right">Total</span>
         <span className="text-right">Exec.</span>

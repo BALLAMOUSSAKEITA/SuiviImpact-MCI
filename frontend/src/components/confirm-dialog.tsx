@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, Info, Pencil, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -16,30 +16,6 @@ interface ConfirmDialogProps {
   loading?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
-}
-
-function DialogIcon({ variant }: { variant: ConfirmDialogProps["variant"] }) {
-  const base =
-    "flex h-11 w-11 shrink-0 items-center justify-center";
-  if (variant === "destructive") {
-    return (
-      <div className={cn(base, "bg-red-50 text-red-600")}>
-        <AlertTriangle className="h-5 w-5" strokeWidth={2} />
-      </div>
-    );
-  }
-  if (variant === "info") {
-    return (
-      <div className={cn(base, "bg-veil text-graphite")}>
-        <Pencil className="h-5 w-5" strokeWidth={2} />
-      </div>
-    );
-  }
-  return (
-    <div className={cn(base, "bg-veil text-forest-ink")}>
-      <Info className="h-5 w-5" strokeWidth={2} />
-    </div>
-  );
 }
 
 export function ConfirmDialog({
@@ -62,26 +38,21 @@ export function ConfirmDialog({
       <button
         type="button"
         aria-label="Fermer"
-        className="absolute inset-0 bg-obsidian/45 backdrop-blur-[2px]"
+        className="absolute inset-0 bg-obsidian/50"
         onClick={onCancel}
       />
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="confirm-dialog-title"
-        className="relative w-full max-w-md overflow-hidden overlay-panel"
+        className="relative w-full max-w-md overflow-hidden overlay-panel border-t-[3px] border-t-[#0d4f38]"
       >
         <div className="p-6">
-          <div className="flex gap-4">
-            <DialogIcon variant={variant} />
-            <div className="min-w-0 flex-1 pt-0.5">
-              <h2 id="confirm-dialog-title" className="font-display text-lg font-semibold text-graphite">
-                {title}
-              </h2>
-              <p className="mt-2 text-sm leading-relaxed text-slate">{description}</p>
-            </div>
-          </div>
-          <div className="mt-6 flex flex-wrap justify-end gap-2 border-t border-cloud/60 pt-4">
+          <h2 id="confirm-dialog-title" className="font-display text-xl font-semibold text-graphite">
+            {title}
+          </h2>
+          <p className="mt-3 text-sm leading-relaxed text-slate">{description}</p>
+          <div className="mt-6 flex flex-wrap justify-end gap-2 border-t border-hairline pt-4">
             <Button type="button" variant="outline" onClick={onCancel} disabled={loading}>
               {cancelLabel}
             </Button>
@@ -143,7 +114,7 @@ export function FormDialog({
       <button
         type="button"
         aria-label="Fermer"
-        className="absolute inset-0 bg-obsidian/45 backdrop-blur-[2px]"
+        className="absolute inset-0 bg-obsidian/50"
         onClick={onClose}
       />
       <div
@@ -158,9 +129,9 @@ export function FormDialog({
           className,
         )}
       >
-        <div className="flex shrink-0 items-start justify-between gap-3 border-b border-cloud px-6 py-4">
+        <div className="flex shrink-0 items-start justify-between gap-3 border-b border-hairline border-t-[3px] border-t-[#0d4f38] px-6 py-4">
           <div className="min-w-0 pr-2">
-            <h2 id="form-dialog-title" className="text-base font-semibold text-graphite">
+            <h2 id="form-dialog-title" className="font-display text-lg font-semibold text-graphite">
               {title}
             </h2>
             {subtitle && (
