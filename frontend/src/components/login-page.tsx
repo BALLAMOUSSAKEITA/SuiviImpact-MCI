@@ -9,7 +9,6 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import { useAuth } from "@/components/auth-provider";
-import { Button } from "@/components/ui/button";
 import { BRAND } from "@/lib/brand";
 
 const loginSchema = z.object({
@@ -52,105 +51,177 @@ export function LoginPage() {
 
   if (isLoading) {
     return (
-      <div className="login-shell grid min-h-screen place-items-center">
-        <p className="text-sm text-slate">Chargement…</p>
+      <div className="login-page grid min-h-screen place-items-center">
+        <p className="text-sm text-[#476788]">Chargement…</p>
       </div>
     );
   }
 
   return (
-    <div className="login-shell flex min-h-screen flex-col">
-      <div className="login-tricolor" aria-hidden="true" />
+    <div className="login-page flex min-h-screen flex-col">
+      <div className="login-flag" aria-hidden="true">
+        <span className="bg-[#ce1126]" />
+        <span className="bg-[#fcd116]" />
+        <span className="bg-[#009460]" />
+      </div>
 
-      <main className="mx-auto flex w-full max-w-[480px] flex-1 flex-col justify-center px-6 py-12">
-        <header className="mb-8 text-center">
-          <Image
-            src="/branding/embleme-guinee.jpg"
-            alt="Armoiries de la République de Guinée"
-            width={96}
-            height={108}
-            className="mx-auto h-20 w-auto object-contain"
-            priority
-          />
-          <p className="mt-4 text-xs font-semibold uppercase tracking-[0.14em] text-slate">
-            {BRAND.country}
-          </p>
-          <p className="mt-2 text-base font-semibold leading-snug text-graphite">
-            {BRAND.ministry}
-          </p>
-          <p className="mt-0.5 text-sm text-slate">{BRAND.bureau}</p>
-        </header>
+      <header className="login-masthead">
+        <div className="login-wrap login-masthead-inner">
+          <div className="flex min-w-0 items-center gap-4">
+            <Image
+              src="/branding/embleme-guinee.jpg"
+              alt="Armoiries de la République de Guinée"
+              width={72}
+              height={80}
+              className="h-[4.25rem] w-auto shrink-0 object-contain sm:h-[4.75rem]"
+              priority
+            />
+            <div className="min-w-0">
+              <p className="login-serif text-[11px] font-semibold uppercase tracking-[0.18em] text-[#0b3558]">
+                {BRAND.country}
+              </p>
+              <p className="login-serif mt-1 text-[1.05rem] font-semibold leading-snug text-[#0b3558] sm:text-[1.2rem]">
+                {BRAND.ministry}
+              </p>
+              <p className="mt-0.5 text-[13px] text-[#476788]">{BRAND.bureau}</p>
+            </div>
+          </div>
 
-        <div className="login-card">
-          <h1 className="text-[28px] font-bold leading-tight text-graphite">
+          <div className="hidden items-center gap-6 sm:flex">
+            <Image
+              src="/branding/guinee-nimba.png"
+              alt="Guinée"
+              width={110}
+              height={36}
+              className="h-8 w-auto object-contain"
+              priority
+            />
+            <Image
+              src="/branding/simandou-2040.png"
+              alt="Simandou 2040"
+              width={132}
+              height={42}
+              className="h-9 w-auto bg-[#0b3558] object-contain px-2 py-1"
+              priority
+            />
+          </div>
+        </div>
+      </header>
+
+      <section className="login-banner">
+        <div className="login-wrap py-10 sm:py-14">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/70">
+            Espace agents — {BRAND.bureauShort}
+          </p>
+          <h1 className="login-serif mt-3 text-[2.15rem] font-semibold leading-[1.15] text-white sm:text-[2.75rem]">
             {BRAND.appName}
           </h1>
-          <p className="mt-2 text-[15px] leading-relaxed text-slate">
+          <p className="mt-3 max-w-xl text-[1.05rem] leading-relaxed text-white/85">
             {BRAND.tagline}
           </p>
+        </div>
+      </section>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-4">
+      <main className="login-wrap flex flex-1 flex-col gap-10 py-10 sm:py-12 lg:flex-row lg:items-start lg:gap-16">
+        <div className="max-w-md lg:flex-1 lg:pt-2">
+          <h2 className="login-serif text-[1.35rem] font-semibold text-[#0b3558]">
+            Accès à la plateforme
+          </h2>
+          <p className="mt-3 text-[15px] leading-relaxed text-[#476788]">
+            {BRAND.loginSubtitle}
+          </p>
+          <dl className="mt-8 space-y-4 border-t border-[#d4e0ed] pt-6 text-sm">
             <div>
-              <label htmlFor="login-username" className="login-label">
-                Identifiant
-              </label>
-              <input
-                id="login-username"
-                {...register("username")}
-                autoComplete="username"
-                className="login-input"
-              />
-              {errors.username && (
-                <p className="mt-1.5 text-xs font-medium text-red-600">
-                  {errors.username.message}
-                </p>
-              )}
+              <dt className="font-semibold text-[#0b3558]">Devise nationale</dt>
+              <dd className="mt-1 text-[#476788]">Travail · Justice · Solidarité</dd>
             </div>
-
             <div>
-              <label htmlFor="login-password" className="login-label">
-                Mot de passe
-              </label>
-              <input
-                id="login-password"
-                type="password"
-                {...register("password")}
-                autoComplete="current-password"
-                className="login-input"
-              />
-              {errors.password && (
-                <p className="mt-1.5 text-xs font-medium text-red-600">
-                  {errors.password.message}
-                </p>
-              )}
+              <dt className="font-semibold text-[#0b3558]">Tutelle</dt>
+              <dd className="mt-1 text-[#476788]">
+                {BRAND.ministry} ({BRAND.ministryShort})
+              </dd>
             </div>
+          </dl>
 
-            <Button type="submit" className="mt-2 h-11 w-full text-[16px]" disabled={submitting}>
-              {submitting ? "Connexion…" : "Se connecter"}
-            </Button>
-          </form>
+          <div className="mt-8 flex items-center gap-6 sm:hidden">
+            <Image
+              src="/branding/guinee-nimba.png"
+              alt="Guinée"
+              width={110}
+              height={36}
+              className="h-8 w-auto object-contain"
+            />
+            <Image
+              src="/branding/simandou-2040.png"
+              alt="Simandou 2040"
+              width={132}
+              height={42}
+              className="h-9 w-auto bg-[#0b3558] object-contain px-2 py-1"
+            />
+          </div>
         </div>
 
-        <div className="mt-10 flex items-center justify-center gap-8">
-          <Image
-            src="/branding/guinee-nimba.png"
-            alt="Guinée"
-            width={108}
-            height={36}
-            className="h-8 w-auto object-contain"
-          />
-          <Image
-            src="/branding/simandou-2040.png"
-            alt="Simandou 2040"
-            width={140}
-            height={44}
-            className="h-10 w-auto rounded-[8px] bg-ink-navy object-contain px-2 py-1"
-          />
+        <div className="w-full lg:max-w-[400px] lg:shrink-0">
+          <form onSubmit={handleSubmit(onSubmit)} className="login-form">
+            <h2 className="login-serif text-xl font-semibold text-[#0b3558]">Connexion</h2>
+            <p className="mt-1 text-sm text-[#476788]">
+              Saisissez vos identifiants institutionnels.
+            </p>
+
+            <div className="mt-6 space-y-4">
+              <div>
+                <label htmlFor="login-username" className="login-label">
+                  Identifiant
+                </label>
+                <input
+                  id="login-username"
+                  {...register("username")}
+                  autoComplete="username"
+                  className="login-input"
+                />
+                {errors.username && (
+                  <p className="mt-1.5 text-xs font-medium text-[#b42318]">
+                    {errors.username.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="login-password" className="login-label">
+                  Mot de passe
+                </label>
+                <input
+                  id="login-password"
+                  type="password"
+                  {...register("password")}
+                  autoComplete="current-password"
+                  className="login-input"
+                />
+                {errors.password && (
+                  <p className="mt-1.5 text-xs font-medium text-[#b42318]">
+                    {errors.password.message}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <button type="submit" className="login-submit" disabled={submitting}>
+              {submitting ? "Connexion…" : "Se connecter"}
+            </button>
+          </form>
         </div>
       </main>
 
-      <footer className="px-6 py-5 text-center text-xs text-slate">
-        © {new Date().getFullYear()} {BRAND.ministry} — {BRAND.bureauShort}
+      <footer className="login-footer">
+        <div className="login-wrap py-5 text-center sm:text-left">
+          <p className="login-serif text-sm font-semibold text-[#0b3558]">
+            Travail · Justice · Solidarité
+          </p>
+          <p className="mt-1 text-xs leading-relaxed text-[#476788]">
+            © {new Date().getFullYear()} {BRAND.country} — {BRAND.ministry} — {BRAND.bureau}.
+            Accès réservé au personnel autorisé.
+          </p>
+        </div>
       </footer>
     </div>
   );
