@@ -8,8 +8,10 @@ from typing import Sequence, Union
 
 import sqlalchemy as sa
 from alembic import op
+from sqlalchemy.dialects import postgresql
 
 from app.data.personnel_cabinet_seed import PERSONNEL_CABINET_SEED, code_for_num_ordre
+from app.db.migration_helpers import drop_enum, ensure_enum
 
 revision: str = "026"
 down_revision: Union[str, None] = "025"
@@ -18,8 +20,11 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    seance_statut = sa.Enum("ouverte", "fermee", name="seance_statut")
-    seance_statut.create(op.get_bind(), checkfirst=True)
+    ensure_enum("seance_statut", "ouverte", "fermee")
+
+    seance_statut = postgresql.ENUM(
+        "ouverte", "fermee", name="seance_statut", create_type=False
+    )
 
     op.create_table(
         "personnel_cabinet",
@@ -58,7 +63,6 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("token"),
     )
-    op.create_index("ix_seances_presence_token", "seances_presence", ["token"])
 
     op.create_table(
         "presences_enregistrements",
@@ -103,7 +107,6 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     op.drop_table("presences_enregistrements")
-    op.drop_index("ix_seances_presence_token", table_name="seances_presence")
     op.drop_table("seances_presence")
     op.drop_table("personnel_cabinet")
-    sa.Enum(name="seance_statut").drop(op.get_bind(), checkfirst=True)
+    drop_enum("seance_statut")
