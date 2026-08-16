@@ -74,6 +74,7 @@ export function QrPresencePrintSheet({
 }
 
 const PRINT_PAGE_STYLES = `
+  @page { size: A4 portrait; margin: 12mm; }
   * { box-sizing: border-box; }
   body {
     margin: 0;
@@ -93,8 +94,22 @@ const PRINT_PAGE_STYLES = `
   svg { display: block; margin: 0 auto; }
 `;
 
-/** Ouvre une fenêtre dédiée — évite les conflits CSS du layout admin à l'impression. */
-export function openQrPrintWindow(rootId = "qr-print-area"): boolean {
+function buildPrintDocument(html: string): string {
+  return `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>QR code — pointage de présence</title>
+  <style>${PRINT_PAGE_STYLES}</style>
+</head>
+<body>
+  <div class="qr-print-sheet">${html}</div>
+</body>
+</html>`;
+}
+
+/** Impression via iframe cachée — fonctionne sans autoriser les pop-ups. */
+export function printQrPresenceSheet(rootId = "qr-print-area"): boolean {
   const sheet = document.getElementById(rootId);
   if (!sheet) return false;
 
@@ -104,28 +119,61 @@ export function openQrPrintWindow(rootId = "qr-print-area"): boolean {
     `src="${origin}/branding/`,
   );
 
-  const printWindow = window.open("", "_blank", "noopener,noreferrer,width=720,height=900");
-  if (!printWindow) return false;
+  const iframe = document.createElement("iframe");
+  iframe.setAttribute("aria-hidden", "true");
+  iframe.setAttribute("title", "Impression QR code");
+  Object.assign(iframe.style, {
+    position: "fixed",
+    right: "0",
+    bottom: "0",
+    width: "0",
+    height: "0",
+    border: "0",
+    visibility: "hidden",
+  });
+  document.body.appendChild(iframe);
 
-  printWindow.document.open();
-  printWindow.document.write(`<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="utf-8" />
-  <title>QR code — pointage de présence</title>
-  <style>${PRINT_PAGE_STYLES}</style>
-</head>
-<body>
-  <div class="qr-print-sheet">${html}</div>
-  <script>
-    window.onload = function () {
-      window.focus();
-      window.print();
-    };
-    window.onafterprint = function () { window.close(); };
-  </script>
-</body>
-</html>`);
-  printWindow.document.close();
+  const win = iframe.contentWindow;
+  const doc = iframe.contentDocument ?? win?.document;
+  if (!win || !doc) {
+    iframe.remove();
+    return false;
+  }
+
+  doc.open();
+  doc.write(buildPrintDocument(html));
+  doc.close();
+
+  let printed = false;
+  const cleanup = () => {
+    iframe.remove();
+  };
+
+  const triggerPrint = () => {
+    if (printed) return;
+    printed = true;
+    win.focus();
+    win.print();
+    win.addEventListener("afterprint", cleanup, { once: true });
+    window.setTimeout(cleanup, 60_000);
+  };
+
+  const img = doc.querySelector("img");
+  if (img && !img.complete) {
+    img.addEventListener("load", triggerPrint, { once: true });
+    img.addEventListener("error", triggerPrint, { once: true });
+  }
+
+  win.addEventListener("load", () => {
+    window.setTimeout(triggerPrint, 150);
+  });
+
+  window.setTimeout(triggerPrint, 400);
+
   return true;
+}
+
+/** @deprecated Utiliser printQrPresenceSheet */
+export function openQrPrintWindow(rootId = "qr-print-area"): boolean {
+  return printQrPresenceSheet(rootId);
 }

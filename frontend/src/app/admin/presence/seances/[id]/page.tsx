@@ -10,7 +10,7 @@ import { useAuth } from "@/components/auth-provider";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { PageHeader } from "@/components/page-header";
 import {
-  openQrPrintWindow,
+  printQrPresenceSheet,
   QrPresencePrintSheet,
 } from "@/components/qr-presence-print-sheet";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -86,11 +86,9 @@ function SeanceDetailContent() {
       toast.error("Le lien QR n'est pas encore disponible");
       return;
     }
-    const ok = openQrPrintWindow();
+    const ok = printQrPresenceSheet();
     if (!ok) {
-      toast.error(
-        "Impossible d'ouvrir l'impression. Autorisez les pop-ups pour ce site.",
-      );
+      toast.error("Impossible de préparer l'impression du QR code.");
     }
   };
 
