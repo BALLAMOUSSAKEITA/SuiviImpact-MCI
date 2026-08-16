@@ -79,6 +79,35 @@ async def test_list_personnel(client: AsyncClient, auth_headers: dict, db_sessio
 
 
 @pytest.mark.asyncio
+async def test_export_seance_pdf(client: AsyncClient, auth_headers: dict, db_session):
+    personnel = PersonnelCabinet(
+        num_ordre=10,
+        nom_complet="Export TEST",
+        fonction="Testeur",
+        categorie="Cabinet",
+        code_presence="4321",
+        actif=True,
+    )
+    db_session.add(personnel)
+    await db_session.commit()
+
+    create_resp = await client.post(
+        "/api/v1/presence/seances",
+        headers=auth_headers,
+        json={"titre": "Conseil export", "date_seance": "2026-08-14"},
+    )
+    seance_id = create_resp.json()["id"]
+
+    export_resp = await client.get(
+        f"/api/v1/presence/seances/{seance_id}/export?format=pdf",
+        headers=auth_headers,
+    )
+    assert export_resp.status_code == 200
+    assert export_resp.headers["content-type"] == "application/pdf"
+    assert export_resp.content[:4] == b"%PDF"
+
+
+@pytest.mark.asyncio
 async def test_close_seance_blocks_checkin(client: AsyncClient, auth_headers: dict, db_session):
     personnel = PersonnelCabinet(
         num_ordre=2,

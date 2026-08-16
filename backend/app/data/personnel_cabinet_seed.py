@@ -111,5 +111,10 @@ PERSONNEL_CABINET_SEED: list[PersonnelSeed] = [
 ]
 
 
-def code_for_num_ordre(num_ordre: int) -> str:
-    return str(num_ordre).zfill(4)
+def seed_presence_codes() -> dict[int, str]:
+    """Codes aléatoires stables pour l'import initial (reproductibles)."""
+    from app.services.presence_codes import generate_unique_codes
+
+    codes = generate_unique_codes(len(PERSONNEL_CABINET_SEED), seed=20260814)
+    return {row["num_ordre"]: code for row, code in zip(PERSONNEL_CABINET_SEED, codes, strict=True)}
+

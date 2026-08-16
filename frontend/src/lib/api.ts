@@ -1879,6 +1879,12 @@ export async function deletePersonnelCabinet(id: number): Promise<void> {
   await apiFetch<void>(`/api/v1/presence/personnel/${id}`, { method: "DELETE" });
 }
 
+export async function regeneratePersonnelCodes(): Promise<{ updated: number }> {
+  return apiFetch<{ updated: number }>("/api/v1/presence/personnel/regenerer-codes", {
+    method: "POST",
+  });
+}
+
 export async function listSeancesPresence(): Promise<SeancePresence[]> {
   return apiFetch<SeancePresence[]>("/api/v1/presence/seances");
 }
@@ -1906,11 +1912,17 @@ export async function deleteSeancePresence(id: number): Promise<void> {
   await apiFetch<void>(`/api/v1/presence/seances/${id}`, { method: "DELETE" });
 }
 
-export async function exportSeancePresence(id: number): Promise<void> {
+export async function exportSeancePresence(
+  id: number,
+  format: "pdf" | "xlsx" = "pdf",
+): Promise<void> {
   const token = getAccessToken();
-  const response = await fetch(`${API_BASE_URL}/api/v1/presence/seances/${id}/export`, {
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/presence/seances/${id}/export?format=${format}`,
+    {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    },
+  );
   if (!response.ok) {
     const error = (await response.json().catch(() => ({}))) as Record<string, unknown>;
     throw new Error(messageFromFailedResponse(error, response.status));
@@ -1918,7 +1930,7 @@ export async function exportSeancePresence(id: number): Promise<void> {
   const blob = await response.blob();
   const disposition = response.headers.get("Content-Disposition");
   const match = disposition?.match(/filename="?([^";\n]+)"?/);
-  const filename = match?.[1] ?? `presence_conseil_${id}.xlsx`;
+  const filename = match?.[1] ?? `liste_presence_conseil_${id}.${format === "pdf" ? "pdf" : "xlsx"}`;
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;

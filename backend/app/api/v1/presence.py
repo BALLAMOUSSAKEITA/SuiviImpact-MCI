@@ -61,6 +61,15 @@ async def update_personnel(
     return PersonnelCabinetRead.model_validate(updated)
 
 
+@router.post("/presence/personnel/regenerer-codes")
+async def regenerate_personnel_codes(
+    _: User = Depends(require_write_access),
+    db: AsyncSession = Depends(get_db),
+) -> dict[str, int]:
+    count = await service.regenerate_all_codes(db)
+    return {"updated": count}
+
+
 @router.delete("/presence/personnel/{personnel_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_personnel(
     personnel_id: int,
@@ -136,13 +145,19 @@ async def delete_seance(
 @router.get("/presence/seances/{seance_id}/export")
 async def export_seance(
     seance_id: int,
+    format: str = "pdf",
     _: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    buffer, filename = await service.export_seance_excel(db, seance_id)
+    if format == "xlsx":
+        buffer, filename = await service.export_seance_excel(db, seance_id)
+        media_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    else:
+        buffer, filename = await service.export_seance_pdf(db, seance_id)
+        media_type = "application/pdf"
     return StreamingResponse(
         buffer,
-        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        media_type=media_type,
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
 

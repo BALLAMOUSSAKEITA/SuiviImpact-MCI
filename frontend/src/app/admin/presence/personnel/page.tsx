@@ -14,6 +14,7 @@ import {
   createPersonnelCabinet,
   deletePersonnelCabinet,
   listPersonnelCabinet,
+  regeneratePersonnelCodes,
   updatePersonnelCabinet,
 } from "@/lib/api";
 import type { PersonnelCabinet } from "@/types";
@@ -40,6 +41,7 @@ function PersonnelPresenceContent() {
   const [showCreate, setShowCreate] = useState(false);
   const [editing, setEditing] = useState<PersonnelCabinet | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<PersonnelCabinet | null>(null);
+  const [confirmRegenerate, setConfirmRegenerate] = useState(false);
   const [form, setForm] = useState(emptyForm);
 
   const queryKey = ["presence-personnel"];
@@ -79,7 +81,6 @@ function PersonnelPresenceContent() {
         contact: form.contact.trim() || null,
         email: form.email.trim() || null,
         categorie: form.categorie.trim(),
-        code_presence: form.code_presence.trim(),
       }),
     onSuccess: () => {
       toast.success("Personnel ajouté");
@@ -119,6 +120,16 @@ function PersonnelPresenceContent() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const regenerateMutation = useMutation({
+    mutationFn: regeneratePersonnelCodes,
+    onSuccess: (res) => {
+      toast.success(`${res.updated} code(s) régénéré(s) aléatoirement`);
+      setConfirmRegenerate(false);
+      invalidate();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const openEdit = (item: PersonnelCabinet) => {
     setEditing(item);
     setForm({
@@ -137,13 +148,18 @@ function PersonnelPresenceContent() {
       <PageHeader
         eyebrow="Présence"
         title="Personnel"
-        description="Liste du personnel du Conseil de Cabinet avec codes de pointage à 4 chiffres."
+        description="Liste du personnel du Conseil de Cabinet. Chaque membre possède un code aléatoire à 4 chiffres pour le pointage."
         actions={
           canWrite ? (
-            <Button onClick={() => { setForm(emptyForm); setShowCreate(true); }}>
-              <Plus className="h-4 w-4" />
-              Ajouter
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button variant="outline" onClick={() => setConfirmRegenerate(true)}>
+                Régénérer les codes
+              </Button>
+              <Button onClick={() => { setForm(emptyForm); setShowCreate(true); }}>
+                <Plus className="h-4 w-4" />
+                Ajouter
+              </Button>
+            </div>
           ) : undefined
         }
       />
@@ -241,6 +257,7 @@ function PersonnelPresenceContent() {
         <PersonnelForm
           form={form}
           setForm={setForm}
+          isEdit={false}
           onSubmit={(e) => { e.preventDefault(); createMutation.mutate(); }}
           loading={createMutation.isPending}
           onCancel={() => setShowCreate(false)}
@@ -255,11 +272,22 @@ function PersonnelPresenceContent() {
         <PersonnelForm
           form={form}
           setForm={setForm}
+          isEdit
           onSubmit={(e) => { e.preventDefault(); updateMutation.mutate(); }}
           loading={updateMutation.isPending}
           onCancel={() => setEditing(null)}
         />
       </FormDialog>
+
+      <ConfirmDialog
+        open={confirmRegenerate}
+        title="Régénérer tous les codes"
+        description="Attribuer un nouveau code aléatoire à 4 chiffres à chaque membre du personnel ? Les anciens codes ne fonctionneront plus."
+        confirmLabel="Régénérer"
+        loading={regenerateMutation.isPending}
+        onCancel={() => setConfirmRegenerate(false)}
+        onConfirm={() => regenerateMutation.mutate()}
+      />
 
       <ConfirmDialog
         open={deleteTarget !== null}
@@ -282,12 +310,14 @@ function PersonnelPresenceContent() {
 function PersonnelForm({
   form,
   setForm,
+  isEdit,
   onSubmit,
   loading,
   onCancel,
 }: {
   form: typeof emptyForm;
   setForm: React.Dispatch<React.SetStateAction<typeof emptyForm>>;
+  isEdit?: boolean;
   onSubmit: (e: React.FormEvent) => void;
   loading: boolean;
   onCancel: () => void;
@@ -307,18 +337,23 @@ function PersonnelForm({
             className="input-grain"
           />
         </div>
-        <div>
-          <label className="label-grain">Code présence (4 chiffres)</label>
-          <input
-            required
-            pattern="\d{4}"
-            maxLength={4}
-            value={form.code_presence}
-            onChange={(e) => setForm((f) => ({ ...f, code_presence: e.target.value.replace(/\D/g, "").slice(0, 4) }))}
-            className="input-grain font-mono"
-            placeholder="0001"
-          />
-        </div>
+        {isEdit ? (
+          <div>
+            <label className="label-grain">Code présence</label>
+            <input
+              required
+              pattern="\d{4}"
+              maxLength={4}
+              value={form.code_presence}
+              onChange={(e) => setForm((f) => ({ ...f, code_presence: e.target.value.replace(/\D/g, "").slice(0, 4) }))}
+              className="input-grain font-mono"
+            />
+          </div>
+        ) : (
+          <div className="flex items-end">
+            <p className="text-sm text-slate">Un code aléatoire à 4 chiffres sera généré automatiquement.</p>
+          </div>
+        )}
       </div>
       <div>
         <label className="label-grain">Nom complet</label>

@@ -808,7 +808,7 @@ export interface PersonnelCabinetCreate {
   contact?: string | null;
   email?: string | null;
   categorie?: string;
-  code_presence: string;
+  code_presence?: string | null;
 }
 
 export interface PersonnelCabinetUpdate {

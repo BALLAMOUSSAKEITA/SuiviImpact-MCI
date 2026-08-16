@@ -18,8 +18,23 @@ class PersonnelCabinetBase(BaseModel):
         return value.strip()
 
 
-class PersonnelCabinetCreate(PersonnelCabinetBase):
-    pass
+class PersonnelCabinetCreate(BaseModel):
+    num_ordre: int = Field(ge=1, le=9999)
+    nom_complet: str = Field(min_length=1, max_length=200)
+    fonction: str = Field(min_length=1, max_length=500)
+    contact: str | None = Field(default=None, max_length=50)
+    email: str | None = Field(default=None, max_length=255)
+    categorie: str = Field(default="", max_length=100)
+    code_presence: str | None = Field(
+        default=None, min_length=4, max_length=4, pattern=r"^\d{4}$"
+    )
+
+    @field_validator("code_presence")
+    @classmethod
+    def normalize_code(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        return value.strip()
 
 
 class PersonnelCabinetUpdate(BaseModel):

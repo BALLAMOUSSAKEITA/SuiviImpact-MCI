@@ -8,7 +8,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.data.personnel_cabinet_seed import PERSONNEL_CABINET_SEED, code_for_num_ordre
+from app.data.personnel_cabinet_seed import PERSONNEL_CABINET_SEED, seed_presence_codes
 from app.models.presence import (
     PersonnelCabinet,
     PresenceEnregistrement,
@@ -30,6 +30,8 @@ from app.services.excel_branding import (
     prepare_branded_sheet,
     write_row_cells,
 )
+from app.services.presence_codes import generate_presence_code
+from app.services.presence_pdf_export import build_presence_list_pdf
 
 
 def _generate_token() -> str:
@@ -77,11 +79,27 @@ async def _assert_unique_personnel_fields(
         raise HTTPException(status_code=400, detail="Ce code de présence existe déjà")
 
 
+async def _existing_codes(db: AsyncSession, exclude_id: int | None = None) -> set[str]:
+    stmt = select(PersonnelCabinet.code_presence)
+    if exclude_id is not None:
+        stmt = stmt.where(PersonnelCabinet.id != exclude_id)
+    result = await db.execute(stmt)
+    return {row[0] for row in result.all()}
+
+
+async def _generate_unique_code(db: AsyncSession, exclude_id: int | None = None) -> str:
+    existing = await _existing_codes(db, exclude_id)
+    return generate_presence_code(existing)
+
+
 async def create_personnel(db: AsyncSession, body: PersonnelCabinetCreate) -> PersonnelCabinet:
-    await _assert_unique_personnel_fields(
-        db, num_ordre=body.num_ordre, code_presence=body.code_presence
-    )
-    item = PersonnelCabinet(**body.model_dump())
+    code = body.code_presence
+    if not code:
+        code = await _generate_unique_code(db)
+    await _assert_unique_personnel_fields(db, num_ordre=body.num_ordre, code_presence=code)
+    payload = body.model_dump()
+    payload["code_presence"] = code
+    item = PersonnelCabinet(**payload)
     db.add(item)
     await db.commit()
     await db.refresh(item)
@@ -94,6 +112,9 @@ async def update_personnel(
     data = body.model_dump(exclude_unset=True)
     num_ordre = data.get("num_ordre", item.num_ordre)
     code_presence = data.get("code_presence", item.code_presence)
+    if "code_presence" in data and not data["code_presence"]:
+        data["code_presence"] = await _generate_unique_code(db, exclude_id=item.id)
+        code_presence = data["code_presence"]
     await _assert_unique_personnel_fields(
         db, num_ordre=num_ordre, code_presence=code_presence, exclude_id=item.id
     )
@@ -114,6 +135,7 @@ async def seed_personnel_if_empty(db: AsyncSession) -> int:
     if int(result.scalar_one()) > 0:
         return 0
 
+    seed_codes = seed_presence_codes()
     for row in PERSONNEL_CABINET_SEED:
         db.add(
             PersonnelCabinet(
@@ -123,7 +145,7 @@ async def seed_personnel_if_empty(db: AsyncSession) -> int:
                 contact=row["contact"],
                 email=row["email"],
                 categorie=row["categorie"],
-                code_presence=code_for_num_ordre(row["num_ordre"]),
+                code_presence=seed_codes[row["num_ordre"]],
                 actif=True,
             )
         )
@@ -309,40 +331,96 @@ async def check_in(db: AsyncSession, token: str, code: str) -> CheckInResponse:
     )
 
 
-async def export_seance_excel(db: AsyncSession, seance_id: int) -> tuple[BytesIO, str]:
-    detail = await get_seance_detail(db, seance_id)
-    if detail is None:
+async def regenerate_all_codes(db: AsyncSession) -> int:
+    result = await db.execute(select(PersonnelCabinet).order_by(PersonnelCabinet.num_ordre))
+    items = list(result.scalars().all())
+    used: set[str] = set()
+    for item in items:
+        code = generate_presence_code(used)
+        used.add(code)
+        item.code_presence = code
+    await db.commit()
+    return len(items)
+
+
+async def _seance_presence_times(
+    db: AsyncSession, seance_id: int
+) -> dict[int, datetime]:
+    result = await db.execute(
+        select(PresenceEnregistrement).where(PresenceEnregistrement.seance_id == seance_id)
+    )
+    return {p.personnel_id: p.pointe_a for p in result.scalars().all()}
+
+
+async def export_seance_pdf(db: AsyncSession, seance_id: int) -> tuple[BytesIO, str]:
+    seance = await get_seance(db, seance_id)
+    if seance is None:
         raise HTTPException(status_code=404, detail="Séance introuvable")
+
+    personnel = await list_personnel(db, actif_only=True)
+    presence_times = await _seance_presence_times(db, seance_id)
+
+    buffer = build_presence_list_pdf(
+        titre=seance.titre,
+        date_seance=seance.date_seance,
+        personnel=personnel,
+        presence_times=presence_times,
+    )
+    filename = f"liste_presence_conseil_{seance.date_seance.isoformat()}.pdf"
+    return buffer, filename
+
+
+async def export_seance_excel(db: AsyncSession, seance_id: int) -> tuple[BytesIO, str]:
+    seance = await get_seance(db, seance_id)
+    if seance is None:
+        raise HTTPException(status_code=404, detail="Séance introuvable")
+
+    personnel = await list_personnel(db, actif_only=True)
+    presence_times = await _seance_presence_times(db, seance_id)
 
     wb = Workbook()
     ws = wb.active
     ws.title = "Présences"
-    headers = ["N°", "Nom complet", "Fonction", "Catégorie", "Contact", "E-mail", "Heure de pointage"]
+    headers = ["N°", "Nom complet", "Fonction", "Catégorie", "Contact", "E-mail", "Émargement"]
     start = prepare_branded_sheet(
         ws,
-        report_title=f"Liste de présence — {detail.titre}",
-        subtitle=f"Date : {detail.date_seance.strftime('%d/%m/%Y')}",
+        report_title=f"Liste de présence — {seance.titre}",
+        subtitle=f"Date : {seance.date_seance.strftime('%d/%m/%Y')}",
         headers=headers,
     )
-    for i, p in enumerate(detail.presences):
+    row_offset = 0
+    current_categorie: str | None = None
+    for i, person in enumerate(personnel):
+        if person.categorie and person.categorie != current_categorie:
+            current_categorie = person.categorie
+            write_row_cells(
+                ws,
+                start + row_offset,
+                ("", current_categorie.upper(), "", "", "", "", ""),
+                zebra_index=i,
+            )
+            row_offset += 1
+        pointe = presence_times.get(person.id)
+        emargement = pointe.astimezone(UTC).strftime("%H:%M") if pointe else ""
         write_row_cells(
             ws,
-            start + i,
+            start + row_offset,
             (
-                i + 1,
-                p.nom_complet,
-                p.fonction,
-                p.categorie,
-                p.contact or "",
-                p.email or "",
-                p.pointe_a.astimezone(UTC).strftime("%H:%M:%S"),
+                person.num_ordre,
+                person.nom_complet,
+                person.fonction,
+                person.categorie,
+                person.contact or "",
+                person.email or "",
+                emargement,
             ),
             zebra_index=i,
         )
+        row_offset += 1
     finalize_sheet(ws, len(headers))
 
     buffer = BytesIO()
     wb.save(buffer)
     buffer.seek(0)
-    filename = f"presence_conseil_{detail.date_seance.isoformat()}.xlsx"
+    filename = f"liste_presence_conseil_{seance.date_seance.isoformat()}.xlsx"
     return buffer, filename
