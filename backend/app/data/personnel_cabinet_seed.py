@@ -28,6 +28,8 @@ PERSONNEL_CABINET_SEED: list[PersonnelSeed] = [
     {"num_ordre": 10, "nom_complet": "M Ahmed Tahirou BANGOURA", "fonction": "Conseiller Chargé des Questions Industrielles", "contact": "610 21 94 86", "email": "ccqi@mic.gov.gn", "categorie": "Cabinet"},
     {"num_ordre": 11, "nom_complet": "M Mamadou DIALLO", "fonction": "Conseiller Chargé de Mission", "contact": "623 27 38 41", "email": "ccmission@mic.gov.gn", "categorie": "Cabinet"},
     {"num_ordre": 12, "nom_complet": "Mme Sougoulé Djéné KEIRA", "fonction": "Secrétaire Générale CCIAG", "contact": "620 71 74 35", "email": "sgchambre@mic.gov.gn", "categorie": "Cabinet"},
+    {"num_ordre": 13, "nom_complet": "", "fonction": "", "contact": None, "email": None, "categorie": "Cabinet"},
+    {"num_ordre": 14, "nom_complet": "", "fonction": "Attachée de Cabinet", "contact": None, "email": None, "categorie": "Cabinet"},
     # Directions nationales
     {"num_ordre": 15, "nom_complet": "M Mohamed TRAORE", "fonction": "Directeur National du Commerce Intérieur et de Concurrence (DNCIC)", "contact": "628 08 69 77", "email": "dncic@mic.gov.gn", "categorie": "Directions nationales"},
     {"num_ordre": 16, "nom_complet": "Mme Saran DIABY", "fonction": "Directrice Nationale Adjointe du Commerce Intérieur et de la Concurrence (DNA-CIC)", "contact": "620 88 45 00", "email": "dnacic@mic.gov.gn", "categorie": "Directions nationales"},
@@ -54,6 +56,7 @@ PERSONNEL_CABINET_SEED: list[PersonnelSeed] = [
     {"num_ordre": 35, "nom_complet": "M Mohamed Kadiatou SYLLA", "fonction": "Directeur Général ONCQ", "contact": "628 52 75 36", "email": "dgoncq@mcipme.gov.gn", "categorie": "Organismes publics autonomes"},
     {"num_ordre": 36, "nom_complet": "M Kéléty TOURE", "fonction": "Directeur Général Adjoint ONCQ", "contact": "628 43 54 15", "email": "dgaoncq@mcipme.gov.gn", "categorie": "Organismes publics autonomes"},
     {"num_ordre": 37, "nom_complet": "M Djoumé SANGARE", "fonction": "Directeur Général IGNM", "contact": "622 32 46 30", "email": "djoumsanga@gmail.com", "categorie": "Organismes publics autonomes"},
+    {"num_ordre": 38, "nom_complet": "", "fonction": "", "contact": None, "email": None, "categorie": "Organismes publics autonomes"},
     {"num_ordre": 39, "nom_complet": "M Pépé Pascale KOROPOGUI", "fonction": "Directeur Général Adjoint IGNM", "contact": "622 29 20 67", "email": "pepepascalk92@gmail.com", "categorie": "Organismes publics autonomes"},
     {"num_ordre": 40, "nom_complet": "M Djiba KEITA", "fonction": "Directeur Général CPTI", "contact": "625 69 78 92", "email": "djibacamira@gmail.com", "categorie": "Organismes publics autonomes"},
     {"num_ordre": 41, "nom_complet": "M Alhassane TOURE", "fonction": "Directeur Général Adjoint CPTI", "contact": "613 01 62 87", "email": "alhassanetoure907@gmail.com", "categorie": "Organismes publics autonomes"},
@@ -87,15 +90,18 @@ PERSONNEL_CABINET_SEED: list[PersonnelSeed] = [
     {"num_ordre": 67, "nom_complet": "M Ansoumane KEITA", "fonction": "Coordinateur Projet Compétitivité Chaîne de Valeur Miel", "contact": "622 84 67 25", "email": "kansouman@gmail.com", "categorie": "Coordinateurs de programmes et projets"},
     {"num_ordre": 68, "nom_complet": "M Sékou M'bemba CHERIF", "fonction": "Coordinateur PDCVA-G", "contact": "627 22 30 35", "email": "pdcvaguinee@gmail.com", "categorie": "Coordinateurs de programmes et projets"},
     {"num_ordre": 69, "nom_complet": "M Mamadou Diouhaya BALDE", "fonction": "D.O CAPME", "contact": None, "email": None, "categorie": "Coordinateurs de programmes et projets"},
+    {"num_ordre": 70, "nom_complet": "", "fonction": "Coordinateur du Projet d'Appui à l'amélioration de la Compétitivité de la Chaîne de Valeur Miel en Guinée", "contact": None, "email": None, "categorie": "Coordinateurs de programmes et projets"},
     {"num_ordre": 71, "nom_complet": "M Oumar KAKE", "fonction": "Coordinateur PAZIF", "contact": None, "email": None, "categorie": "Coordinateurs de programmes et projets"},
     {"num_ordre": 72, "nom_complet": "M Mamoudou MARA", "fonction": "Directeur Général FGPE", "contact": "626 27 77 80", "email": "mamadou.mara@fgpeguinee.com", "categorie": "Coordinateurs de programmes et projets"},
     {"num_ordre": 73, "nom_complet": "M Alhassane BARRY", "fonction": "Directeur Général Adjoint FGPE", "contact": "621 96 01 65", "email": "alhassane.barry@fgpeguinee.com", "categorie": "Coordinateurs de programmes et projets"},
     # Secrétaires / assistants
     {"num_ordre": 74, "nom_complet": "M Mohamed Saliou BANGOURA", "fonction": "Assistant Technique de Madame la Ministre", "contact": "628 98 41 24", "email": None, "categorie": "Secrétaires et assistants"},
+    {"num_ordre": 75, "nom_complet": "", "fonction": "Secrétaire Particulière de Madame la Ministre", "contact": None, "email": None, "categorie": "Secrétaires et assistants"},
     {"num_ordre": 76, "nom_complet": "M Aboubacar Sidiki DOUMBOUYA", "fonction": "Assistant Technique et Administratif du SG", "contact": "623 86 09 63", "email": "abousd01@gmail.com", "categorie": "Secrétaires et assistants"},
     {"num_ordre": 77, "nom_complet": "Mme Mariama CONDE", "fonction": "Secrétaire Particulière du Secrétaire Général", "contact": None, "email": None, "categorie": "Secrétaires et assistants"},
     {"num_ordre": 78, "nom_complet": "Mme Mariama Cire Djibril CAMARA", "fonction": "Secrétaire Particulière du Chef de Cabinet", "contact": "626 41 84 89", "email": "atech.cc@mic.gov.gn", "categorie": "Secrétaires et assistants"},
     {"num_ordre": 79, "nom_complet": "M Issa Oury DIALLO", "fonction": "Assistant Technique et Administratif du Chef de Cabinet", "contact": "622 41 50 68", "email": "atech.cc@mic.gov.gn", "categorie": "Secrétaires et assistants"},
+    {"num_ordre": 80, "nom_complet": "", "fonction": "", "contact": None, "email": None, "categorie": "Secrétaires et assistants"},
     # Syndicat
     {"num_ordre": 81, "nom_complet": "M Morlaye SOUMAH", "fonction": "Secrétaire Général du Syndicat", "contact": "622 75 88 30", "email": "morlayeyayasoumah@yahoo.fr", "categorie": "Syndicat"},
     # Inspection régionale
@@ -111,10 +117,16 @@ PERSONNEL_CABINET_SEED: list[PersonnelSeed] = [
 ]
 
 
+def personnel_actif_for_seed(row: PersonnelSeed) -> bool:
+    """Pointage QR réservé aux lignes avec un nom renseigné."""
+    return bool((row["nom_complet"] or "").strip())
+
+
 def seed_presence_codes() -> dict[int, str]:
     """Codes aléatoires stables pour l'import initial (reproductibles)."""
     from app.services.presence_codes import generate_unique_codes
 
-    codes = generate_unique_codes(len(PERSONNEL_CABINET_SEED), seed=20260814)
-    return {row["num_ordre"]: code for row, code in zip(PERSONNEL_CABINET_SEED, codes, strict=True)}
+    roster = sorted(PERSONNEL_CABINET_SEED, key=lambda r: r["num_ordre"])
+    codes = generate_unique_codes(len(roster), seed=20260814)
+    return {row["num_ordre"]: code for row, code in zip(roster, codes, strict=True)}
 

@@ -8,7 +8,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.data.personnel_cabinet_seed import PERSONNEL_CABINET_SEED, seed_presence_codes
+from app.data.personnel_cabinet_seed import PERSONNEL_CABINET_SEED, personnel_actif_for_seed, seed_presence_codes
 from app.models.presence import (
     PersonnelCabinet,
     PresenceEnregistrement,
@@ -51,6 +51,11 @@ async def list_personnel(db: AsyncSession, actif_only: bool = False) -> list[Per
         stmt = stmt.where(PersonnelCabinet.actif.is_(True))
     result = await db.execute(stmt)
     return list(result.scalars().all())
+
+
+async def list_personnel_export(db: AsyncSession) -> list[PersonnelCabinet]:
+    """Liste complète numéros 1–89 pour export PDF/Excel."""
+    return await list_personnel(db, actif_only=False)
 
 
 async def get_personnel(db: AsyncSession, personnel_id: int) -> PersonnelCabinet | None:
@@ -146,7 +151,7 @@ async def seed_personnel_if_empty(db: AsyncSession) -> int:
                 email=row["email"],
                 categorie=row["categorie"],
                 code_presence=seed_codes[row["num_ordre"]],
-                actif=True,
+                actif=personnel_actif_for_seed(row),
             )
         )
     await db.commit()
@@ -357,7 +362,7 @@ async def export_seance_pdf(db: AsyncSession, seance_id: int) -> tuple[BytesIO, 
     if seance is None:
         raise HTTPException(status_code=404, detail="Séance introuvable")
 
-    personnel = await list_personnel(db, actif_only=True)
+    personnel = await list_personnel_export(db)
     presence_times = await _seance_presence_times(db, seance_id)
 
     buffer = build_presence_list_pdf(
@@ -375,7 +380,7 @@ async def export_seance_excel(db: AsyncSession, seance_id: int) -> tuple[BytesIO
     if seance is None:
         raise HTTPException(status_code=404, detail="Séance introuvable")
 
-    personnel = await list_personnel(db, actif_only=True)
+    personnel = await list_personnel_export(db)
     presence_times = await _seance_presence_times(db, seance_id)
 
     wb = Workbook()
@@ -407,8 +412,8 @@ async def export_seance_excel(db: AsyncSession, seance_id: int) -> tuple[BytesIO
             start + row_offset,
             (
                 person.num_ordre,
-                person.nom_complet,
-                person.fonction,
+                person.nom_complet.strip() or "—",
+                person.fonction.strip() or "—",
                 person.categorie,
                 person.contact or "",
                 person.email or "",

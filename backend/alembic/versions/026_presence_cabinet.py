@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.dialects import postgresql
 
-from app.data.personnel_cabinet_seed import PERSONNEL_CABINET_SEED, seed_presence_codes
+from app.data.personnel_cabinet_seed import PERSONNEL_CABINET_SEED, personnel_actif_for_seed, seed_presence_codes
 from app.db.migration_helpers import drop_enum, ensure_enum
 
 revision: str = "026"
@@ -99,7 +99,7 @@ def upgrade() -> None:
                 "email": row["email"],
                 "categorie": row["categorie"],
                 "code_presence": seed_codes[row["num_ordre"]],
-                "actif": True,
+                "actif": personnel_actif_for_seed(row),
             }
             for row in PERSONNEL_CABINET_SEED
         ],

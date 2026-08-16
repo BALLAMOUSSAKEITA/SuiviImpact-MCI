@@ -148,7 +148,7 @@ function PersonnelPresenceContent() {
       <PageHeader
         eyebrow="Présence"
         title="Personnel"
-        description="Liste du personnel du Conseil de Cabinet. Chaque membre possède un code aléatoire à 4 chiffres pour le pointage."
+        description="Liste complète de 89 lignes (Conseil de Cabinet). Les lignes sans nom servent à l'export ; seules les personnes identifiées pointent via QR."
         actions={
           canWrite ? (
             <div className="flex flex-wrap gap-2">
@@ -225,7 +225,7 @@ function PersonnelPresenceContent() {
             {filtered.map((p) => (
               <tr key={p.id} className={!p.actif ? "opacity-50" : undefined}>
                 <td className="text-slate">{p.num_ordre}</td>
-                <td className="font-medium text-graphite">{p.nom_complet}</td>
+                <td className="font-medium text-graphite">{p.nom_complet.trim() || "—"}</td>
                 <td className="max-w-xs text-sm text-slate">{p.fonction}</td>
                 <td className="text-sm text-slate">{p.categorie || "—"}</td>
                 <td className="text-sm text-slate">{p.contact || "—"}</td>

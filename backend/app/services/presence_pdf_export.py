@@ -47,8 +47,13 @@ def _format_time(value: datetime) -> str:
     return local.strftime("%H:%M")
 
 
+def _display_cell(value: str | None) -> str:
+    text = (value or "").strip()
+    return text if text else "—"
+
+
 def _paragraph(text: str, style: ParagraphStyle) -> Paragraph:
-    safe = (text or "—").replace("&", "&amp;").replace("<", "&lt;")
+    safe = _display_cell(text).replace("&", "&amp;").replace("<", "&lt;")
     return Paragraph(safe, style)
 
 
@@ -178,10 +183,10 @@ def build_presence_list_pdf(
         table_data.append(
             [
                 _paragraph(str(person.num_ordre), cell_center),
-                _paragraph(person.nom_complet, cell_style),
-                _paragraph(person.fonction, cell_style),
-                _paragraph(person.contact or "", cell_style),
-                _paragraph(person.email or "", cell_style),
+                _paragraph(_display_cell(person.nom_complet), cell_style),
+                _paragraph(_display_cell(person.fonction), cell_style),
+                _paragraph(_display_cell(person.contact), cell_style),
+                _paragraph(_display_cell(person.email), cell_style),
                 _paragraph(emargement, cell_center),
             ]
         )
