@@ -55,13 +55,27 @@ class PersonnelCabinetUpdate(BaseModel):
         return value.strip()
 
 
-class PersonnelCabinetRead(PersonnelCabinetBase):
+class PersonnelCabinetRead(BaseModel):
+    """Lecture API — autorise les lignes placeholder (nom/fonction vides, n° 13–14…)."""
+
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    num_ordre: int = Field(ge=1, le=9999)
+    nom_complet: str = Field(max_length=200)
+    fonction: str = Field(max_length=500)
+    contact: str | None = Field(default=None, max_length=50)
+    email: str | None = Field(default=None, max_length=255)
+    categorie: str = Field(default="", max_length=100)
+    code_presence: str = Field(min_length=4, max_length=4, pattern=r"^\d{4}$")
     actif: bool
     created_at: datetime
     updated_at: datetime
+
+    @field_validator("code_presence")
+    @classmethod
+    def normalize_code(cls, value: str) -> str:
+        return value.strip()
 
 
 class SeancePresenceCreate(BaseModel):

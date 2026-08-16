@@ -1885,6 +1885,13 @@ export async function regeneratePersonnelCodes(): Promise<{ updated: number }> {
   });
 }
 
+export async function restorePersonnelSeed(): Promise<{ added: number; total: number }> {
+  return apiFetch<{ added: number; total: number }>(
+    "/api/v1/presence/personnel/restaurer-seed",
+    { method: "POST" },
+  );
+}
+
 export async function listSeancesPresence(): Promise<SeancePresence[]> {
   return apiFetch<SeancePresence[]>("/api/v1/presence/seances");
 }

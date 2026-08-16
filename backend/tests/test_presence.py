@@ -60,6 +60,52 @@ async def test_public_check_in_flow(client: AsyncClient, auth_headers: dict, db_
 
 
 @pytest.mark.asyncio
+async def test_list_personnel_with_placeholder_rows(client: AsyncClient, auth_headers: dict, db_session):
+    db_session.add(
+        PersonnelCabinet(
+            num_ordre=13,
+            nom_complet="",
+            fonction="",
+            categorie="Cabinet",
+            code_presence="0013",
+            actif=False,
+        )
+    )
+    db_session.add(
+        PersonnelCabinet(
+            num_ordre=14,
+            nom_complet="",
+            fonction="Attachée de Cabinet",
+            categorie="Cabinet",
+            code_presence="0014",
+            actif=False,
+        )
+    )
+    await db_session.commit()
+
+    resp = await client.get("/api/v1/presence/personnel", headers=auth_headers)
+    assert resp.status_code == 200
+    data = resp.json()
+    assert len(data) >= 2
+    by_num = {p["num_ordre"]: p for p in data}
+    assert by_num[13]["nom_complet"] == ""
+    assert by_num[14]["fonction"] == "Attachée de Cabinet"
+
+
+@pytest.mark.asyncio
+async def test_restore_personnel_seed(client: AsyncClient, auth_headers: dict, db_session):
+    resp = await client.post("/api/v1/presence/personnel/restaurer-seed", headers=auth_headers)
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["total"] == 89
+    assert body["added"] == 89
+
+    list_resp = await client.get("/api/v1/presence/personnel", headers=auth_headers)
+    assert list_resp.status_code == 200
+    assert len(list_resp.json()) == 89
+
+
+@pytest.mark.asyncio
 async def test_list_personnel(client: AsyncClient, auth_headers: dict, db_session):
     db_session.add(
         PersonnelCabinet(

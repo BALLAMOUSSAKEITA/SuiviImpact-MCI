@@ -15,6 +15,7 @@ import {
   deletePersonnelCabinet,
   listPersonnelCabinet,
   regeneratePersonnelCodes,
+  restorePersonnelSeed,
   updatePersonnelCabinet,
 } from "@/lib/api";
 import type { PersonnelCabinet } from "@/types";
@@ -42,11 +43,12 @@ function PersonnelPresenceContent() {
   const [editing, setEditing] = useState<PersonnelCabinet | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<PersonnelCabinet | null>(null);
   const [confirmRegenerate, setConfirmRegenerate] = useState(false);
+  const [confirmRestore, setConfirmRestore] = useState(false);
   const [form, setForm] = useState(emptyForm);
 
   const queryKey = ["presence-personnel"];
 
-  const { data = [], isLoading } = useQuery({
+  const { data = [], isLoading, isError, error, refetch } = useQuery({
     queryKey,
     queryFn: listPersonnelCabinet,
   });
@@ -130,6 +132,20 @@ function PersonnelPresenceContent() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const restoreMutation = useMutation({
+    mutationFn: restorePersonnelSeed,
+    onSuccess: (res) => {
+      toast.success(
+        res.added > 0
+          ? `Liste restaurée : ${res.added} ligne(s) ajoutée(s), ${res.total} au total.`
+          : `Liste complète : ${res.total} ligne(s) déjà en base.`,
+      );
+      setConfirmRestore(false);
+      invalidate();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const openEdit = (item: PersonnelCabinet) => {
     setEditing(item);
     setForm({
@@ -152,6 +168,9 @@ function PersonnelPresenceContent() {
         actions={
           canWrite ? (
             <div className="flex flex-wrap gap-2">
+              <Button variant="outline" onClick={() => setConfirmRestore(true)}>
+                Restaurer la liste officielle
+              </Button>
               <Button variant="outline" onClick={() => setConfirmRegenerate(true)}>
                 Régénérer les codes
               </Button>
@@ -163,6 +182,23 @@ function PersonnelPresenceContent() {
           ) : undefined
         }
       />
+
+      {isError && (
+        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+          <p className="font-semibold">Impossible de charger le personnel</p>
+          <p className="mt-1">{error instanceof Error ? error.message : "Erreur serveur"}</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Button variant="outline" size="sm" onClick={() => refetch()}>
+              Réessayer
+            </Button>
+            {canWrite && (
+              <Button size="sm" onClick={() => setConfirmRestore(true)}>
+                Restaurer la liste officielle
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="panel-grain mb-4 flex flex-wrap items-end gap-3">
         <div className="min-w-[200px] flex-1">
@@ -215,10 +251,19 @@ function PersonnelPresenceContent() {
                 </td>
               </tr>
             )}
-            {!isLoading && filtered.length === 0 && (
+            {!isLoading && !isError && filtered.length === 0 && (
               <tr>
                 <td colSpan={canWrite ? 8 : 7} className="py-8 text-center text-ash">
-                  Aucun personnel trouvé
+                  <p>Aucun personnel trouvé</p>
+                  {canWrite && data.length === 0 && (
+                    <Button
+                      className="mt-3"
+                      size="sm"
+                      onClick={() => setConfirmRestore(true)}
+                    >
+                      Restaurer la liste officielle (89 lignes)
+                    </Button>
+                  )}
                 </td>
               </tr>
             )}
@@ -287,6 +332,16 @@ function PersonnelPresenceContent() {
         loading={regenerateMutation.isPending}
         onCancel={() => setConfirmRegenerate(false)}
         onConfirm={() => regenerateMutation.mutate()}
+      />
+
+      <ConfirmDialog
+        open={confirmRestore}
+        title="Restaurer la liste officielle"
+        description="Réinjecte les 89 lignes du Conseil de Cabinet depuis la liste de référence. Les personnes déjà en base ne sont pas modifiées ; seules les lignes manquantes sont ajoutées."
+        confirmLabel="Restaurer"
+        loading={restoreMutation.isPending}
+        onCancel={() => setConfirmRestore(false)}
+        onConfirm={() => restoreMutation.mutate()}
       />
 
       <ConfirmDialog

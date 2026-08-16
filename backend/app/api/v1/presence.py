@@ -70,6 +70,15 @@ async def regenerate_personnel_codes(
     return {"updated": count}
 
 
+@router.post("/presence/personnel/restaurer-seed")
+async def restore_personnel_seed(
+    _: User = Depends(require_write_access),
+    db: AsyncSession = Depends(get_db),
+) -> dict[str, int]:
+    """Restaure la liste officielle (89 lignes) si vide ou incomplète — n'écrase pas les données existantes."""
+    return await service.restore_personnel_from_seed(db)
+
+
 @router.delete("/presence/personnel/{personnel_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_personnel(
     personnel_id: int,

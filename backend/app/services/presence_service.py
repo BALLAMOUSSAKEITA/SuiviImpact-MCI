@@ -158,6 +158,49 @@ async def seed_personnel_if_empty(db: AsyncSession) -> int:
     return len(PERSONNEL_CABINET_SEED)
 
 
+async def restore_personnel_from_seed(db: AsyncSession) -> dict[str, int]:
+    """Réinjecte le seed officiel si la table est vide, sinon complète les numéros manquants."""
+    result = await db.execute(select(func.count()).select_from(PersonnelCabinet))
+    total_before = int(result.scalar_one())
+    if total_before == 0:
+        added = await seed_personnel_if_empty(db)
+        return {"added": added, "total": added}
+
+    existing_nums = {
+        row[0]
+        for row in (await db.execute(select(PersonnelCabinet.num_ordre))).all()
+    }
+    existing_codes = {
+        row[0]
+        for row in (await db.execute(select(PersonnelCabinet.code_presence))).all()
+    }
+
+    added = 0
+    for row in PERSONNEL_CABINET_SEED:
+        if row["num_ordre"] in existing_nums:
+            continue
+        code = generate_presence_code(existing_codes)
+        existing_codes.add(code)
+        db.add(
+            PersonnelCabinet(
+                num_ordre=row["num_ordre"],
+                nom_complet=row["nom_complet"],
+                fonction=row["fonction"],
+                contact=row["contact"],
+                email=row["email"],
+                categorie=row["categorie"],
+                code_presence=code,
+                actif=personnel_actif_for_seed(row),
+            )
+        )
+        added += 1
+
+    if added:
+        await db.commit()
+
+    return {"added": added, "total": total_before + added}
+
+
 def _seance_read(
     seance: SeancePresence, nb_presents: int, nb_personnel_actif: int
 ) -> SeancePresenceRead:
