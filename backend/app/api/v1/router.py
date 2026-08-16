@@ -8,17 +8,18 @@ from app.api.v1 import (
     health,
     indicateurs,
     missions,
+    notifications,
     parametrage,
     plan_action,
     planification,
     ppm,
+    presence,
     projets,
     recommandations,
     stats,
     suivi,
     users,
     workflow,
-    notifications,
 )
 
 api_router = APIRouter()
@@ -40,3 +41,4 @@ api_router.include_router(exports.router, tags=["exports"])
 api_router.include_router(archive.router, tags=["archive"])
 api_router.include_router(workflow.router, tags=["workflow"])
 api_router.include_router(notifications.router, tags=["notifications"])
+api_router.include_router(presence.router, tags=["presence"])

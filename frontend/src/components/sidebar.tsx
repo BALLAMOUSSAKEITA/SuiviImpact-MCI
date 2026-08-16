@@ -10,6 +10,7 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  ClipboardCheck,
   ClipboardList,
   Download,
   FolderArchive,
@@ -95,6 +96,15 @@ const navItems: NavItem[] = [
     developerOnly: true,
   },
   { href: "/admin/archive", label: "Archive", icon: FolderArchive },
+  {
+    href: "/admin/presence",
+    label: "Présence",
+    icon: ClipboardCheck,
+    children: [
+      { href: "/admin/presence/personnel", label: "Personnel", icon: Users },
+      { href: "/admin/presence/seances", label: "Séances", icon: CalendarDays },
+    ],
+  },
   { href: "/admin/profil", label: "Mon profil", icon: UserCircle },
   { href: "/admin/comptes", label: "Comptes", icon: Users, adminOnly: true },
 ];

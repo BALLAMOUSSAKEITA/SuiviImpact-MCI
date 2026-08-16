@@ -1839,4 +1839,113 @@ export async function importFinances(file: File): Promise<FinanceState> {
   return apiFetchFormData<FinanceState>("/api/v1/finances/import", formData);
 }
 
+/* ─── Présence Conseil de Cabinet ─── */
+
+import type {
+  CheckInResponse,
+  PersonnelCabinet,
+  PersonnelCabinetCreate,
+  PersonnelCabinetUpdate,
+  PublicSeanceInfo,
+  SeancePresence,
+  SeancePresenceCreate,
+  SeancePresenceDetail,
+} from "@/types";
+
+export async function listPersonnelCabinet(): Promise<PersonnelCabinet[]> {
+  return apiFetch<PersonnelCabinet[]>("/api/v1/presence/personnel");
+}
+
+export async function createPersonnelCabinet(
+  data: PersonnelCabinetCreate,
+): Promise<PersonnelCabinet> {
+  return apiFetch<PersonnelCabinet>("/api/v1/presence/personnel", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updatePersonnelCabinet(
+  id: number,
+  data: PersonnelCabinetUpdate,
+): Promise<PersonnelCabinet> {
+  return apiFetch<PersonnelCabinet>(`/api/v1/presence/personnel/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deletePersonnelCabinet(id: number): Promise<void> {
+  await apiFetch<void>(`/api/v1/presence/personnel/${id}`, { method: "DELETE" });
+}
+
+export async function listSeancesPresence(): Promise<SeancePresence[]> {
+  return apiFetch<SeancePresence[]>("/api/v1/presence/seances");
+}
+
+export async function getSeancePresenceDetail(id: number): Promise<SeancePresenceDetail> {
+  return apiFetch<SeancePresenceDetail>(`/api/v1/presence/seances/${id}`);
+}
+
+export async function createSeancePresence(
+  data: SeancePresenceCreate,
+): Promise<SeancePresence> {
+  return apiFetch<SeancePresence>("/api/v1/presence/seances", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function closeSeancePresence(id: number): Promise<SeancePresence> {
+  return apiFetch<SeancePresence>(`/api/v1/presence/seances/${id}/cloturer`, {
+    method: "PATCH",
+  });
+}
+
+export async function deleteSeancePresence(id: number): Promise<void> {
+  await apiFetch<void>(`/api/v1/presence/seances/${id}`, { method: "DELETE" });
+}
+
+export async function exportSeancePresence(id: number): Promise<void> {
+  const token = getAccessToken();
+  const response = await fetch(`${API_BASE_URL}/api/v1/presence/seances/${id}/export`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!response.ok) {
+    throw new Error(await messageFromFailedResponse(response));
+  }
+  const blob = await response.blob();
+  const disposition = response.headers.get("Content-Disposition");
+  const match = disposition?.match(/filename="?([^";\n]+)"?/);
+  const filename = match?.[1] ?? `presence_conseil_${id}.xlsx`;
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+export async function getPublicSeanceInfo(token: string): Promise<PublicSeanceInfo> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/presence/public/${token}`);
+  if (!response.ok) {
+    throw new Error(await messageFromFailedResponse(response));
+  }
+  return response.json();
+}
+
+export async function publicCheckIn(
+  token: string,
+  code: string,
+): Promise<CheckInResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/presence/public/${token}/checkin`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ code }),
+  });
+  if (!response.ok) {
+    throw new Error(await messageFromFailedResponse(response));
+  }
+  return response.json();
+}
 

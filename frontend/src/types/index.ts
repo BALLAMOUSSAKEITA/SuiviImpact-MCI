@@ -784,3 +784,86 @@ export const NOTIFICATION_STATUT_LABELS: Record<string, string> = {
   simule: "Simulé",
   echec: "Échec",
 };
+
+/* ─── Présence Conseil de Cabinet ─── */
+
+export interface PersonnelCabinet {
+  id: number;
+  num_ordre: number;
+  nom_complet: string;
+  fonction: string;
+  contact: string | null;
+  email: string | null;
+  categorie: string;
+  code_presence: string;
+  actif: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PersonnelCabinetCreate {
+  num_ordre: number;
+  nom_complet: string;
+  fonction: string;
+  contact?: string | null;
+  email?: string | null;
+  categorie?: string;
+  code_presence: string;
+}
+
+export interface PersonnelCabinetUpdate {
+  num_ordre?: number;
+  nom_complet?: string;
+  fonction?: string;
+  contact?: string | null;
+  email?: string | null;
+  categorie?: string;
+  code_presence?: string;
+  actif?: boolean;
+}
+
+export interface SeancePresence {
+  id: number;
+  titre: string;
+  date_seance: string;
+  token: string;
+  statut: "ouverte" | "fermee";
+  created_at: string;
+  closed_at: string | null;
+  nb_presents: number;
+  nb_personnel_actif: number;
+}
+
+export interface SeancePresenceCreate {
+  titre: string;
+  date_seance: string;
+}
+
+export interface PresenceEnregistrement {
+  id: number;
+  personnel_id: number;
+  nom_complet: string;
+  fonction: string;
+  categorie: string;
+  contact: string | null;
+  email: string | null;
+  pointe_a: string;
+}
+
+export interface SeancePresenceDetail extends SeancePresence {
+  presences: PresenceEnregistrement[];
+}
+
+export interface PublicSeanceInfo {
+  titre: string;
+  date_seance: string;
+  statut: string;
+}
+
+export interface CheckInResponse {
+  success: boolean;
+  message: string;
+  nom_complet: string | null;
+  pointe_a: string | null;
+  deja_pointe: boolean;
+}
