@@ -9,7 +9,10 @@ import { toast } from "sonner";
 import { useAuth } from "@/components/auth-provider";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { PageHeader } from "@/components/page-header";
-import { QrPresencePrintSheet } from "@/components/qr-presence-print-sheet";
+import {
+  openQrPrintWindow,
+  QrPresencePrintSheet,
+} from "@/components/qr-presence-print-sheet";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -78,7 +81,18 @@ function SeanceDetailContent() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const handlePrint = () => window.print();
+  const handlePrint = () => {
+    if (!checkInUrl) {
+      toast.error("Le lien QR n'est pas encore disponible");
+      return;
+    }
+    const ok = openQrPrintWindow();
+    if (!ok) {
+      toast.error(
+        "Impossible d'ouvrir l'impression. Autorisez les pop-ups pour ce site.",
+      );
+    }
+  };
 
   const handleExport = async (format: "pdf" | "xlsx") => {
     if (format === "pdf") setExportingPdf(true);
@@ -104,153 +118,109 @@ function SeanceDetailContent() {
 
   return (
     <>
-      <div className="print:hidden">
-        <PageHeader
-          eyebrow="Présence"
-          title={data.titre}
-          description={formatDate(data.date_seance)}
-          actions={
-            <div className="flex flex-wrap gap-2">
-              <Link
-                href="/admin/presence/seances"
-                className={cn(buttonVariants({ variant: "outline" }))}
-              >
-                Retour
-              </Link>
-              <Button variant="outline" onClick={() => handleExport("pdf")} disabled={exportingPdf}>
-                {exportingPdf ? "Export…" : "Exporter PDF"}
+      <PageHeader
+        eyebrow="Présence"
+        title={data.titre}
+        description={formatDate(data.date_seance)}
+        actions={
+          <div className="flex flex-wrap gap-2">
+            <Link
+              href="/admin/presence/seances"
+              className={cn(buttonVariants({ variant: "outline" }))}
+            >
+              Retour
+            </Link>
+            <Button variant="outline" onClick={() => handleExport("pdf")} disabled={exportingPdf}>
+              {exportingPdf ? "Export…" : "Exporter PDF"}
+            </Button>
+            <Button variant="outline" onClick={() => handleExport("xlsx")} disabled={exportingXlsx}>
+              {exportingXlsx ? "Export…" : "Exporter Excel"}
+            </Button>
+            {canWrite && data.statut === "ouverte" && (
+              <Button variant="outline" onClick={() => setConfirmClose(true)}>
+                Clôturer
               </Button>
-              <Button variant="outline" onClick={() => handleExport("xlsx")} disabled={exportingXlsx}>
-                {exportingXlsx ? "Export…" : "Exporter Excel"}
-              </Button>
-              {canWrite && data.statut === "ouverte" && (
-                <Button variant="outline" onClick={() => setConfirmClose(true)}>
-                  Clôturer
-                </Button>
-              )}
-            </div>
-          }
-        />
-
-        <div className="mb-6 grid gap-6 lg:grid-cols-[360px_1fr]">
-          <div className="panel-grain">
-            <div className="mb-4 flex items-center justify-between gap-2 print:hidden">
-              <p className="text-sm font-semibold text-graphite">QR code de pointage</p>
-              <Button variant="outline" size="sm" onClick={handlePrint}>
-                Imprimer
-              </Button>
-            </div>
-            <div className="hidden print:block">
-              <QrPresencePrintSheet
-                titre={data.titre}
-                dateLabel={formatDate(data.date_seance)}
-                checkInUrl={checkInUrl}
-              />
-            </div>
-            <div className="print:hidden">
-              <QrPresencePrintSheet
-                titre={data.titre}
-                dateLabel={formatDate(data.date_seance)}
-                checkInUrl={checkInUrl}
-              />
-            </div>
+            )}
           </div>
+        }
+      />
 
-          <div className="panel-grain">
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-              <div>
-                <p className="text-2xl font-semibold text-graphite">
-                  {data.nb_presents}
-                  <span className="text-lg font-normal text-slate"> / {data.nb_personnel_actif}</span>
-                </p>
-                <p className="text-sm text-slate">Présents enregistrés</p>
-              </div>
-              <span
-                className={
-                  data.statut === "ouverte"
-                    ? "rounded-full bg-[#e0f5ea] px-3 py-1 text-sm font-semibold text-forest-ink"
-                    : "rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate"
-                }
-              >
-                {data.statut === "ouverte" ? "Séance ouverte" : "Séance clôturée"}
-              </span>
-            </div>
-
-            <div className="table-shell max-h-[480px] overflow-y-auto">
-              <table className="table-grain">
-                <thead>
-                  <tr>
-                    <th>N°</th>
-                    <th>Nom</th>
-                    <th>Fonction</th>
-                    <th>Heure</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.presences.length === 0 && (
-                    <tr>
-                      <td colSpan={4} className="py-8 text-center text-ash">
-                        Aucun pointage pour l&apos;instant
-                      </td>
-                    </tr>
-                  )}
-                  {data.presences.map((p, idx) => (
-                    <tr key={p.id}>
-                      <td className="text-slate">{idx + 1}</td>
-                      <td className="font-medium text-graphite">{p.nom_complet}</td>
-                      <td className="max-w-xs text-sm text-slate">{p.fonction}</td>
-                      <td className="text-sm text-slate">{formatTime(p.pointe_a)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+      <div className="mb-6 grid gap-6 lg:grid-cols-[360px_1fr]">
+        <div className="panel-grain">
+          <div className="mb-4 flex items-center justify-between gap-2">
+            <p className="text-sm font-semibold text-graphite">QR code de pointage</p>
+            <Button variant="outline" size="sm" onClick={handlePrint}>
+              Imprimer
+            </Button>
           </div>
+          <QrPresencePrintSheet
+            titre={data.titre}
+            dateLabel={formatDate(data.date_seance)}
+            checkInUrl={checkInUrl}
+          />
         </div>
 
-        <ConfirmDialog
-          open={confirmClose}
-          title="Clôturer la séance"
-          description="Les participants ne pourront plus pointer leur présence. Vous pourrez toujours exporter la liste."
-          confirmLabel="Clôturer"
-          loading={closeMutation.isPending}
-          onCancel={() => setConfirmClose(false)}
-          onConfirm={() => closeMutation.mutate()}
-        />
+        <div className="panel-grain">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <p className="text-2xl font-semibold text-graphite">
+                {data.nb_presents}
+                <span className="text-lg font-normal text-slate"> / {data.nb_personnel_actif}</span>
+              </p>
+              <p className="text-sm text-slate">Présents enregistrés</p>
+            </div>
+            <span
+              className={
+                data.statut === "ouverte"
+                  ? "rounded-full bg-[#e0f5ea] px-3 py-1 text-sm font-semibold text-forest-ink"
+                  : "rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate"
+              }
+            >
+              {data.statut === "ouverte" ? "Séance ouverte" : "Séance clôturée"}
+            </span>
+          </div>
+
+          <div className="table-shell max-h-[480px] overflow-y-auto">
+            <table className="table-grain">
+              <thead>
+                <tr>
+                  <th>N°</th>
+                  <th>Nom</th>
+                  <th>Fonction</th>
+                  <th>Heure</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.presences.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="py-8 text-center text-ash">
+                      Aucun pointage pour l&apos;instant
+                    </td>
+                  </tr>
+                )}
+                {data.presences.map((p, idx) => (
+                  <tr key={p.id}>
+                    <td className="text-slate">{idx + 1}</td>
+                    <td className="font-medium text-graphite">{p.nom_complet}</td>
+                    <td className="max-w-xs text-sm text-slate">{p.fonction}</td>
+                    <td className="text-sm text-slate">{formatTime(p.pointe_a)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
-      <div className="hidden print:block">
-        <QrPresencePrintSheet
-          titre={data.titre}
-          dateLabel={formatDate(data.date_seance)}
-          checkInUrl={checkInUrl}
-        />
-      </div>
-
-      <style jsx global>{`
-        @media print {
-          @page {
-            size: A4 portrait;
-            margin: 12mm;
-          }
-          body {
-            background: white !important;
-          }
-          body * {
-            visibility: hidden;
-          }
-          .print\\:block,
-          .print\\:block * {
-            visibility: visible;
-          }
-          .print\\:block {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-          }
-        }
-      `}</style>
+      <ConfirmDialog
+        open={confirmClose}
+        title="Clôturer la séance"
+        description="Les participants ne pourront plus pointer leur présence. Vous pourrez toujours exporter la liste."
+        confirmLabel="Clôturer"
+        loading={closeMutation.isPending}
+        onCancel={() => setConfirmClose(false)}
+        onConfirm={() => closeMutation.mutate()}
+      />
     </>
   );
 }
