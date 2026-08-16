@@ -8,6 +8,8 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.core.timezone import format_time_guinea
+
 from app.data.personnel_cabinet_seed import PERSONNEL_CABINET_SEED, personnel_actif_for_seed, seed_presence_codes
 from app.models.presence import (
     PersonnelCabinet,
@@ -456,7 +458,7 @@ async def export_seance_excel(db: AsyncSession, seance_id: int) -> tuple[BytesIO
             )
             row_offset += 1
         pointe = presence_times.get(person.id)
-        emargement = pointe.astimezone(UTC).strftime("%H:%M") if pointe else ""
+        emargement = format_time_guinea(pointe) if pointe else ""
         write_row_cells(
             ws,
             start + row_offset,

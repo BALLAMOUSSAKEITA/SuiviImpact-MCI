@@ -20,6 +20,7 @@ import {
   exportSeancePresence,
   getSeancePresenceDetail,
 } from "@/lib/api";
+import { formatTimeGuinea } from "@/lib/datetime";
 
 function formatDate(value: string): string {
   const [year, month, day] = value.slice(0, 10).split("-").map(Number);
@@ -29,13 +30,6 @@ function formatDate(value: string): string {
     day: "numeric",
     month: "long",
     year: "numeric",
-  });
-}
-
-function formatTime(value: string): string {
-  return new Date(value).toLocaleTimeString("fr-FR", {
-    hour: "2-digit",
-    minute: "2-digit",
   });
 }
 
@@ -201,7 +195,7 @@ function SeanceDetailContent() {
                     <td className="text-slate">{idx + 1}</td>
                     <td className="font-medium text-graphite">{p.nom_complet}</td>
                     <td className="max-w-xs text-sm text-slate">{p.fonction}</td>
-                    <td className="text-sm text-slate">{formatTime(p.pointe_a)}</td>
+                    <td className="text-sm text-slate">{formatTimeGuinea(p.pointe_a)}</td>
                   </tr>
                 ))}
               </tbody>

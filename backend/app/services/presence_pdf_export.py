@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import UTC, date, datetime
+from datetime import date, datetime
 from io import BytesIO
 from pathlib import Path
 
@@ -13,6 +13,7 @@ from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import cm
 from reportlab.platypus import Image, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
+from app.core.timezone import format_time_guinea
 from app.models.presence import PersonnelCabinet
 
 ASSETS_DIR = Path(__file__).resolve().parents[1] / "assets" / "branding"
@@ -43,8 +44,7 @@ def _format_date_fr(value: date) -> str:
 
 
 def _format_time(value: datetime) -> str:
-    local = value.astimezone(UTC)
-    return local.strftime("%H:%M")
+    return format_time_guinea(value)
 
 
 def _display_cell(value: str | None) -> str:
