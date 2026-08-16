@@ -10,7 +10,8 @@ import { toast } from "sonner";
 import { useAuth } from "@/components/auth-provider";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { PageHeader } from "@/components/page-header";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   closeSeancePresence,
   exportSeancePresence,
@@ -106,9 +107,12 @@ function SeanceDetailContent() {
         description={formatDate(data.date_seance)}
         actions={
           <div className="flex flex-wrap gap-2">
-            <Button variant="outline" asChild>
-              <Link href="/admin/presence/seances">Retour</Link>
-            </Button>
+            <Link
+              href="/admin/presence/seances"
+              className={cn(buttonVariants({ variant: "outline" }))}
+            >
+              Retour
+            </Link>
             <Button variant="outline" onClick={handleExport} disabled={exporting}>
               {exporting ? "Export…" : "Exporter Excel"}
             </Button>

@@ -9,7 +9,8 @@ import { toast } from "sonner";
 import { useAuth } from "@/components/auth-provider";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { PageHeader } from "@/components/page-header";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { createSeancePresence, deleteSeancePresence, listSeancesPresence } from "@/lib/api";
 
 function formatDate(value: string): string {
@@ -168,9 +169,12 @@ function SeancesPresenceContent() {
                 </td>
                 <td className="text-right">
                   <div className="flex items-center justify-end gap-2">
-                    <Button variant="outline" size="sm" asChild>
-                      <Link href={`/admin/presence/seances/${s.id}`}>Voir</Link>
-                    </Button>
+                    <Link
+                      href={`/admin/presence/seances/${s.id}`}
+                      className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+                    >
+                      Voir
+                    </Link>
                     {canWrite && (
                       <Button
                         variant="destructive"

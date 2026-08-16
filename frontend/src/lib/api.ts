@@ -1912,7 +1912,8 @@ export async function exportSeancePresence(id: number): Promise<void> {
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
   if (!response.ok) {
-    throw new Error(await messageFromFailedResponse(response));
+    const error = (await response.json().catch(() => ({}))) as Record<string, unknown>;
+    throw new Error(messageFromFailedResponse(error, response.status));
   }
   const blob = await response.blob();
   const disposition = response.headers.get("Content-Disposition");
@@ -1929,7 +1930,8 @@ export async function exportSeancePresence(id: number): Promise<void> {
 export async function getPublicSeanceInfo(token: string): Promise<PublicSeanceInfo> {
   const response = await fetch(`${API_BASE_URL}/api/v1/presence/public/${token}`);
   if (!response.ok) {
-    throw new Error(await messageFromFailedResponse(response));
+    const error = (await response.json().catch(() => ({}))) as Record<string, unknown>;
+    throw new Error(messageFromFailedResponse(error, response.status));
   }
   return response.json();
 }
@@ -1944,7 +1946,8 @@ export async function publicCheckIn(
     body: JSON.stringify({ code }),
   });
   if (!response.ok) {
-    throw new Error(await messageFromFailedResponse(response));
+    const error = (await response.json().catch(() => ({}))) as Record<string, unknown>;
+    throw new Error(messageFromFailedResponse(error, response.status));
   }
   return response.json();
 }
