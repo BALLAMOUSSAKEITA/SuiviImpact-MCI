@@ -75,6 +75,8 @@ class PresenceEnregistrement(Base):
     personnel_id: Mapped[int] = mapped_column(
         ForeignKey("personnel_cabinet.id", ondelete="CASCADE"), nullable=False
     )
+    nom_complet: Mapped[str] = mapped_column(String(200), nullable=False, default="")
+    fonction: Mapped[str] = mapped_column(String(500), nullable=False, default="")
     pointe_a: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )

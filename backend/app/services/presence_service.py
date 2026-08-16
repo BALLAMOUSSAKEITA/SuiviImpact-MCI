@@ -222,8 +222,8 @@ async def get_seance_detail(db: AsyncSession, seance_id: int) -> SeancePresenceD
             PresenceEnregistrementRead(
                 id=p.id,
                 personnel_id=p.personnel_id,
-                nom_complet=p.personnel.nom_complet,
-                fonction=p.personnel.fonction,
+                nom_complet=p.nom_complet or p.personnel.nom_complet,
+                fonction=p.fonction or p.personnel.fonction,
                 categorie=p.personnel.categorie,
                 contact=p.personnel.contact,
                 email=p.personnel.email,
@@ -319,10 +319,16 @@ async def check_in(db: AsyncSession, token: str, code: str) -> CheckInResponse:
             success=True,
             message=f"Vous êtes déjà enregistré(e), {personnel.nom_complet}.",
             nom_complet=personnel.nom_complet,
+            fonction=personnel.fonction,
             deja_pointe=True,
         )
 
-    enregistrement = PresenceEnregistrement(seance_id=seance.id, personnel_id=personnel.id)
+    enregistrement = PresenceEnregistrement(
+        seance_id=seance.id,
+        personnel_id=personnel.id,
+        nom_complet=personnel.nom_complet,
+        fonction=personnel.fonction,
+    )
     db.add(enregistrement)
     await db.commit()
     await db.refresh(enregistrement)
@@ -331,6 +337,7 @@ async def check_in(db: AsyncSession, token: str, code: str) -> CheckInResponse:
         success=True,
         message=f"Présence enregistrée. Merci, {personnel.nom_complet}.",
         nom_complet=personnel.nom_complet,
+        fonction=personnel.fonction,
         pointe_a=enregistrement.pointe_a,
         deja_pointe=False,
     )

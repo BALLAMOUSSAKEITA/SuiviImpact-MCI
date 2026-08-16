@@ -42,6 +42,7 @@ async def test_public_check_in_flow(client: AsyncClient, auth_headers: dict, db_
     body = checkin_resp.json()
     assert body["success"] is True
     assert body["nom_complet"] == "Test USER"
+    assert body["fonction"] == "Testeur"
 
     duplicate_resp = await client.post(
         f"/api/v1/presence/public/{token}/checkin",

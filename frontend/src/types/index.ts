@@ -864,6 +864,7 @@ export interface CheckInResponse {
   success: boolean;
   message: string;
   nom_complet: string | null;
+  fonction: string | null;
   pointe_a: string | null;
   deja_pointe: boolean;
 }

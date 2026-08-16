@@ -119,5 +119,6 @@ class CheckInResponse(BaseModel):
     success: bool
     message: str
     nom_complet: str | None = None
+    fonction: str | None = None
     pointe_a: datetime | None = None
     deja_pointe: bool = False
