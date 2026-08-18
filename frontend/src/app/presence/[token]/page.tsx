@@ -3,8 +3,8 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { AlertCircle, CheckCircle2, Info, Loader2 } from "lucide-react";
 import Image from "next/image";
-import { useParams } from "next/navigation";
-import { useRef, useState } from "react";
+import { useParams, useSearchParams } from "next/navigation";
+import { Suspense, useRef, useState } from "react";
 
 import { FlagStripe } from "@/components/flag-stripe";
 import { getPublicSeanceInfo, publicCheckIn } from "@/lib/api";
@@ -30,20 +30,36 @@ type ResultState = {
 };
 
 export default function PublicPresencePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-full items-center justify-center bg-[#f4f9f6] text-[#5A6B63]">
+          Chargement…
+        </div>
+      }
+    >
+      <PublicPresenceContent />
+    </Suspense>
+  );
+}
+
+function PublicPresenceContent() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const token = String(params.token ?? "");
+  const qrPass = searchParams.get("p");
   const [digits, setDigits] = useState(["", "", "", ""]);
   const [result, setResult] = useState<ResultState | null>(null);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const { data: seance, isLoading, error } = useQuery({
-    queryKey: ["public-seance", token],
-    queryFn: () => getPublicSeanceInfo(token),
+    queryKey: ["public-seance", token, qrPass],
+    queryFn: () => getPublicSeanceInfo(token, qrPass),
     enabled: Boolean(token),
   });
 
   const checkInMutation = useMutation({
-    mutationFn: (code: string) => publicCheckIn(token, code),
+    mutationFn: (code: string) => publicCheckIn(token, code, qrPass),
     onSuccess: (res) => {
       setResult({
         type: res.success ? (res.deja_pointe ? "info" : "success") : "error",
@@ -164,9 +180,13 @@ export default function PublicPresencePage() {
           {error && (
             <div className="flex flex-col items-center gap-3 px-6 py-14 text-center">
               <AlertCircle className="h-10 w-10 text-red-500" />
-              <p className="font-semibold text-[#1A3D2E]">Lien invalide</p>
+              <p className="font-semibold text-[#1A3D2E]">
+                {qrPass ? "QR code expiré" : "Lien invalide"}
+              </p>
               <p className="text-sm text-[#5A6B63]">
-                Séance introuvable ou QR code expiré. Contactez le BSD.
+                {qrPass
+                  ? "Rescannez le code affiché à l'entrée de la salle."
+                  : "Séance introuvable ou lien invalide. Contactez le BSD."}
               </p>
             </div>
           )}
@@ -198,6 +218,12 @@ export default function PublicPresencePage() {
                       Cette réunion est terminée. Le pointage n&apos;est plus possible.
                     </p>
                   </div>
+                )}
+
+                {!closed && !qrPass && (
+                  <p className="mb-4 rounded-lg bg-amber-50 px-3 py-2 text-center text-xs text-amber-900">
+                    Mode secours — scannez de préférence le QR dynamique affiché à l&apos;entrée.
+                  </p>
                 )}
 
                 {showForm && (

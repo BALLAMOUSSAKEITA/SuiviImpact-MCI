@@ -118,15 +118,44 @@ class PublicSeanceInfo(BaseModel):
     titre: str
     date_seance: date
     statut: str
+    qr_pass_required: bool = False
 
 
 class CheckInRequest(BaseModel):
     code: str = Field(min_length=4, max_length=4, pattern=r"^\d{4}$")
+    qr_pass: str | None = Field(default=None, max_length=32)
 
     @field_validator("code")
     @classmethod
     def normalize_code(cls, value: str) -> str:
         return value.strip()
+
+    @field_validator("qr_pass")
+    @classmethod
+    def normalize_pass(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        stripped = value.strip()
+        return stripped or None
+
+
+class PresenceParametrageRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    qr_ttl_seconds: int
+    updated_at: datetime
+
+
+class PresenceParametrageUpdate(BaseModel):
+    qr_ttl_seconds: int = Field(ge=5, le=300)
+
+
+class SeanceQrLiveRead(BaseModel):
+    token: str
+    qr_pass: str
+    ttl_seconds: int
+    expires_in: int
+    check_in_path: str
 
 
 class CheckInResponse(BaseModel):

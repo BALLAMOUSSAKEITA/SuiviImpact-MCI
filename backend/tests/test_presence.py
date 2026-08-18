@@ -1,7 +1,76 @@
 import pytest
 from httpx import AsyncClient
 
+from app.models import presence_parametrage  # noqa: F401
 from app.models.presence import PersonnelCabinet, SeancePresence, SeanceStatut
+
+
+@pytest.mark.asyncio
+async def test_check_in_with_valid_qr_pass(client: AsyncClient, auth_headers: dict, db_session):
+    personnel = PersonnelCabinet(
+        num_ordre=20,
+        nom_complet="QR PASS USER",
+        fonction="Testeur",
+        categorie="Test",
+        code_presence="2468",
+        actif=True,
+    )
+    db_session.add(personnel)
+    await db_session.commit()
+
+    create_resp = await client.post(
+        "/api/v1/presence/seances",
+        headers=auth_headers,
+        json={"titre": "Conseil QR", "date_seance": "2026-08-14"},
+    )
+    seance = create_resp.json()
+    token = seance["token"]
+
+    live_resp = await client.get(
+        f"/api/v1/presence/seances/{seance['id']}/qr-live",
+        headers=auth_headers,
+    )
+    assert live_resp.status_code == 200
+    qr_pass = live_resp.json()["qr_pass"]
+
+    checkin_resp = await client.post(
+        f"/api/v1/presence/public/{token}/checkin",
+        json={"code": "2468", "qr_pass": qr_pass},
+    )
+    assert checkin_resp.status_code == 200
+    assert checkin_resp.json()["success"] is True
+
+
+@pytest.mark.asyncio
+async def test_check_in_rejects_expired_qr_pass(client: AsyncClient, auth_headers: dict, db_session):
+    from app.core.config import settings
+    from app.services.presence_qr_pass import generate_qr_pass
+
+    personnel = PersonnelCabinet(
+        num_ordre=21,
+        nom_complet="EXPIRED QR",
+        fonction="Testeur",
+        categorie="Test",
+        code_presence="1357",
+        actif=True,
+    )
+    db_session.add(personnel)
+    await db_session.commit()
+
+    create_resp = await client.post(
+        "/api/v1/presence/seances",
+        headers=auth_headers,
+        json={"titre": "Conseil expiré", "date_seance": "2026-08-14"},
+    )
+    token = create_resp.json()["token"]
+
+    old_pass, _ = generate_qr_pass(settings.SECRET_KEY, token, 20, ts=1_000_000.0)
+    checkin_resp = await client.post(
+        f"/api/v1/presence/public/{token}/checkin",
+        json={"code": "1357", "qr_pass": old_pass},
+    )
+    assert checkin_resp.status_code == 200
+    assert checkin_resp.json()["success"] is False
 
 
 @pytest.mark.asyncio

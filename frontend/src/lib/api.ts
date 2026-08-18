@@ -1846,10 +1846,12 @@ import type {
   PersonnelCabinet,
   PersonnelCabinetCreate,
   PersonnelCabinetUpdate,
+  PresenceParametrage,
   PublicSeanceInfo,
   SeancePresence,
   SeancePresenceCreate,
   SeancePresenceDetail,
+  SeanceQrLive,
 } from "@/types";
 
 export async function listPersonnelCabinet(): Promise<PersonnelCabinet[]> {
@@ -1900,6 +1902,23 @@ export async function getSeancePresenceDetail(id: number): Promise<SeancePresenc
   return apiFetch<SeancePresenceDetail>(`/api/v1/presence/seances/${id}`);
 }
 
+export async function getSeanceQrLive(id: number): Promise<SeanceQrLive> {
+  return apiFetch<SeanceQrLive>(`/api/v1/presence/seances/${id}/qr-live`);
+}
+
+export async function getPresenceParametrage(): Promise<PresenceParametrage> {
+  return apiFetch<PresenceParametrage>("/api/v1/presence/parametrage");
+}
+
+export async function updatePresenceParametrage(
+  qr_ttl_seconds: number,
+): Promise<PresenceParametrage> {
+  return apiFetch<PresenceParametrage>("/api/v1/presence/parametrage", {
+    method: "PUT",
+    body: JSON.stringify({ qr_ttl_seconds }),
+  });
+}
+
 export async function createSeancePresence(
   data: SeancePresenceCreate,
 ): Promise<SeancePresence> {
@@ -1946,8 +1965,12 @@ export async function exportSeancePresence(
   URL.revokeObjectURL(url);
 }
 
-export async function getPublicSeanceInfo(token: string): Promise<PublicSeanceInfo> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/presence/public/${token}`);
+export async function getPublicSeanceInfo(
+  token: string,
+  qrPass?: string | null,
+): Promise<PublicSeanceInfo> {
+  const query = qrPass ? `?p=${encodeURIComponent(qrPass)}` : "";
+  const response = await fetch(`${API_BASE_URL}/api/v1/presence/public/${token}${query}`);
   if (!response.ok) {
     const error = (await response.json().catch(() => ({}))) as Record<string, unknown>;
     throw new Error(messageFromFailedResponse(error, response.status));
@@ -1958,11 +1981,15 @@ export async function getPublicSeanceInfo(token: string): Promise<PublicSeanceIn
 export async function publicCheckIn(
   token: string,
   code: string,
+  qrPass?: string | null,
 ): Promise<CheckInResponse> {
   const response = await fetch(`${API_BASE_URL}/api/v1/presence/public/${token}/checkin`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ code }),
+    body: JSON.stringify({
+      code,
+      qr_pass: qrPass ?? null,
+    }),
   });
   if (!response.ok) {
     const error = (await response.json().catch(() => ({}))) as Record<string, unknown>;

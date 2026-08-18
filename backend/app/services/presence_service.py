@@ -8,6 +8,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.core.config import settings
 from app.core.timezone import format_time_guinea
 
 from app.data.personnel_cabinet_seed import PERSONNEL_CABINET_SEED, personnel_actif_for_seed, seed_presence_codes
@@ -17,15 +18,19 @@ from app.models.presence import (
     SeancePresence,
     SeanceStatut,
 )
+from app.models.presence_parametrage import PRESENCE_PARAMETRAGE_ID, PresenceParametrage
 from app.schemas.presence import (
     CheckInResponse,
     PersonnelCabinetCreate,
     PersonnelCabinetUpdate,
     PresenceEnregistrementRead,
+    PresenceParametrageRead,
+    PresenceParametrageUpdate,
     PublicSeanceInfo,
     SeancePresenceCreate,
     SeancePresenceDetail,
     SeancePresenceRead,
+    SeanceQrLiveRead,
 )
 from app.services.excel_branding import (
     finalize_sheet,
@@ -34,6 +39,7 @@ from app.services.excel_branding import (
 )
 from app.services.presence_codes import generate_presence_code
 from app.services.presence_pdf_export import build_presence_list_pdf
+from app.services.presence_qr_pass import DEFAULT_QR_TTL_SECONDS, generate_qr_pass, validate_qr_pass
 
 
 def _generate_token() -> str:
@@ -317,18 +323,83 @@ async def delete_seance(db: AsyncSession, seance: SeancePresence) -> None:
     await db.commit()
 
 
-async def get_public_seance_info(db: AsyncSession, token: str) -> PublicSeanceInfo:
+async def _ensure_presence_parametrage(db: AsyncSession) -> PresenceParametrage:
+    row = await db.get(PresenceParametrage, PRESENCE_PARAMETRAGE_ID)
+    if row is None:
+        row = PresenceParametrage(
+            id=PRESENCE_PARAMETRAGE_ID,
+            qr_ttl_seconds=DEFAULT_QR_TTL_SECONDS,
+        )
+        db.add(row)
+        await db.commit()
+        await db.refresh(row)
+    return row
+
+
+async def get_presence_parametrage(db: AsyncSession) -> PresenceParametrageRead:
+    row = await _ensure_presence_parametrage(db)
+    return PresenceParametrageRead.model_validate(row)
+
+
+async def update_presence_parametrage(
+    db: AsyncSession, body: PresenceParametrageUpdate
+) -> PresenceParametrageRead:
+    row = await _ensure_presence_parametrage(db)
+    row.qr_ttl_seconds = body.qr_ttl_seconds
+    await db.commit()
+    await db.refresh(row)
+    return PresenceParametrageRead.model_validate(row)
+
+
+async def _get_qr_ttl_seconds(db: AsyncSession) -> int:
+    row = await _ensure_presence_parametrage(db)
+    return row.qr_ttl_seconds
+
+
+async def get_seance_qr_live(db: AsyncSession, seance_id: int) -> SeanceQrLiveRead:
+    seance = await get_seance(db, seance_id)
+    if seance is None:
+        raise HTTPException(status_code=404, detail="Séance introuvable")
+    if seance.statut != SeanceStatut.OUVERTE:
+        raise HTTPException(status_code=400, detail="Cette séance est clôturée")
+
+    ttl = await _get_qr_ttl_seconds(db)
+    qr_pass, expires_in = generate_qr_pass(settings.SECRET_KEY, seance.token, ttl)
+    return SeanceQrLiveRead(
+        token=seance.token,
+        qr_pass=qr_pass,
+        ttl_seconds=ttl,
+        expires_in=expires_in,
+        check_in_path=f"/presence/{seance.token}?p={qr_pass}",
+    )
+
+
+async def get_public_seance_info(
+    db: AsyncSession, token: str, qr_pass: str | None = None
+) -> PublicSeanceInfo:
     seance = await get_seance_by_token(db, token)
     if seance is None:
         raise HTTPException(status_code=404, detail="Séance introuvable")
+
+    if qr_pass:
+        ttl = await _get_qr_ttl_seconds(db)
+        if not validate_qr_pass(settings.SECRET_KEY, seance.token, qr_pass, ttl):
+            raise HTTPException(
+                status_code=403,
+                detail="QR code expiré. Rescannez le code affiché à l'entrée.",
+            )
+
     return PublicSeanceInfo(
         titre=seance.titre,
         date_seance=seance.date_seance,
         statut=seance.statut.value,
+        qr_pass_required=bool(qr_pass),
     )
 
 
-async def check_in(db: AsyncSession, token: str, code: str) -> CheckInResponse:
+async def check_in(
+    db: AsyncSession, token: str, code: str, qr_pass: str | None = None
+) -> CheckInResponse:
     seance = await get_seance_by_token(db, token)
     if seance is None:
         raise HTTPException(status_code=404, detail="Séance introuvable")
@@ -338,6 +409,15 @@ async def check_in(db: AsyncSession, token: str, code: str) -> CheckInResponse:
             message="Cette réunion est terminée. Le pointage n'est plus possible.",
             deja_pointe=False,
         )
+
+    if qr_pass:
+        ttl = await _get_qr_ttl_seconds(db)
+        if not validate_qr_pass(settings.SECRET_KEY, seance.token, qr_pass, ttl):
+            return CheckInResponse(
+                success=False,
+                message="QR code expiré. Rescannez le code affiché à l'entrée.",
+                deja_pointe=False,
+            )
 
     personnel_result = await db.execute(
         select(PersonnelCabinet).where(

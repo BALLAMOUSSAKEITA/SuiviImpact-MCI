@@ -858,6 +858,20 @@ export interface PublicSeanceInfo {
   titre: string;
   date_seance: string;
   statut: string;
+  qr_pass_required: boolean;
+}
+
+export interface PresenceParametrage {
+  qr_ttl_seconds: number;
+  updated_at: string;
+}
+
+export interface SeanceQrLive {
+  token: string;
+  qr_pass: string;
+  ttl_seconds: number;
+  expires_in: number;
+  check_in_path: string;
 }
 
 export interface CheckInResponse {

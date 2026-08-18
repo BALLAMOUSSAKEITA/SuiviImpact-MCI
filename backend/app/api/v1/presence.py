@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_current_user, require_write_access
+from app.api.deps import get_current_user, require_admin, require_write_access
 from app.core.database import get_db
 from app.models.user import User
 from app.schemas.presence import (
@@ -11,10 +11,13 @@ from app.schemas.presence import (
     PersonnelCabinetCreate,
     PersonnelCabinetRead,
     PersonnelCabinetUpdate,
+    PresenceParametrageRead,
+    PresenceParametrageUpdate,
     PublicSeanceInfo,
     SeancePresenceCreate,
     SeancePresenceDetail,
     SeancePresenceRead,
+    SeanceQrLiveRead,
 )
 from app.services import presence_service as service
 
@@ -91,6 +94,23 @@ async def delete_personnel(
     await service.delete_personnel(db, item)
 
 
+@router.get("/presence/parametrage", response_model=PresenceParametrageRead)
+async def get_presence_parametrage(
+    _: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> PresenceParametrageRead:
+    return await service.get_presence_parametrage(db)
+
+
+@router.put("/presence/parametrage", response_model=PresenceParametrageRead)
+async def update_presence_parametrage(
+    body: PresenceParametrageUpdate,
+    _: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+) -> PresenceParametrageRead:
+    return await service.update_presence_parametrage(db, body)
+
+
 # --- Séances (admin) ---
 
 
@@ -125,6 +145,15 @@ async def create_seance(
     db: AsyncSession = Depends(get_db),
 ) -> SeancePresenceRead:
     return await service.create_seance(db, body, created_by=user.id)
+
+
+@router.get("/presence/seances/{seance_id}/qr-live", response_model=SeanceQrLiveRead)
+async def get_seance_qr_live(
+    seance_id: int,
+    _: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> SeanceQrLiveRead:
+    return await service.get_seance_qr_live(db, seance_id)
 
 
 @router.patch("/presence/seances/{seance_id}/cloturer", response_model=SeancePresenceRead)
@@ -177,9 +206,10 @@ async def export_seance(
 @router.get("/presence/public/{token}", response_model=PublicSeanceInfo)
 async def public_seance_info(
     token: str,
+    p: str | None = None,
     db: AsyncSession = Depends(get_db),
 ) -> PublicSeanceInfo:
-    return await service.get_public_seance_info(db, token)
+    return await service.get_public_seance_info(db, token, qr_pass=p)
 
 
 @router.post("/presence/public/{token}/checkin", response_model=CheckInResponse)
@@ -188,4 +218,4 @@ async def public_check_in(
     body: CheckInRequest,
     db: AsyncSession = Depends(get_db),
 ) -> CheckInResponse:
-    return await service.check_in(db, token, body.code)
+    return await service.check_in(db, token, body.code, qr_pass=body.qr_pass)

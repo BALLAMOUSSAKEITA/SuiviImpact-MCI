@@ -8,6 +8,7 @@ import { toast } from "sonner";
 
 import { useAuth } from "@/components/auth-provider";
 import { ConfirmDialog } from "@/components/confirm-dialog";
+import { LiveQrPresenceDisplay } from "@/components/live-qr-presence-display";
 import { PageHeader } from "@/components/page-header";
 import {
   printQrPresenceSheet,
@@ -55,7 +56,7 @@ function SeanceDetailContent() {
     refetchInterval: 5000,
   });
 
-  const checkInUrl = useMemo(() => {
+  const backupCheckInUrl = useMemo(() => {
     if (!data?.token || typeof window === "undefined") return "";
     return `${window.location.origin}/presence/${data.token}`;
   }, [data?.token]);
@@ -76,11 +77,11 @@ function SeanceDetailContent() {
   });
 
   const handlePrint = () => {
-    if (!checkInUrl) {
+    if (!backupCheckInUrl) {
       toast.error("Le lien QR n'est pas encore disponible");
       return;
     }
-    const ok = printQrPresenceSheet();
+    const ok = printQrPresenceSheet("qr-print-backup");
     if (!ok) {
       toast.error("Impossible de préparer l'impression du QR code.");
     }
@@ -139,17 +140,43 @@ function SeanceDetailContent() {
 
       <div className="mb-6 grid gap-6 lg:grid-cols-[360px_1fr]">
         <div className="panel-grain">
-          <div className="mb-4 flex items-center justify-between gap-2">
-            <p className="text-sm font-semibold text-graphite">QR code de pointage</p>
-            <Button variant="outline" size="sm" onClick={handlePrint}>
-              Imprimer
-            </Button>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+            <p className="text-sm font-semibold text-graphite">QR code dynamique</p>
+            <div className="flex flex-wrap gap-2">
+              {data.statut === "ouverte" && (
+                <Link
+                  href={`/admin/presence/seances/${seanceId}/affichage`}
+                  target="_blank"
+                  className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+                >
+                  Affichage entrée
+                </Link>
+              )}
+              <Button variant="outline" size="sm" onClick={handlePrint}>
+                Imprimer (secours)
+              </Button>
+            </div>
           </div>
-          <QrPresencePrintSheet
-            titre={data.titre}
-            dateLabel={formatDate(data.date_seance)}
-            checkInUrl={checkInUrl}
-          />
+
+          {data.statut === "ouverte" ? (
+            <LiveQrPresenceDisplay
+              seanceId={seanceId}
+              titre={data.titre}
+              dateLabel={formatDate(data.date_seance)}
+            />
+          ) : (
+            <p className="py-6 text-center text-sm text-slate">Séance clôturée — QR inactif</p>
+          )}
+
+          <div className="sr-only" aria-hidden="true">
+            <QrPresencePrintSheet
+              printRootId="qr-print-backup"
+              titre={data.titre}
+              dateLabel={formatDate(data.date_seance)}
+              checkInUrl={backupCheckInUrl}
+              backupMode
+            />
+          </div>
         </div>
 
         <div className="panel-grain">

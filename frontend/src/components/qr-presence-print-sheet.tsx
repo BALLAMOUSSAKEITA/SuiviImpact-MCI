@@ -9,6 +9,8 @@ interface QrPresencePrintSheetProps {
   dateLabel: string;
   checkInUrl: string;
   printRootId?: string;
+  /** Mention sur feuille imprimée (QR statique de secours) */
+  backupMode?: boolean;
 }
 
 export function QrPresencePrintSheet({
@@ -16,6 +18,7 @@ export function QrPresencePrintSheet({
   dateLabel,
   checkInUrl,
   printRootId = "qr-print-area",
+  backupMode = false,
 }: QrPresencePrintSheetProps) {
   return (
     <div id={printRootId} className="qr-print-sheet mx-auto max-w-lg text-center">
@@ -43,6 +46,11 @@ export function QrPresencePrintSheet({
         <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#009959]">
           Pointage de présence
         </p>
+        {backupMode && (
+          <p className="mt-2 rounded-lg bg-amber-50 px-3 py-2 text-[11px] font-medium text-amber-900">
+            QR de secours (lien fixe) — préférez l&apos;affichage dynamique à l&apos;entrée
+          </p>
+        )}
         <h2 className="mt-2 font-display text-lg font-bold text-[#1A3D2E]">{titre}</h2>
         <p className="mt-1 text-sm text-[#5A6B63]">{dateLabel}</p>
       </div>

@@ -13,10 +13,12 @@ import { Button } from "@/components/ui/button";
 import {
   createPersonnelCabinet,
   deletePersonnelCabinet,
+  getPresenceParametrage,
   listPersonnelCabinet,
   regeneratePersonnelCodes,
   restorePersonnelSeed,
   updatePersonnelCabinet,
+  updatePresenceParametrage,
 } from "@/lib/api";
 import type { PersonnelCabinet } from "@/types";
 
@@ -35,7 +37,7 @@ export default function PersonnelPresencePage() {
 }
 
 function PersonnelPresenceContent() {
-  const { canWrite } = useAuth();
+  const { canWrite, isAdmin } = useAuth();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [categorieFilter, setCategorieFilter] = useState<string>("");
@@ -44,13 +46,21 @@ function PersonnelPresenceContent() {
   const [deleteTarget, setDeleteTarget] = useState<PersonnelCabinet | null>(null);
   const [confirmRegenerate, setConfirmRegenerate] = useState(false);
   const [confirmRestore, setConfirmRestore] = useState(false);
+  const [qrTtlInput, setQrTtlInput] = useState("");
   const [form, setForm] = useState(emptyForm);
 
   const queryKey = ["presence-personnel"];
+  const paramKey = ["presence-parametrage"];
 
   const { data = [], isLoading, isError, error, refetch } = useQuery({
     queryKey,
     queryFn: listPersonnelCabinet,
+  });
+
+  const { data: parametrage } = useQuery({
+    queryKey: paramKey,
+    queryFn: getPresenceParametrage,
+    enabled: isAdmin,
   });
 
   const categories = useMemo(
@@ -146,6 +156,15 @@ function PersonnelPresenceContent() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const paramMutation = useMutation({
+    mutationFn: (ttl: number) => updatePresenceParametrage(ttl),
+    onSuccess: (res) => {
+      toast.success(`Durée du QR dynamique : ${res.qr_ttl_seconds}s`);
+      queryClient.invalidateQueries({ queryKey: paramKey });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const openEdit = (item: PersonnelCabinet) => {
     setEditing(item);
     setForm({
@@ -182,6 +201,46 @@ function PersonnelPresenceContent() {
           ) : undefined
         }
       />
+
+      {isAdmin && parametrage && (
+        <div className="panel-grain mb-4">
+          <p className="mb-1 text-sm font-semibold text-graphite">QR dynamique (superadmin)</p>
+          <p className="mb-3 text-xs text-slate">
+            Durée de validité de chaque QR affiché à l&apos;entrée (5 à 300 secondes).
+          </p>
+          <form
+            className="flex flex-wrap items-end gap-3"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const ttl = Number(qrTtlInput || parametrage.qr_ttl_seconds);
+              if (!Number.isFinite(ttl) || ttl < 5 || ttl > 300) {
+                toast.error("Durée invalide (5–300 s)");
+                return;
+              }
+              paramMutation.mutate(ttl);
+            }}
+          >
+            <div className="w-32">
+              <label className="label-grain">Secondes</label>
+              <input
+                type="number"
+                min={5}
+                max={300}
+                className="input-grain"
+                placeholder={String(parametrage.qr_ttl_seconds)}
+                value={qrTtlInput}
+                onChange={(e) => setQrTtlInput(e.target.value)}
+              />
+            </div>
+            <Button type="submit" variant="outline" disabled={paramMutation.isPending}>
+              {paramMutation.isPending ? "Enregistrement…" : "Enregistrer"}
+            </Button>
+            <p className="pb-2 text-sm text-slate">
+              Actuel : <strong>{parametrage.qr_ttl_seconds}s</strong>
+            </p>
+          </form>
+        </div>
+      )}
 
       {isError && (
         <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
