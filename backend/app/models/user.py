@@ -1,7 +1,7 @@
 import enum
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, String, func
+from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
@@ -20,6 +20,7 @@ class UserRole(str, enum.Enum):
     SG = "sg"
     MINISTRE = "ministre"
     DAF = "daf"
+    MEMBRE_BSD = "membre_bsd"
 
 
 class User(Base):
@@ -37,6 +38,7 @@ class User(Base):
     type_acces: Mapped[AccessType] = mapped_column(
         pg_enum(AccessType, "access_type"), default=AccessType.LECTURE, nullable=False
     )
+    allowed_tabs: Mapped[list[str]] = mapped_column(JSON, nullable=False, default=list)
     etat: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()

@@ -13,14 +13,14 @@ export function RoleRouteGuard({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (isLoading || !user) return;
-    if (!isPathAllowed(user.role, pathname)) {
-      router.replace(defaultHomeForRole(user.role));
+    if (!isPathAllowed(user.role, pathname, user.allowed_tabs)) {
+      router.replace(defaultHomeForRole(user.role, user.allowed_tabs));
     }
   }, [isLoading, user, pathname, router]);
 
   if (isLoading || !user) return null;
 
-  if (!isPathAllowed(user.role, pathname)) {
+  if (!isPathAllowed(user.role, pathname, user.allowed_tabs)) {
     return (
       <div className="py-12 text-center text-sm text-ash">
         Redirection…

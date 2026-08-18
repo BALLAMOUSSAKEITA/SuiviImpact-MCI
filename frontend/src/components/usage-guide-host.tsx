@@ -29,7 +29,7 @@ export function UsageGuideHost() {
 
   const guideContext = useMemo(() => {
     if (!user) return null;
-    return { role: user.role, typeAcces: user.type_acces };
+    return { role: user.role, typeAcces: user.type_acces, allowedTabs: user.allowed_tabs };
   }, [user]);
 
   if (!user || !guideContext) return null;

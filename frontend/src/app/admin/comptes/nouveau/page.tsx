@@ -15,9 +15,18 @@ import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { createUser } from "@/lib/api";
 import { INSTITUTION_ROLES, ROLE_LABELS } from "@/lib/roles";
+import { BsdMemberTabsField } from "@/components/bsd-member-tabs-field";
 import type { UserRole } from "@/types";
 
-const ROLES = ["admin", "developpeur", "directeur", "sg", "ministre", "daf"] as const satisfies readonly UserRole[];
+const ROLES = [
+  "admin",
+  "membre_bsd",
+  "developpeur",
+  "directeur",
+  "sg",
+  "ministre",
+  "daf",
+] as const satisfies readonly UserRole[];
 
 const schema = z.object({
   prenom: z.string().min(1, "Prénom requis"),
@@ -25,6 +34,15 @@ const schema = z.object({
   username: z.string().min(3, "Minimum 3 caractères"),
   type_acces: z.enum(["lecture", "ecriture"]),
   role: z.enum(ROLES),
+  allowed_tabs: z.array(z.string()).default([]),
+}).superRefine((data, ctx) => {
+  if (data.role === "membre_bsd" && data.allowed_tabs.length === 0) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["allowed_tabs"],
+      message: "Sélectionnez au moins un onglet",
+    });
+  }
 });
 
 type FormData = z.infer<typeof schema>;
@@ -46,15 +64,18 @@ function NouveauCompteContent() {
     register,
     handleSubmit,
     control,
+    setValue,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { type_acces: "ecriture", role: "admin", nom: "" },
+    defaultValues: { type_acces: "ecriture", role: "admin", nom: "", allowed_tabs: [] },
   });
 
   const role = useWatch({ control, name: "role" });
+  const allowedTabs = useWatch({ control, name: "allowed_tabs" }) ?? [];
   const isInstitution = INSTITUTION_ROLES.includes(role);
   const isDeveloper = role === "developpeur";
+  const isMembreBsd = role === "membre_bsd";
 
   const mutation = useMutation({
     mutationFn: createUser,
@@ -95,12 +116,13 @@ function NouveauCompteContent() {
         description="Un mot de passe sécurisé est généré automatiquement à la création."
       />
 
-      <div className="panel-grain mx-auto max-w-lg">
+      <div className="panel-grain mx-auto max-w-2xl">
         <form
           onSubmit={handleSubmit((data) =>
             mutation.mutate({
               ...data,
               type_acces: isInstitution ? "lecture" : isDeveloper ? "ecriture" : data.type_acces,
+              allowed_tabs: isMembreBsd ? data.allowed_tabs : [],
             }),
           )}
           className="space-y-4"
@@ -134,6 +156,20 @@ function NouveauCompteContent() {
               Accès exclusif à l&apos;onglet <strong>Notifications</strong> (configuration e-mail,
               historique et rappels d&apos;activités). Aucun accès aux modules métier.
             </p>
+          ) : isMembreBsd ? (
+            <>
+              <Field label="Type d'accès" error={errors.type_acces?.message}>
+                <select {...register("type_acces")} className="input-grain w-full">
+                  <option value="lecture">Lecture (Visiteur)</option>
+                  <option value="ecriture">Écriture (Éditeur)</option>
+                </select>
+              </Field>
+              <BsdMemberTabsField
+                value={allowedTabs}
+                onChange={(tabs) => setValue("allowed_tabs", tabs, { shouldValidate: true })}
+                error={errors.allowed_tabs?.message}
+              />
+            </>
           ) : (
             <Field label="Type d'accès" error={errors.type_acces?.message}>
               <select {...register("type_acces")} className="input-grain w-full">

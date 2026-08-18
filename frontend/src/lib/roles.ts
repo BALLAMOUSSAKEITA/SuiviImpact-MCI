@@ -1,8 +1,10 @@
 import type { UserRole, WorkflowStepRole } from "@/types";
+import { defaultHomeForTabs, tabsAllowPath } from "@/lib/bsd-tabs";
 
 export const ROLE_LABELS: Record<UserRole, string> = {
   admin: "Super administrateur (BSD)",
   user: "Utilisateur (BSD)", // comptes historiques
+  membre_bsd: "Membre BSD",
   developpeur: "Développeur",
   directeur: "Directeur",
   sg: "Secrétaire général",
@@ -46,7 +48,11 @@ export function canWritePlatform(role: UserRole | undefined, typeAcces: string |
 }
 
 /** Chemins autorisés (hors préfixe /admin). Vue d'ensemble = exact /admin. */
-export function isPathAllowed(role: UserRole | undefined, pathname: string): boolean {
+export function isPathAllowed(
+  role: UserRole | undefined,
+  pathname: string,
+  allowedTabs?: string[] | null,
+): boolean {
   const path = pathname.split("?")[0];
   if (path === "/admin/profil" || path.startsWith("/admin/profil/")) return true;
 
@@ -55,6 +61,10 @@ export function isPathAllowed(role: UserRole | undefined, pathname: string): boo
   }
 
   if (!role || role === "admin" || role === "user") return true;
+
+  if (role === "membre_bsd") {
+    return tabsAllowPath(allowedTabs, path);
+  }
 
   if (role === "directeur") {
     const allowed = [
@@ -85,7 +95,12 @@ function matchesAllowed(path: string, allowed: string[]): boolean {
   return false;
 }
 
-export function canSeeNavHref(role: UserRole | undefined, href: string, adminOnly?: boolean): boolean {
+export function canSeeNavHref(
+  role: UserRole | undefined,
+  href: string,
+  adminOnly?: boolean,
+  allowedTabs?: string[] | null,
+): boolean {
   if (!role) return false;
   if (href === "/admin/profil" || href.startsWith("/admin/profil/")) return true;
   if (adminOnly) return role === "admin";
@@ -97,6 +112,11 @@ export function canSeeNavHref(role: UserRole | undefined, href: string, adminOnl
   if (href.startsWith("/admin/notifications")) return false;
 
   if (role === "admin" || role === "user") return true;
+
+  if (role === "membre_bsd") {
+    if (href === "/admin/comptes" || href.startsWith("/admin/comptes/")) return false;
+    return tabsAllowPath(allowedTabs, href);
+  }
 
   if (href === "/admin/comptes" || href.startsWith("/admin/comptes/")) return false;
   if (href.startsWith("/admin/plan-action") || href.startsWith("/admin/objectifs")) return false;
@@ -133,13 +153,18 @@ export function canSeeNavGroup(
   parentHref: string,
   childHrefs: string[],
   adminOnly?: boolean,
+  allowedTabs?: string[] | null,
 ): boolean {
   if (adminOnly) return role === "admin";
-  return childHrefs.some((href) => canSeeNavHref(role, href, false));
+  return childHrefs.some((href) => canSeeNavHref(role, href, false, allowedTabs));
 }
 
-export function defaultHomeForRole(role: UserRole | undefined): string {
+export function defaultHomeForRole(
+  role: UserRole | undefined,
+  allowedTabs?: string[] | null,
+): string {
   if (role === "developpeur") return "/admin/notifications";
+  if (role === "membre_bsd") return defaultHomeForTabs(allowedTabs);
   return "/admin";
 }
 
@@ -148,6 +173,7 @@ export function userWorkflowStepRole(role: UserRole | undefined): WorkflowStepRo
   const map: Record<UserRole, WorkflowStepRole | null> = {
     admin: "bsd",
     user: "bsd",
+    membre_bsd: "bsd",
     developpeur: null,
     directeur: "directeur",
     sg: "sg",

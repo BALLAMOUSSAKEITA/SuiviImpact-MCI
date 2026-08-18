@@ -208,13 +208,19 @@ export function Sidebar({
             if (item.developerOnly && !mayAccessNotifications) return false;
             if (item.children) {
               const childHrefs = item.children.map((c) => c.href);
-              return canSeeNavGroup(user?.role, item.href, childHrefs, item.adminOnly);
+              return canSeeNavGroup(
+                user?.role,
+                item.href,
+                childHrefs,
+                item.adminOnly,
+                user?.allowed_tabs,
+              );
             }
-            return canSeeNavHref(user?.role, item.href, item.adminOnly);
+            return canSeeNavHref(user?.role, item.href, item.adminOnly, user?.allowed_tabs);
           })
           .map((item) => {
             const visibleChildren = item.children?.filter((c) =>
-              canSeeNavHref(user?.role, c.href, false),
+              canSeeNavHref(user?.role, c.href, false, user?.allowed_tabs),
             );
             if (item.children && (!visibleChildren || visibleChildren.length === 0)) {
               return null;

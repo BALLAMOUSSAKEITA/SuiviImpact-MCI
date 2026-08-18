@@ -15,6 +15,7 @@ import {
   deleteUser,
   listUsers,
 } from "@/lib/api";
+import { bsdTabLabels } from "@/lib/bsd-tabs";
 import { ROLE_LABELS } from "@/lib/roles";
 
 export default function ComptesPage() {
@@ -111,7 +112,14 @@ function ComptesContent() {
                   <td>{user.nom || "—"}</td>
                   <td className="font-medium">{user.prenom}</td>
                   <td>{user.username}</td>
-                  <td>{ROLE_LABELS[user.role]}</td>
+                  <td>
+                    <div>{ROLE_LABELS[user.role]}</div>
+                    {user.role === "membre_bsd" && (
+                      <p className="mt-0.5 max-w-[220px] text-xs text-ash">
+                        {bsdTabLabels(user.allowed_tabs).join(", ") || "Aucun onglet"}
+                      </p>
+                    )}
+                  </td>
                   <td className="capitalize">{user.type_acces}</td>
                   <td>
                     <span
@@ -126,6 +134,13 @@ function ComptesContent() {
                   </td>
                   <td className="text-right">
                     <div className="flex flex-wrap justify-end gap-1 sm:gap-2">
+                      {user.role === "membre_bsd" && (
+                        <Link href={`/admin/comptes/${user.id}/modifier`}>
+                          <Button variant="outline" size="sm">
+                            Modifier
+                          </Button>
+                        </Link>
+                      )}
                       {user.etat ? (
                         <Button
                           variant="outline"

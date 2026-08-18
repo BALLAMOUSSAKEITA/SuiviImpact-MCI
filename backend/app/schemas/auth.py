@@ -17,6 +17,7 @@ class UserRole(str, Enum):
     SG = "sg"
     MINISTRE = "ministre"
     DAF = "daf"
+    MEMBRE_BSD = "membre_bsd"
 
 
 class LoginRequest(BaseModel):
@@ -41,6 +42,7 @@ class UserCreate(BaseModel):
     nom: str = Field(default="", max_length=100)
     type_acces: AccessType = AccessType.LECTURE
     role: UserRole = UserRole.ADMIN
+    allowed_tabs: list[str] = Field(default_factory=list)
 
     @field_validator("password")
     @classmethod
@@ -59,6 +61,7 @@ class UserRead(BaseModel):
     nom: str
     role: UserRole
     type_acces: AccessType
+    allowed_tabs: list[str] = Field(default_factory=list)
     etat: bool
     has_avatar: bool = False
     created_at: datetime
@@ -68,6 +71,11 @@ class UserRead(BaseModel):
 class UserCreateResponse(BaseModel):
     user: UserRead
     generated_password: str | None = None
+
+
+class UserUpdate(BaseModel):
+    type_acces: AccessType | None = None
+    allowed_tabs: list[str] | None = None
 
 
 class UserMe(UserRead):
@@ -92,6 +100,7 @@ def user_to_read(user) -> UserRead:
         nom=user.nom or "",
         role=user.role,
         type_acces=user.type_acces,
+        allowed_tabs=list(user.allowed_tabs or []),
         etat=user.etat,
         has_avatar=bool(user.avatar_path),
         created_at=user.created_at,

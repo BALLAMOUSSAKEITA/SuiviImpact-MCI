@@ -1,5 +1,13 @@
 export type AccessType = "lecture" | "ecriture";
-export type UserRole = "user" | "admin" | "developpeur" | "directeur" | "sg" | "ministre" | "daf";
+export type UserRole =
+  | "user"
+  | "admin"
+  | "membre_bsd"
+  | "developpeur"
+  | "directeur"
+  | "sg"
+  | "ministre"
+  | "daf";
 
 export interface User {
   id: number;
@@ -8,6 +16,7 @@ export interface User {
   nom: string;
   role: UserRole;
   type_acces: AccessType;
+  allowed_tabs: string[];
   etat: boolean;
   has_avatar?: boolean;
   created_at: string;
@@ -32,11 +41,17 @@ export interface UserCreate {
   nom?: string;
   type_acces: AccessType;
   role?: UserRole;
+  allowed_tabs?: string[];
 }
 
 export interface UserCreateResponse {
   user: User;
   generated_password: string | null;
+}
+
+export interface UserUpdate {
+  type_acces?: AccessType;
+  allowed_tabs?: string[];
 }
 
 export interface PasswordChange {

@@ -9,6 +9,7 @@ from app.models.workflow import WorkflowStepRole
 _USER_TO_STEP: dict[UserRole, WorkflowStepRole] = {
     UserRole.ADMIN: WorkflowStepRole.BSD,
     UserRole.USER: WorkflowStepRole.BSD,
+    UserRole.MEMBRE_BSD: WorkflowStepRole.BSD,
     UserRole.DIRECTEUR: WorkflowStepRole.DIRECTEUR,
     UserRole.SG: WorkflowStepRole.SG,
     UserRole.MINISTRE: WorkflowStepRole.MINISTRE,
@@ -64,6 +65,7 @@ def can_view_workflow_files(user: User) -> bool:
     return user.role in (
         UserRole.ADMIN,
         UserRole.USER,
+        UserRole.MEMBRE_BSD,
         UserRole.DIRECTEUR,
         UserRole.SG,
         UserRole.MINISTRE,

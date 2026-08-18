@@ -114,6 +114,8 @@ import type {
 
   UserCreateResponse,
 
+  UserUpdate,
+
 } from "@/types";
 
 import { appendStatsPeriodToSearch, yearToDateRange } from "@/lib/stats-period";
@@ -603,6 +605,28 @@ export async function createUser(data: UserCreate): Promise<UserCreateResponse> 
   return apiFetch<UserCreateResponse>("/api/v1/users", {
 
     method: "POST",
+
+    body: JSON.stringify(data),
+
+  });
+
+}
+
+
+
+export async function getUser(id: number): Promise<User> {
+
+  return apiFetch<User>(`/api/v1/users/${id}`);
+
+}
+
+
+
+export async function updateUser(id: number, data: UserUpdate): Promise<User> {
+
+  return apiFetch<User>(`/api/v1/users/${id}`, {
+
+    method: "PATCH",
 
     body: JSON.stringify(data),
 

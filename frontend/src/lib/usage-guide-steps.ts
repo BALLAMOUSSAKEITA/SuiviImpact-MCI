@@ -6,6 +6,7 @@ import { ROLE_LABELS, canSeeNavHref } from "@/lib/roles";
 export type UsageGuideContext = {
   role: UserRole;
   typeAcces: AccessType;
+  allowedTabs?: string[];
 };
 
 export type UsageGuideStep = {
@@ -34,14 +35,14 @@ export function toGuideProfile(ctx: UsageGuideContext): GuideProfile {
   if (ctx.role === "admin") {
     return ctx.typeAcces === "lecture" ? "bsd-lecture" : "admin";
   }
-  if (ctx.role === "user") {
+  if (ctx.role === "user" || ctx.role === "membre_bsd") {
     return ctx.typeAcces === "lecture" ? "bsd-lecture" : "bsd-ecriture";
   }
   return ctx.role;
 }
 
 function profileLabel(ctx: UsageGuideContext): string {
-  if (ctx.role === "admin" || ctx.role === "user") {
+  if (ctx.role === "admin" || ctx.role === "user" || ctx.role === "membre_bsd") {
     const mode = ctx.typeAcces === "lecture" ? " — consultation" : " — saisie";
     return `${ROLE_LABELS[ctx.role]}${mode}`;
   }
@@ -462,7 +463,7 @@ function isStepVisible(step: UsageGuideStep, ctx: UsageGuideContext): boolean {
   if (step.adminOnly && role !== "admin") return false;
 
   const hrefCheck = step.navHref ?? (step.target.startsWith("/") ? step.target : null);
-  if (hrefCheck && !canSeeNavHref(role, hrefCheck)) return false;
+  if (hrefCheck && !canSeeNavHref(role, hrefCheck, false, ctx.allowedTabs)) return false;
 
   return true;
 }

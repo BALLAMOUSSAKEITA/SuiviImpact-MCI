@@ -95,7 +95,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await apiLogin(data);
       const profile = await getMe();
       setUser(profile);
-      router.push(defaultHomeForRole(profile.role));
+      router.push(defaultHomeForRole(profile.role, profile.allowed_tabs));
     },
     [router],
   );
