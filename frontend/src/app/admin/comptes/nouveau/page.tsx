@@ -34,7 +34,7 @@ const schema = z.object({
   username: z.string().min(3, "Minimum 3 caractères"),
   type_acces: z.enum(["lecture", "ecriture"]),
   role: z.enum(ROLES),
-  allowed_tabs: z.array(z.string()).default([]),
+  allowed_tabs: z.array(z.string()),
 }).superRefine((data, ctx) => {
   if (data.role === "membre_bsd" && data.allowed_tabs.length === 0) {
     ctx.addIssue({
