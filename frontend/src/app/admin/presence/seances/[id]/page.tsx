@@ -141,7 +141,7 @@ function SeanceDetailContent() {
       <div className="mb-6 grid gap-6 lg:grid-cols-[360px_1fr]">
         <div className="panel-grain">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-            <p className="text-sm font-semibold text-graphite">QR code dynamique</p>
+            <p className="text-sm font-semibold text-graphite">QR code de pointage</p>
             <div className="flex flex-wrap gap-2">
               {data.statut === "ouverte" && (
                 <Link

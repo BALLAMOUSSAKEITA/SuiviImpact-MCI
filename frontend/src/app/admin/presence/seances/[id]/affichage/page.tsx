@@ -55,17 +55,15 @@ export default function SeanceAffichagePage() {
   }
 
   return (
-    <div className="fixed inset-0 z-[100] overflow-auto bg-[#f4f9f6]">
-      <FlagStripe className="h-1.5 w-full" />
-      <LiveQrPresenceDisplay
-        seanceId={seanceId}
-        titre={data.titre}
-        dateLabel={formatDate(data.date_seance)}
-        fullscreen
-      />
-      <p className="pb-6 text-center text-[10px] text-[#5A6B63]">
-        Ministère de l&apos;Industrie et du Commerce — BSD
-      </p>
+    <div className="fixed inset-0 z-[100] flex flex-col overflow-auto bg-[#f6faf7]">
+      <FlagStripe className="h-1.5 w-full shrink-0" />
+      <div className="flex flex-1 items-center justify-center px-4 py-8">
+        <LiveQrPresenceDisplay
+          seanceId={seanceId}
+          titre={data.titre}
+          dateLabel={formatDate(data.date_seance)}
+        />
+      </div>
     </div>
   );
 }
