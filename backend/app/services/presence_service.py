@@ -518,7 +518,7 @@ async def export_seance_excel(db: AsyncSession, seance_id: int) -> tuple[BytesIO
     wb = Workbook()
     ws = wb.active
     ws.title = "Présences"
-    headers = ["N°", "Nom complet", "Fonction", "Catégorie", "Contact", "E-mail", "Émargement"]
+    headers = ["N°", "Nom complet", "Fonction", "Catégorie", "Contact", "E-mail", "Heure d'enregistrement"]
     start = prepare_branded_sheet(
         ws,
         report_title=f"Liste de présence — {seance.titre}",
@@ -538,7 +538,7 @@ async def export_seance_excel(db: AsyncSession, seance_id: int) -> tuple[BytesIO
             )
             row_offset += 1
         pointe = presence_times.get(person.id)
-        emargement = format_time_guinea(pointe) if pointe else ""
+        heure_enregistrement = format_time_guinea(pointe) if pointe else ""
         write_row_cells(
             ws,
             start + row_offset,
@@ -549,7 +549,7 @@ async def export_seance_excel(db: AsyncSession, seance_id: int) -> tuple[BytesIO
                 person.categorie,
                 person.contact or "",
                 person.email or "",
-                emargement,
+                heure_enregistrement,
             ),
             zebra_index=i,
         )

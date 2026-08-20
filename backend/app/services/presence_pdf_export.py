@@ -158,7 +158,7 @@ def build_presence_list_pdf(
         _paragraph("FONCTIONS", cell_center),
         _paragraph("CONTACTS", cell_center),
         _paragraph("EMAILS", cell_center),
-        _paragraph("EMARGEMENT", cell_center),
+        _paragraph("HEURE D'ENREGISTREMENT", cell_center),
     ]
     table_data: list[list] = [headers]
 
@@ -178,7 +178,7 @@ def build_presence_list_pdf(
             )
 
         pointe = presence_times.get(person.id)
-        emargement = _format_time(pointe) if pointe else ""
+        heure_enregistrement = _format_time(pointe) if pointe else ""
 
         table_data.append(
             [
@@ -187,11 +187,11 @@ def build_presence_list_pdf(
                 _paragraph(_display_cell(person.fonction), cell_style),
                 _paragraph(_display_cell(person.contact), cell_style),
                 _paragraph(_display_cell(person.email), cell_style),
-                _paragraph(emargement, cell_center),
+                _paragraph(heure_enregistrement, cell_center),
             ]
         )
 
-    col_widths = [1.2 * cm, 5.5 * cm, 7.5 * cm, 3 * cm, 5.5 * cm, 2.8 * cm]
+    col_widths = [1.2 * cm, 5.3 * cm, 7.1 * cm, 3 * cm, 5.2 * cm, 3.7 * cm]
     table = Table(table_data, colWidths=col_widths, repeatRows=1)
 
     green = colors.HexColor("#009959")
